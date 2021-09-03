@@ -45,6 +45,52 @@ bool MSSQLDatabase::SaveUserToDB(const User& user)
 	}
 }
 
+bool MSSQLDatabase::AddUserToChat(const std::string& user_login, const std::string& chat_title)
+{
+	// check if user is already participant of the chat
+	ExecuteQuery("select * from ChatParticipant as cp"
+				" where cp.chat_id = (select c.chat_id from Chat as c where c.title=\'" + chat_title + "\')"
+				" AND cp.participant_id = (select u.user_id from [User] as u where u.login=\'" + user_login + "\')");
+
+	if (SQLFetch(m_sql_statement_handle) == SQL_SUCCESS)
+	{
+		throw std::runtime_error("User \"" + user_login + "\" is already participant of the chat \"" + chat_title + "\"");
+	}
+
+	return ExecuteQuery("insert into ChatParticipant values"
+						" ((select c.chat_id from Chat as c where c.title=\'" + chat_title + "\'),"
+						" (select u.user_id from [User] as u where u.login=\'" + user_login + "\'))");
+}
+
+Chat MSSQLDatabase::GetChatFromDB(const std::string& chat_title)
+{
+	ExecuteQuery("select * from Chat as c where c.title=\'" + chat_title + "\'");
+
+	if (SQLFetch(m_sql_statement_handle) != SQL_SUCCESS)
+	{
+		throw std::runtime_error("No such chat title: \"" + chat_title + "\"");
+	}
+
+	return GetChatFromDB();
+}
+
+std::vector<Chat> MSSQLDatabase::GetUserChatsFromDB(const std::string& user_login)
+{
+	ExecuteQuery("select c.* from Chat as c"
+				" inner join ChatParticipant as cp"
+				" on cp.chat_id = c.chat_id"
+				" where cp.participant_id = (select u.user_id from [User] as u where u.login=\'" + user_login + "\')");
+
+	std::vector<Chat> chats;
+
+	while (SQLFetch(m_sql_statement_handle) == SQL_SUCCESS)
+	{
+		chats.push_back(GetChatFromDB());
+	}
+
+	return chats;
+}
+
 void MSSQLDatabase::InitEnvironmentHandle()
 {
 	if (SQLAllocHandle(SQL_HANDLE_ENV, SQL_NULL_HANDLE, &m_sql_environment_handle) != SQL_SUCCESS)
@@ -150,4 +196,15 @@ User MSSQLDatabase::GetUserFromDB() const
 	SQLGetData(m_sql_statement_handle, 3, SQL_C_CHAR, password, USER_PASSWORD_LEN, nullptr);
 
 	return User(id, login, password);
+}
+
+Chat MSSQLDatabase::GetChatFromDB() const
+{
+	unsigned long id = 0;
+	char title[CHAT_TITLE_LEN];
+
+	SQLGetData(m_sql_statement_handle, 1, SQL_C_ULONG, &id, sizeof(unsigned long), nullptr);
+	SQLGetData(m_sql_statement_handle, 2, SQL_C_CHAR, title, CHAT_TITLE_LEN, nullptr);
+
+	return Chat(id, title);
 }

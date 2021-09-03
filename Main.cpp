@@ -6,11 +6,12 @@ int main()
 	{
 		MSSQLDatabase db;
 
-		User test("testlogin", "testpassword");
-		db.SaveUserToDB(test);
+		db.AddUserToChat("user2", "test chat");
+		db.AddUserToChat("user2", "chat2");
 
-		User u = db.GetUserFromDB("testlogin");
-		std::cout << u << std::endl;
+		std::vector<Chat> chats = db.GetUserChatsFromDB("user2");
+		for (const Chat& chat : chats)
+			std::cout << chat;
 	}
 	catch (const std::exception& e)
 	{
