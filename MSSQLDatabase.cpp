@@ -34,15 +34,14 @@ bool MSSQLDatabase::SaveUserToDB(const ISXModel::User& user)
 	std::string login = user.get_login();
 	std::string password = user.get_password();
 
-	try
+	ExecuteQuery("select * from [User] as u where u.login=\'" + login + "\'"); // check if user login exist
+
+	if (SQLFetch(m_sql_statement_handle) == SQL_SUCCESS)
 	{
-		GetUserFromDB(login); // check if user login exist
-		return false;
+		throw std::runtime_error("User login \"" + login + "\" already exist");
 	}
-	catch (const std::exception&)
-	{
-		return ExecuteQuery("insert into [User](login, password) values(\'" + login + "\', \'" + password + "\')");
-	}
+
+	return ExecuteQuery("insert into [User](login, password) values(\'" + login + "\', \'" + password + "\')");
 }
 
 ISXModel::Message MSSQLDatabase::GetMessageFromDB(const unsigned long& message_id)
@@ -109,6 +108,7 @@ bool MSSQLDatabase::SaveMessageToDB(const ISXModel::Message& message)
 	std::string sender_id = std::to_string(message.get_sender_id());
 	std::string chat_id = std::to_string(message.get_chat_id());
 
+	// check if user is participant of the chat
 	ExecuteQuery("select * from ChatParticipant as cp where cp.chat_id=\'" + chat_id + "\' AND cp.participant_id=\'" + sender_id + "\'");
 
 	if (SQLFetch(m_sql_statement_handle) != SQL_SUCCESS)
