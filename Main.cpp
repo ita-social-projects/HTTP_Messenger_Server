@@ -6,7 +6,9 @@ int main()
 	{
 		MSSQLDatabase db;
 
-		std::vector<ISXModel::Message> messages = db.GetChatMessagesFromDB("test chat");
+		db.SaveMessageToDB(ISXModel::Message("new message", 3, 2));
+
+		std::vector<ISXModel::Message> messages = db.GetChatMessagesFromDB("chat2");
 		for (const ISXModel::Message& message : messages)
 			std::cout << message;
 	}

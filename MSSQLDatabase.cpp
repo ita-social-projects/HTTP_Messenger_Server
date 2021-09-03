@@ -103,6 +103,22 @@ ISXModel::Chat MSSQLDatabase::GetChatFromDB(const std::string& chat_title)
 	return GetChatFromDB();
 }
 
+bool MSSQLDatabase::SaveMessageToDB(const ISXModel::Message& message)
+{
+	std::string content = message.get_content();
+	std::string sender_id = std::to_string(message.get_sender_id());
+	std::string chat_id = std::to_string(message.get_chat_id());
+
+	ExecuteQuery("select * from ChatParticipant as cp where cp.chat_id=\'" + chat_id + "\' AND cp.participant_id=\'" + sender_id + "\'");
+
+	if (SQLFetch(m_sql_statement_handle) != SQL_SUCCESS)
+	{
+		throw std::runtime_error("User with id: " + sender_id + " is not participant of the chat with id: " + chat_id);
+	}
+
+	return ExecuteQuery("insert into Message([content], sender_id, chat_id) values(\'" + content + "\', \'" + sender_id + "\', \'" + chat_id + "\')");
+}
+
 std::vector<ISXModel::Chat> MSSQLDatabase::GetUserChatsFromDB(const std::string& user_login)
 {
 	ExecuteQuery("select c.* from Chat as c"
