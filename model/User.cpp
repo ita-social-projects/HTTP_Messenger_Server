@@ -1,5 +1,7 @@
 #include "User.h"
 
+using namespace ISXModel;
+
 User::User()
 		: m_id(0)
 		, m_login("")
@@ -46,8 +48,11 @@ void User::set_password(const std::string& password)
 	this->m_password = password;
 }
 
+namespace ISXModel
+{
 std::ostream& operator<<(std::ostream& os, const User& user)
 {
 	os << user.m_id << " \"" << user.m_login << "\" \"" << user.m_password << "\"" << std::endl;
 	return os;
 }
+};

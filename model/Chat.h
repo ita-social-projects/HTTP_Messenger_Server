@@ -5,6 +5,8 @@
 
 #define CHAT_TITLE_LEN 51
 
+namespace ISXModel
+{
 class Chat
 {
 public:
@@ -22,4 +24,5 @@ private:
 
 	unsigned long m_id;
 	std::string m_title;
+};
 };

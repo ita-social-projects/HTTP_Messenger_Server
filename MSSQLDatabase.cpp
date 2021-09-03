@@ -17,7 +17,7 @@ MSSQLDatabase::~MSSQLDatabase()
 	SQLFreeHandle(SQL_HANDLE_ENV, m_sql_environment_handle);
 }
 
-User MSSQLDatabase::GetUserFromDB(const std::string& user_login)
+ISXModel::User MSSQLDatabase::GetUserFromDB(const std::string& user_login)
 {
 	ExecuteQuery("select * from [User] as u where u.login=\'" + user_login + "\'");
 
@@ -29,7 +29,7 @@ User MSSQLDatabase::GetUserFromDB(const std::string& user_login)
 	return GetUserFromDB();
 }
 
-bool MSSQLDatabase::SaveUserToDB(const User& user)
+bool MSSQLDatabase::SaveUserToDB(const ISXModel::User& user)
 {
 	std::string login = user.get_login();
 	std::string password = user.get_password();
@@ -43,6 +43,35 @@ bool MSSQLDatabase::SaveUserToDB(const User& user)
 	{
 		return ExecuteQuery("insert into [User](login, password) values(\'" + login + "\', \'" + password + "\')");
 	}
+}
+
+ISXModel::Message MSSQLDatabase::GetMessageFromDB(const unsigned long& message_id)
+{
+	ExecuteQuery("select * from Message as m where m.message_id=\'" + std::to_string(message_id) + "\'");
+
+	if (SQLFetch(m_sql_statement_handle) != SQL_SUCCESS)
+	{
+		throw std::runtime_error("No such message id: " + std::to_string(message_id));
+	}
+
+	return GetMessageFromDB();
+}
+
+std::vector<ISXModel::Message> MSSQLDatabase::GetChatMessagesFromDB(const std::string& chat_title)
+{
+	ExecuteQuery("select m.* from Message as m"
+				" inner join Chat as c"
+				" on c.chat_id = m.chat_id"
+				" where m.chat_id = (select c.chat_id from Chat as c where c.title=\'" + chat_title + "\')");
+
+	std::vector<ISXModel::Message> messages;
+
+	while (SQLFetch(m_sql_statement_handle) == SQL_SUCCESS)
+	{
+		messages.push_back(GetMessageFromDB());
+	}
+
+	return messages;
 }
 
 bool MSSQLDatabase::AddUserToChat(const std::string& user_login, const std::string& chat_title)
@@ -62,7 +91,7 @@ bool MSSQLDatabase::AddUserToChat(const std::string& user_login, const std::stri
 						" (select u.user_id from [User] as u where u.login=\'" + user_login + "\'))");
 }
 
-Chat MSSQLDatabase::GetChatFromDB(const std::string& chat_title)
+ISXModel::Chat MSSQLDatabase::GetChatFromDB(const std::string& chat_title)
 {
 	ExecuteQuery("select * from Chat as c where c.title=\'" + chat_title + "\'");
 
@@ -74,14 +103,14 @@ Chat MSSQLDatabase::GetChatFromDB(const std::string& chat_title)
 	return GetChatFromDB();
 }
 
-std::vector<Chat> MSSQLDatabase::GetUserChatsFromDB(const std::string& user_login)
+std::vector<ISXModel::Chat> MSSQLDatabase::GetUserChatsFromDB(const std::string& user_login)
 {
 	ExecuteQuery("select c.* from Chat as c"
 				" inner join ChatParticipant as cp"
 				" on cp.chat_id = c.chat_id"
 				" where cp.participant_id = (select u.user_id from [User] as u where u.login=\'" + user_login + "\')");
 
-	std::vector<Chat> chats;
+	std::vector<ISXModel::Chat> chats;
 
 	while (SQLFetch(m_sql_statement_handle) == SQL_SUCCESS)
 	{
@@ -185,7 +214,7 @@ bool MSSQLDatabase::ExecuteQuery(const std::string& query)
 	return true;
 }
 
-User MSSQLDatabase::GetUserFromDB() const
+ISXModel::User MSSQLDatabase::GetUserFromDB() const
 {
 	unsigned long id = 0;
 	char login[USER_LOGIN_LEN];
@@ -195,10 +224,27 @@ User MSSQLDatabase::GetUserFromDB() const
 	SQLGetData(m_sql_statement_handle, 2, SQL_C_CHAR, login, USER_LOGIN_LEN, nullptr);
 	SQLGetData(m_sql_statement_handle, 3, SQL_C_CHAR, password, USER_PASSWORD_LEN, nullptr);
 
-	return User(id, login, password);
+	return ISXModel::User(id, login, password);
 }
 
-Chat MSSQLDatabase::GetChatFromDB() const
+ISXModel::Message MSSQLDatabase::GetMessageFromDB() const
+{
+	unsigned long id = 0;
+	char content[MESSAGE_CONTENT_LEN];
+	unsigned long sender_id = 0;
+	unsigned long chat_id = 0;
+	char timestamp[MESSAGE_TIMESTAMP_LEN];
+
+	SQLGetData(m_sql_statement_handle, 1, SQL_C_ULONG, &id, sizeof(unsigned long), nullptr);
+	SQLGetData(m_sql_statement_handle, 2, SQL_C_CHAR, content, MESSAGE_CONTENT_LEN, nullptr);
+	SQLGetData(m_sql_statement_handle, 3, SQL_C_ULONG, &sender_id, sizeof(unsigned long), nullptr);
+	SQLGetData(m_sql_statement_handle, 4, SQL_C_ULONG, &chat_id, sizeof(unsigned long), nullptr);
+	SQLGetData(m_sql_statement_handle, 5, SQL_C_CHAR, timestamp, MESSAGE_TIMESTAMP_LEN, nullptr);
+
+	return ISXModel::Message(id, content, sender_id, chat_id, timestamp);
+}
+
+ISXModel::Chat MSSQLDatabase::GetChatFromDB() const
 {
 	unsigned long id = 0;
 	char title[CHAT_TITLE_LEN];
@@ -206,5 +252,5 @@ Chat MSSQLDatabase::GetChatFromDB() const
 	SQLGetData(m_sql_statement_handle, 1, SQL_C_ULONG, &id, sizeof(unsigned long), nullptr);
 	SQLGetData(m_sql_statement_handle, 2, SQL_C_CHAR, title, CHAT_TITLE_LEN, nullptr);
 
-	return Chat(id, title);
+	return ISXModel::Chat(id, title);
 }

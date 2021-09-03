@@ -6,12 +6,9 @@ int main()
 	{
 		MSSQLDatabase db;
 
-		db.AddUserToChat("user2", "test chat");
-		db.AddUserToChat("user2", "chat2");
-
-		std::vector<Chat> chats = db.GetUserChatsFromDB("user2");
-		for (const Chat& chat : chats)
-			std::cout << chat;
+		std::vector<ISXModel::Message> messages = db.GetChatMessagesFromDB("test chat");
+		for (const ISXModel::Message& message : messages)
+			std::cout << message;
 	}
 	catch (const std::exception& e)
 	{

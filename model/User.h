@@ -7,6 +7,8 @@
 #define USER_LOGIN_LEN 21
 #define USER_PASSWORD_LEN 21
 
+namespace ISXModel
+{
 class User
 {
 public:
@@ -27,4 +29,5 @@ private:
 	unsigned long m_id;
 	std::string m_login;
 	std::string m_password;
+};
 };
