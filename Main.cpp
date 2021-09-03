@@ -6,11 +6,11 @@ int main()
 	{
 		MSSQLDatabase db;
 
-		User u = db.GetUserFromDB("admin");
-		std::cout << u << std::endl;
+		User test("testlogin", "testpassword");
+		db.SaveUserToDB(test);
 
-		User u2 = db.GetUserFromDB("user2");
-		std::cout << u2 << std::endl;
+		User u = db.GetUserFromDB("testlogin");
+		std::cout << u << std::endl;
 	}
 	catch (const std::exception& e)
 	{

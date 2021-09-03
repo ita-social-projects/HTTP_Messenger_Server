@@ -20,13 +20,14 @@ public:
 	~MSSQLDatabase();
 
 	User GetUserFromDB(const std::string& user_login);
+	bool SaveUserToDB(const User& user);
 
 private:
 	void InitEnvironmentHandle();
 	void InitConnectionHandle();
 	void InitStatementHandle();
 	void GetConnectionStringFromFile(const std::string& filename, SQLCHAR** output_ptr) const;
-	void ExecuteQuery(const std::string& query);
+	bool ExecuteQuery(const std::string& query);
 	User GetUserFromDB() const;
 
 	SQLHANDLE m_sql_environment_handle;

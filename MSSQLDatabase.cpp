@@ -29,6 +29,22 @@ User MSSQLDatabase::GetUserFromDB(const std::string& user_login)
 	return GetUserFromDB();
 }
 
+bool MSSQLDatabase::SaveUserToDB(const User& user)
+{
+	std::string login = user.get_login();
+	std::string password = user.get_password();
+
+	try
+	{
+		GetUserFromDB(login); // check if user login exist
+		return false;
+	}
+	catch (const std::exception&)
+	{
+		return ExecuteQuery("insert into [User](login, password) values(\'" + login + "\', \'" + password + "\')");
+	}
+}
+
 void MSSQLDatabase::InitEnvironmentHandle()
 {
 	if (SQLAllocHandle(SQL_HANDLE_ENV, SQL_NULL_HANDLE, &m_sql_environment_handle) != SQL_SUCCESS)
@@ -36,7 +52,7 @@ void MSSQLDatabase::InitEnvironmentHandle()
 		throw std::runtime_error("Error allocating environment handle");
 	}
 
-	if (SQLSetEnvAttr(m_sql_environment_handle, SQL_ATTR_ODBC_VERSION, (SQLPOINTER)SQL_OV_ODBC3, 0) != SQL_SUCCESS)
+	if (SQLSetEnvAttr(m_sql_environment_handle, SQL_ATTR_ODBC_VERSION, (SQLPOINTER) SQL_OV_ODBC3, 0) != SQL_SUCCESS)
 	{
 		throw std::runtime_error("Error setting environment attribute");
 	}
@@ -111,14 +127,16 @@ void MSSQLDatabase::GetConnectionStringFromFile(const std::string& filename, SQL
 	}
 }
 
-void MSSQLDatabase::ExecuteQuery(const std::string& query)
+bool MSSQLDatabase::ExecuteQuery(const std::string& query)
 {
 	InitStatementHandle(); // needed to do always before executing each query
 
-	if (SQLExecDirect(m_sql_statement_handle, (SQLCHAR*)query.c_str(), SQL_NTS) != SQL_SUCCESS)
+	if (SQLExecDirect(m_sql_statement_handle, (SQLCHAR*) query.c_str(), SQL_NTS) != SQL_SUCCESS)
 	{
-		throw std::runtime_error("Could not execute query: \"" + query + "\"");
+		return false;
 	}
+
+	return true;
 }
 
 User MSSQLDatabase::GetUserFromDB() const
