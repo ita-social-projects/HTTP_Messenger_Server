@@ -17,23 +17,16 @@ MSSQLDatabase::~MSSQLDatabase()
 	SQLFreeHandle(SQL_HANDLE_ENV, m_sql_environment_handle);
 }
 
-void MSSQLDatabase::ExecuteQuery(const std::string& query)
+User MSSQLDatabase::GetUserFromDB(const std::string& user_login)
 {
-	InitStatementHandle(); // needed to do always before executing query
+	ExecuteQuery("select * from [User] as u where u.login=\'" + user_login + "\'");
 
-	std::cout << "Executing SQL query..." << std::endl;
-
-	if (SQLExecDirect(m_sql_statement_handle, (SQLCHAR*)query.c_str(), SQL_NTS) != SQL_SUCCESS)
+	if (SQLFetch(m_sql_statement_handle) != SQL_SUCCESS)
 	{
-		throw std::runtime_error("Could not execute query: \"" + query + "\"");
+		throw std::runtime_error("No such user login: \"" + user_login + "\"");
 	}
 
-    char buffer[SQL_BUFFER_LEN];
-    while (SQLFetch(m_sql_statement_handle) == SQL_SUCCESS)
-    {
-        SQLGetData(m_sql_statement_handle, 1, SQL_C_CHAR, buffer, SQL_BUFFER_LEN, nullptr);
-        std::cout << buffer << std::endl;
-    }
+	return GetUserFromDB();
 }
 
 void MSSQLDatabase::InitEnvironmentHandle()
@@ -55,8 +48,6 @@ void MSSQLDatabase::InitConnectionHandle()
 	{
 		throw std::runtime_error("Error allocating connection handle");
 	}
-
-	std::cout << "Connecting to SQL Server..." << std::endl;
 
 	SQLCHAR connection_string[SQL_CONNECTION_STRING_LEN] = { 0 };
 	SQLCHAR *connection_string_ptr = connection_string;
@@ -80,7 +71,6 @@ void MSSQLDatabase::InitConnectionHandle()
 	{
 	case SQL_SUCCESS:
 	case SQL_SUCCESS_WITH_INFO:
-		std::cout << "Successfully connected to SQL Server" << std::endl;
 		break;
 	case SQL_INVALID_HANDLE:
 	case SQL_ERROR:
@@ -110,7 +100,7 @@ void MSSQLDatabase::GetConnectionStringFromFile(const std::string& filename, SQL
 		throw std::runtime_error("Cannot open file: \"" + filename + "\"");
 	}
 
-	while(std::getline(config_file, line))
+	while (std::getline(config_file, line))
 	{
 		connection_string += line + ';';
 	}
@@ -119,4 +109,27 @@ void MSSQLDatabase::GetConnectionStringFromFile(const std::string& filename, SQL
 	{
 		strcpy_s((char*) *output_ptr, SQL_CONNECTION_STRING_LEN, connection_string.c_str());
 	}
+}
+
+void MSSQLDatabase::ExecuteQuery(const std::string& query)
+{
+	InitStatementHandle(); // needed to do always before executing each query
+
+	if (SQLExecDirect(m_sql_statement_handle, (SQLCHAR*)query.c_str(), SQL_NTS) != SQL_SUCCESS)
+	{
+		throw std::runtime_error("Could not execute query: \"" + query + "\"");
+	}
+}
+
+User MSSQLDatabase::GetUserFromDB() const
+{
+	unsigned long id = 0;
+	char login[USER_LOGIN_LEN];
+	char password[USER_PASSWORD_LEN];
+
+	SQLGetData(m_sql_statement_handle, 1, SQL_C_ULONG, &id, sizeof(unsigned long), nullptr);
+	SQLGetData(m_sql_statement_handle, 2, SQL_C_CHAR, login, USER_LOGIN_LEN, nullptr);
+	SQLGetData(m_sql_statement_handle, 3, SQL_C_CHAR, password, USER_PASSWORD_LEN, nullptr);
+
+	return User(id, login, password);
 }

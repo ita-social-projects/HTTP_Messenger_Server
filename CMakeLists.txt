@@ -20,5 +20,5 @@ endif ()
 
 set(CMAKE_CXX_STANDARD 17)
 
-add_executable(HTTP_Messenger_Server Main.cpp MSSQLDatabase.cpp)
+add_executable(HTTP_Messenger_Server Main.cpp MSSQLDatabase.cpp User.cpp)
 target_link_libraries(HTTP_Messenger_Server PRIVATE cpprestsdk::cpprest odbc32)

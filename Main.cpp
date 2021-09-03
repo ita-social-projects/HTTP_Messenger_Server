@@ -5,7 +5,12 @@ int main()
 	try
 	{
 		MSSQLDatabase db;
-		db.ExecuteQuery("select @@version");
+
+		User u = db.GetUserFromDB("admin");
+		std::cout << u << std::endl;
+
+		User u2 = db.GetUserFromDB("user2");
+		std::cout << u2 << std::endl;
 	}
 	catch (const std::exception& e)
 	{
