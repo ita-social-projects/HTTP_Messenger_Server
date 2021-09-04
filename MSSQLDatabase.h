@@ -22,6 +22,7 @@ public:
 	~MSSQLDatabase();
 
 	ISXModel::User GetUserFromDB(const std::string& user_login);
+	bool CheckUser(const ISXModel::User& user);
 	bool SaveUserToDB(const ISXModel::User& user);
 	bool AddUserToChat(const std::string& user_login, const std::string& chat_title);
 

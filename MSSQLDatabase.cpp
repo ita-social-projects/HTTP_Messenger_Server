@@ -29,6 +29,19 @@ ISXModel::User MSSQLDatabase::GetUserFromDB(const std::string& user_login)
 	return GetUserFromDB();
 }
 
+bool MSSQLDatabase::CheckUser(const ISXModel::User& user)
+{
+	try
+	{
+		ISXModel::User user_from_db = GetUserFromDB(user.get_login());
+		return user_from_db == user;
+	}
+	catch (const std::exception&)
+	{
+		return false; // also false if user login doesn't exist
+	}
+}
+
 bool MSSQLDatabase::SaveUserToDB(const ISXModel::User& user)
 {
 	std::string login = user.get_login();
@@ -42,6 +55,23 @@ bool MSSQLDatabase::SaveUserToDB(const ISXModel::User& user)
 	}
 
 	return ExecuteQuery("insert into [User](login, password) values(\'" + login + "\', \'" + password + "\')");
+}
+
+bool MSSQLDatabase::AddUserToChat(const std::string& user_login, const std::string& chat_title)
+{
+	// check if user is already participant of the chat
+	ExecuteQuery("select * from ChatParticipant as cp"
+				" where cp.chat_id = (select c.chat_id from Chat as c where c.title=\'" + chat_title + "\')"
+				" AND cp.participant_id = (select u.user_id from [User] as u where u.login=\'" + user_login + "\')");
+
+	if (SQLFetch(m_sql_statement_handle) == SQL_SUCCESS)
+	{
+		throw std::runtime_error("User \"" + user_login + "\" is already participant of the chat \"" + chat_title + "\"");
+	}
+
+	return ExecuteQuery("insert into ChatParticipant values"
+						" ((select c.chat_id from Chat as c where c.title=\'" + chat_title + "\'),"
+						" (select u.user_id from [User] as u where u.login=\'" + user_login + "\'))");
 }
 
 ISXModel::Message MSSQLDatabase::GetMessageFromDB(const unsigned long& message_id)
@@ -73,35 +103,6 @@ std::vector<ISXModel::Message> MSSQLDatabase::GetChatMessagesFromDB(const std::s
 	return messages;
 }
 
-bool MSSQLDatabase::AddUserToChat(const std::string& user_login, const std::string& chat_title)
-{
-	// check if user is already participant of the chat
-	ExecuteQuery("select * from ChatParticipant as cp"
-				" where cp.chat_id = (select c.chat_id from Chat as c where c.title=\'" + chat_title + "\')"
-				" AND cp.participant_id = (select u.user_id from [User] as u where u.login=\'" + user_login + "\')");
-
-	if (SQLFetch(m_sql_statement_handle) == SQL_SUCCESS)
-	{
-		throw std::runtime_error("User \"" + user_login + "\" is already participant of the chat \"" + chat_title + "\"");
-	}
-
-	return ExecuteQuery("insert into ChatParticipant values"
-						" ((select c.chat_id from Chat as c where c.title=\'" + chat_title + "\'),"
-						" (select u.user_id from [User] as u where u.login=\'" + user_login + "\'))");
-}
-
-ISXModel::Chat MSSQLDatabase::GetChatFromDB(const std::string& chat_title)
-{
-	ExecuteQuery("select * from Chat as c where c.title=\'" + chat_title + "\'");
-
-	if (SQLFetch(m_sql_statement_handle) != SQL_SUCCESS)
-	{
-		throw std::runtime_error("No such chat title: \"" + chat_title + "\"");
-	}
-
-	return GetChatFromDB();
-}
-
 bool MSSQLDatabase::SaveMessageToDB(const ISXModel::Message& message)
 {
 	std::string content = message.get_content();
@@ -117,6 +118,18 @@ bool MSSQLDatabase::SaveMessageToDB(const ISXModel::Message& message)
 	}
 
 	return ExecuteQuery("insert into Message([content], sender_id, chat_id) values(\'" + content + "\', \'" + sender_id + "\', \'" + chat_id + "\')");
+}
+
+ISXModel::Chat MSSQLDatabase::GetChatFromDB(const std::string& chat_title)
+{
+	ExecuteQuery("select * from Chat as c where c.title=\'" + chat_title + "\'");
+
+	if (SQLFetch(m_sql_statement_handle) != SQL_SUCCESS)
+	{
+		throw std::runtime_error("No such chat title: \"" + chat_title + "\"");
+	}
+
+	return GetChatFromDB();
 }
 
 std::vector<ISXModel::Chat> MSSQLDatabase::GetUserChatsFromDB(const std::string& user_login)
