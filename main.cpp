@@ -8,7 +8,6 @@ using namespace web::http::experimental::listener;
 #include <map>
 
 
-
 void handle_get(http_request request){
 	if (request.relative_uri().to_string() == "/login")
 	{
