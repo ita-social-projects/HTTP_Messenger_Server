@@ -11,7 +11,7 @@ RequestGetChats::RequestGetChats(MSSQLDatabase *db, const std::string &userLogin
 
 void RequestGetChats::DoStuff(){
     try {
-        std::vector<ISXModel::Chat> chatList = db.GetUserChatsFromDB(this->user_login);
+        std::vector<ISXModel::Chat> chatList = db->GetUserChatsFromDB(this->user_login);
     }catch(...){
 
     }
@@ -21,30 +21,33 @@ RequestGetMessages::RequestGetMessages(MSSQLDatabase *db, const std::string &cha
                                                                                           chat_title(chatTitle) {}
 void RequestGetMessages::DoStuff(){
     try {
-        std::vector<ISXModel::Message> messageList = db.SetChatMessagesFromDB(this->chat_title);
+        std::vector<ISXModel::Message> messageList = db->GetChatMessagesFromDB(this->chat_title);
     }catch(...){
 
     }
 }
 
 
-RequestSendMessages::RequestSendMessages(MSSQLDatabase *db, const ISXModel::Message &message) : IRequests(db),
+RequestSendMessages::RequestSendMessages(MSSQLDatabase *db, const ISXModel::Message &message) : IRequests(db)
+{
+    
+}
 
 void RequestSendMessages::DoStuff(){
     try {
-        db.SaveMessageToDB(this->message);
+        db->SaveMessageToDB(this->message);
     }
     catch(...){
 
     }
-}                                                                                              message(message) {}
+}                                                                                              ISXModel::Message(message) {};
 
 
 RequestSignUp::RequestSignUp(MSSQLDatabase *db, const ISXModel::User &user) : IRequests(db), user(user) {}
 
 void RequestSignUp::DoStuff(){
     try{
-        db.SaveUserToDB(this->User);
+        db->SaveUserToDB(this->user);
     }
     catch(...) {
 
@@ -58,12 +61,16 @@ RequestLogin::RequestLogin(MSSQLDatabase *db, const std::string &login, const st
 
 void RequestLogin::DoStuff(){
     try{
-        ISXModel::User currentUser = db.GetUserFromDB(this->login);
+        ISXModel::User currentUser = db->GetUserFromDB(this->login);
         if(currentUser.get_password() == this->password){
 
         }else{
 
         }
+    }
+    catch(...)
+    {
+        
     }
 }
 

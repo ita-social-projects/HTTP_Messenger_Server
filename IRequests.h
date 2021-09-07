@@ -6,14 +6,16 @@
 #define BACKEND_IREQUESTS_H
 #pragma once
 #include <cpprest/json.h>
-#include <MSSQLDatabase.h>
 #include "MSSQLDatabase.h"
-#include <model/User.h>
-#include <model/Message.h>
-#include <model/Chat.h>
+#include "MSSQLDatabase.h"
+#include "model/User.h"
+#include "model/Message.h"
+#include "model/Chat.h"
 using namespace web;
 
 class IRequests {
+    
+protected:
     MSSQLDatabase* db;
 public:
     IRequests(MSSQLDatabase *db);
