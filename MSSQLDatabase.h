@@ -33,6 +33,7 @@ public:
 
 	ISXModel::Chat GetChatFromDB(const std::string& chat_title);
 	std::vector<ISXModel::Chat> GetUserChatsFromDB(const std::string& user_login);
+	bool SaveChatToDB(const ISXModel::Chat& chat);
 
 private:
 	void InitEnvironmentHandle();

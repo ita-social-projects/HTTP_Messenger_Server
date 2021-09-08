@@ -166,6 +166,20 @@ std::vector<ISXModel::Chat> MSSQLDatabase::GetUserChatsFromDB(const std::string&
 	return chats;
 }
 
+bool MSSQLDatabase::SaveChatToDB(const ISXModel::Chat& chat)
+{
+	std::string title = chat.get_title();
+
+	ExecuteQuery("select * from Chat as c where c.title=\'" + title + "\'");
+
+	if (SQLFetch(m_sql_statement_handle) == SQL_SUCCESS)
+	{
+		throw std::runtime_error("Chat title \"" + title + "\" already exist");
+	}
+
+	return ExecuteQuery("insert into Chat(title) values(\'" + title + "\')");
+}
+
 void MSSQLDatabase::InitEnvironmentHandle()
 {
 	if (SQLAllocHandle(SQL_HANDLE_ENV, SQL_NULL_HANDLE, &m_sql_environment_handle) != SQL_SUCCESS)
