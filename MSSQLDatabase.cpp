@@ -29,6 +29,23 @@ ISXModel::User MSSQLDatabase::GetUserFromDB(const std::string& user_login)
 	return GetUserFromDB();
 }
 
+std::vector<ISXModel::User> MSSQLDatabase::GetChatParticipantsFromDB(const std::string& chat_title)
+{
+	ExecuteQuery("select u.* from [User] as u"
+				" inner join ChatParticipant as cp"
+				" on cp.participant_id = u.user_id"
+				" where cp.chat_id = (select c.chat_id from Chat as c where c.title=\'" + chat_title + "\')");
+
+	std::vector<ISXModel::User> participants;
+
+	while (SQLFetch(m_sql_statement_handle) == SQL_SUCCESS)
+	{
+		participants.push_back(GetUserFromDB());
+	}
+
+	return participants;
+}
+
 bool MSSQLDatabase::CheckUser(const ISXModel::User& user)
 {
 	try
