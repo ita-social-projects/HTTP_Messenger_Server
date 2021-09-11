@@ -5,82 +5,86 @@
 //  Created by Павло Коваль on 31.08.2021.
 //
 
-#include <cpprest/http_client.h>
-#include <cpprest/filestream.h>
-#include "HandlerRequest.hpp"
 
+#include "HandlerRequest.h"
 
-using namespace utility;                    // Common utilities like string conversions
-using namespace web;                        // Common features like URIs.
-using namespace web::http;                  // Common HTTP functionality
-using namespace web::http::client;          // HTTP client features
-using namespace concurrency::streams;       // Asynchronous streams
-
-requestStatus  HandlerRequest::_GetRequestResponse()
-{
-    std::string url_ = "http://www.20min.ch/rss/rss.tmpl?type=channel&get=68";
-    http_client client1(utility::conversions::to_string_t(url_));
-    http_request request;
+void HandlerRequest::_handle_get(http_request request) {
     
-    request.set_method(methods::GET);
-    request.headers().add(U("Host"), U("www.20min.ch"));
-    
-    client1.request(request).then([] (http_response response)
+    if (request.relative_uri().to_string() == "/get_message")
     {
-        return response.status_code();
-    }).wait();
-    
-    // data = text msg, log
-    // statusCode ;
-    
-}
-
-void HandlerRequest::AddQueueThread()
-{
-    requestStatus statusCode = _GetRequestResponse();
-    ThreadWorker  worker;
-    
-    switch (statusCode)
+        const std::string FUTURE_CHAT_TITLE = "none";
+        
+        RequestGetMessages temp(&db, FUTURE_CHAT_TITLE);
+        worker.PushRequest(temp);
+        
+    } else if (request.relative_uri().to_string() == "/get_chats")
     {
-        case SIGN_UP:
-        {
-            RequestSignUp temp;
-            worker.PushRequest(temp);
-        }
-            break;
-            
-        case LOG_IN:
-        {
-            RequestLogin temp;
-            worker.PushRequest(temp);
-        }
-            break;
-            
-        case GET_MESSAGE:
-        {
-            RequestGetMessages temp;
-            worker.PushRequest(temp);
-        }
-            break;
-            
-        case SEND_MESSAGE:
-        {
-            RequestSignUp temp;
-            worker.PushRequest(temp);
-        }
-            break;
-            
-        case GET_CHATS:
-        {
-            RequestSignUp temp;
-            worker.PushRequest(temp);
-        }
-            break;
-            
-        default:
-            break;
+        const std::string FUTURE_USER_JSON = "none";
+        
+        RequestGetMessages temp(&db, FUTURE_USER_JSON);
+        worker.PushRequest(temp);
     }
     
+    request.reply(status_codes::OK, "OK");
+}
+
+void HandlerRequest::_handle_post(http_request request) {
+    if (request.relative_uri().to_string() == "/login")
+    {
+        const std::string FUTURE_USER_JSON = "none";
+        const std::string FUTURE_PASS_USER_JSON = "none";
+        
+        RequestLogin temp(&db, FUTURE_USER_JSON, FUTURE_PASS_USER_JSON);
+        worker.PushRequest(temp);
+        
+    } else if (request.relative_uri().to_string() == "/user/register")
+    {
+        const std::string FUTURE_USER_JSON = "none";
+        const std::string FUTURE_PASS_USER_JSON = "none";
+        
+        RequestSignUp temp(&db, ISXModel::User(FUTURE_USER_JSON, FUTURE_PASS_USER_JSON));
+        worker.PushRequest(temp);
+    }
+    
+    std::cout << "Handling put!\n";
+}
+
+void HandlerRequest::_handle_put(http_request request) {
+    if (request.relative_uri().to_string() == "/user/send_message")
+    {
+        const std::string FUTURE_USER_MESSAGE = "none";
+        const unsigned long FUTURE_SENDER       = 0;
+        const unsigned long FUTURE_CHAT_ID      = 0;
+        
+        RequestSendMessages temp(&db, ISXModel::Message(FUTURE_USER_MESSAGE, FUTURE_SENDER, FUTURE_CHAT_ID));
+        worker.PushRequest(temp);
+    }
+}
+
+void HandlerRequest::_handle_del(http_request request) {
+    std::cout << "Handling delete!\n";
+}
+
+void HandlerRequest::AddQueueThread(MSSQLDatabase &db)
+{
+        http_listener listener("http://localhost:8080/restdemo");
+    
+        listener.support(methods::GET,  _handle_get);
+        listener.support(methods::POST, _handle_post);
+        listener.support(methods::PUT,  _handle_put);
+        listener.support(methods::DEL,  _handle_del);
+        try
+        {
+            listener
+                    .open()
+                    .then([&listener](){std::cout<<"Starting..."<<std::endl;})
+                    .wait();
+            while (true);
+        }
+        catch (std::exception const & e)
+        {
+            std::cout << e.what() << std::endl;
+        }
     
 }
 
