@@ -27,6 +27,7 @@ public:
 	bool SaveUserToDB(const ISXModel::User& user);
 	bool AddUserToChat(const std::string& user_login, const std::string& chat_title);
 	bool RemoveUserFromChat(const std::string& user_login, const std::string& chat_title);
+	bool RemoveUserFromDB(const std::string& user_login);
 
 	ISXModel::Message GetMessageFromDB(const unsigned long& message_id);
 	std::vector<ISXModel::Message> GetChatMessagesFromDB(const std::string& chat_title);

@@ -98,6 +98,11 @@ bool MSSQLDatabase::RemoveUserFromChat(const std::string& user_login, const std:
 						" AND cp.participant_id = (select u.user_id from [User] as u where u.login=\'" + user_login + "\')");
 }
 
+bool MSSQLDatabase::RemoveUserFromDB(const std::string& user_login)
+{
+	return ExecuteQuery("delete u from [User] as u where u.login=\'" + user_login + "\'");
+}
+
 ISXModel::Message MSSQLDatabase::GetMessageFromDB(const unsigned long& message_id)
 {
 	ExecuteQuery("select * from Message as m where m.message_id=\'" + std::to_string(message_id) + "\'");
