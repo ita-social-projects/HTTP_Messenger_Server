@@ -91,6 +91,13 @@ bool MSSQLDatabase::AddUserToChat(const std::string& user_login, const std::stri
 						" (select u.user_id from [User] as u where u.login=\'" + user_login + "\'))");
 }
 
+bool MSSQLDatabase::RemoveUserFromChat(const std::string& user_login, const std::string& chat_title)
+{
+	return ExecuteQuery("delete cp from ChatParticipant as cp"
+						" where cp.chat_id = (select c.chat_id from Chat as c where c.title=\'" + chat_title + "\')"
+						" AND cp.participant_id = (select u.user_id from [User] as u where u.login=\'" + user_login + "\')");
+}
+
 ISXModel::Message MSSQLDatabase::GetMessageFromDB(const unsigned long& message_id)
 {
 	ExecuteQuery("select * from Message as m where m.message_id=\'" + std::to_string(message_id) + "\'");
@@ -178,6 +185,11 @@ bool MSSQLDatabase::SaveChatToDB(const ISXModel::Chat& chat)
 	}
 
 	return ExecuteQuery("insert into Chat(title) values(\'" + title + "\')");
+}
+
+bool MSSQLDatabase::RemoveChatFromDB(const std::string& chat_title)
+{
+	return ExecuteQuery("delete c from Chat as c where c.title=\'" + chat_title + "\'");
 }
 
 void MSSQLDatabase::InitEnvironmentHandle()
