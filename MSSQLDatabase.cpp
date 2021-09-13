@@ -149,6 +149,11 @@ bool MSSQLDatabase::SaveMessageToDB(const ISXModel::Message& message)
 	return ExecuteQuery("insert into Message([content], sender_id, chat_id) values(\'" + content + "\', \'" + sender_id + "\', \'" + chat_id + "\')");
 }
 
+bool MSSQLDatabase::RemoveMessageFromDB(const unsigned long& message_id)
+{
+	return ExecuteQuery("delete m from Message as m where m.message_id=\'" + std::to_string(message_id) + "\'");
+}
+
 ISXModel::Chat MSSQLDatabase::GetChatFromDB(const std::string& chat_title)
 {
 	ExecuteQuery("select * from Chat as c where c.title=\'" + chat_title + "\'");

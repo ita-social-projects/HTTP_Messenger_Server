@@ -32,6 +32,7 @@ public:
 	ISXModel::Message GetMessageFromDB(const unsigned long& message_id);
 	std::vector<ISXModel::Message> GetChatMessagesFromDB(const std::string& chat_title);
 	bool SaveMessageToDB(const ISXModel::Message& message);
+	bool RemoveMessageFromDB(const unsigned long& message_id);
 
 	ISXModel::Chat GetChatFromDB(const std::string& chat_title);
 	std::vector<ISXModel::Chat> GetUserChatsFromDB(const std::string& user_login);
