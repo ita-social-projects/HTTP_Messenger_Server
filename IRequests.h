@@ -14,55 +14,57 @@
 using namespace web;
 
 class IRequests {
-    
+
 protected:
     MSSQLDatabase* db;
 public:
-    IRequests(MSSQLDatabase *db);
-    void DoStuff();
+    IRequests(MSSQLDatabase* db);
+    virtual json::value DoRequest() {
+        return json::value();
+    }
 };
 
-class RequestGetChats: public IRequests {
+class RequestGetChats : public IRequests {
 private:
     std::string user_login;
 public:
-    RequestGetChats(MSSQLDatabase *db, const std::string &userLogin);
+    RequestGetChats(MSSQLDatabase* db, const std::string& userLogin);
 
-    void DoStuff();
+    json::value DoRequest();
 };
 
-class RequestGetMessages: public IRequests {
+class RequestGetMessages : public IRequests {
 private:
     std::string chat_title;
 public:
-    RequestGetMessages(MSSQLDatabase *db, const std::string &chatTitle);
+    RequestGetMessages(MSSQLDatabase* db, const std::string& chatTitle);
 
-    void DoStuff();
+    json::value DoRequest();
 };
 
-class RequestSendMessages: public IRequests {
+class RequestSendMessages : public IRequests {
 private:
     ISXModel::Message message;
 public:
-    RequestSendMessages(MSSQLDatabase *db, const ISXModel::Message &message);
-    void DoStuff();
+    RequestSendMessages(MSSQLDatabase* db, const ISXModel::Message& message);
+    json::value DoRequest();
 };
 
-class RequestSignUp: public IRequests {
+class RequestSignUp : public IRequests {
 private:
     ISXModel::User user;
 public:
-    RequestSignUp(MSSQLDatabase *db, const ISXModel::User &user);
-    void DoStuff();
+    RequestSignUp(MSSQLDatabase* db, const ISXModel::User& user);
+    json::value DoRequest();
 };
 
-class RequestLogin: public IRequests {
+class RequestLogin : public IRequests {
 private:
-    std::string login,password;
+    std::string login, password;
 public:
-    RequestLogin(MSSQLDatabase *db, const std::string &login, const std::string &password);
-    void DoStuff();
+    RequestLogin(MSSQLDatabase* db, const std::string& login, const std::string& password);
+    json::value DoRequest();
 };
 
 
-#endif //BACKEND_IREQUESTS_H
+
