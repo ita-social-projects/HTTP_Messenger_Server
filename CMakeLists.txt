@@ -21,4 +21,5 @@ endif ()
 set(CMAKE_CXX_STANDARD 17)
 
 add_executable(backend main.cpp MSSQLDatabase.cpp IRequests.cpp model/User.cpp model/Message.cpp model/Chat.cpp AnswerContainer.cpp AnswerContainer.h stringtowstring.h stringtowstring.cpp)
+
 target_link_libraries(backend PRIVATE cpprestsdk::cpprest odbc32)
