@@ -2,8 +2,6 @@
 // Created by pavlo on 9/2/21.
 //
 
-#ifndef BACKEND_IREQUESTS_H
-#define BACKEND_IREQUESTS_H
 #pragma once
 #include <cpprest/json.h>
 #include "MSSQLDatabase.h"
@@ -65,6 +63,5 @@ public:
     RequestLogin(MSSQLDatabase* db, const std::string& login, const std::string& password);
     json::value DoRequest();
 };
-
 
 
