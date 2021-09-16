@@ -25,6 +25,7 @@ public:
 
 private:
 	friend std::ostream& operator<<(std::ostream& os, const User& user);
+	friend bool operator==(const User& lhs, const User& rhs);
 
 	unsigned long m_id;
 	std::string m_login;

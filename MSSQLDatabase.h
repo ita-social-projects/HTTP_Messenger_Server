@@ -22,15 +22,22 @@ public:
 	~MSSQLDatabase();
 
 	ISXModel::User GetUserFromDB(const std::string& user_login);
+	std::vector<ISXModel::User> GetChatParticipantsFromDB(const std::string& chat_title);
+	bool CheckUser(const ISXModel::User& user);
 	bool SaveUserToDB(const ISXModel::User& user);
 	bool AddUserToChat(const std::string& user_login, const std::string& chat_title);
+	bool RemoveUserFromChat(const std::string& user_login, const std::string& chat_title);
+	bool RemoveUserFromDB(const std::string& user_login);
 
 	ISXModel::Message GetMessageFromDB(const unsigned long& message_id);
 	std::vector<ISXModel::Message> GetChatMessagesFromDB(const std::string& chat_title);
 	bool SaveMessageToDB(const ISXModel::Message& message);
+	bool RemoveMessageFromDB(const unsigned long& message_id);
 
 	ISXModel::Chat GetChatFromDB(const std::string& chat_title);
 	std::vector<ISXModel::Chat> GetUserChatsFromDB(const std::string& user_login);
+	bool SaveChatToDB(const ISXModel::Chat& chat);
+	bool RemoveChatFromDB(const std::string& chat_title);
 
 private:
 	void InitEnvironmentHandle();

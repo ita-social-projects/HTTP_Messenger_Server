@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.2)
-project(backend)
+project(HTTP_Messenger_Server)
 
 if (WIN32)
 	set(vcpkg_installed_x64_DIR vcpkg\\installed\\x64-windows)
@@ -20,6 +20,5 @@ endif ()
 
 set(CMAKE_CXX_STANDARD 17)
 
-add_executable(backend main.cpp MSSQLDatabase.cpp IRequests.cpp model/User.cpp model/Message.cpp model/Chat.cpp AnswerContainer.cpp AnswerContainer.h stringtowstring.h stringtowstring.cpp)
-
-target_link_libraries(backend PRIVATE cpprestsdk::cpprest odbc32)
+add_executable(HTTP_Messenger_Server main.cpp MSSQLDatabase.cpp model/User.cpp model/Message.cpp model/Chat.cpp IRequests.cpp AnswerContainer.cpp AnswerContainer.h stringtowstring.h stringtowstring.cpp)
+target_link_libraries(HTTP_Messenger_Server PRIVATE cpprestsdk::cpprest odbc32)
