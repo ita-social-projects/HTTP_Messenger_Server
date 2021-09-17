@@ -23,4 +23,5 @@ public:
 	virtual void SetStatusCode(status_code code) {}
 	bool IsDone();
 	void MakeDone();
+
 };
