@@ -12,9 +12,19 @@ RequestSendMessages::RequestSendMessages(MSSQLDatabase* db,AnswerContainerInterf
 
 void RequestSendMessages::DoRequest() {
     json::value result;
-    db->SaveMessageToDB(this->message);
-    result[L"status"] = json::value::string(L"OK");
-    return result;
+    try {
+        db->SaveMessageToDB(this->message);
+        result[L"status"] = json::value::string(L"OK");
+        this->answercontainer->SetStatusCode(status_codes::Accepted);
+    }
+    catch(std::exception e){
+        result[L"what"] = json::value::string(to_wstring(e.what()));
+        this->answercontainer->SetStatusCode(status_codes::BadRequest);
+    }
+    this->answercontainer->SetAnswer(result);
+    this->answercontainer->MakeDone();
+
+    
 }
 
 
