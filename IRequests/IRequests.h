@@ -11,17 +11,17 @@
 #include "../model/Chat.h"
 #include "../AnswerContainerInterface.h"
 using namespace web;
-extern class answercontainerinterface;
+extern class AnswerContainerInterface;
 
 class IRequests {
 
 protected:
     MSSQLDatabase* db;
-    answercontainerinterface* answercontainer;
+    AnswerContainerInterface* answercontainer;
 public:
-    IRequests(MSSQLDatabase* db,answercontainerinterface* answercontainer);
-    virtual json::value DoRequest() {
-        return json::value();
+    IRequests(MSSQLDatabase* db,AnswerContainerInterface* answercontainer);
+    virtual void DoRequest() {
+        
     }
 };
 

@@ -7,6 +7,6 @@ class RequestGetChats : public IRequests {
 private:
     std::string user_login;
 public:
-    RequestGetChats(MSSQLDatabase* db, answercontainerinterface* answercontainer, const std::string& userLogin);
-    json::value DoRequest();
+    RequestGetChats(MSSQLDatabase* db, AnswerContainerInterface* answercontainer, const std::string& userLogin);
+    void DoRequest();
 };

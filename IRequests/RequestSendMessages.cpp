@@ -5,12 +5,12 @@
 #include "../stringtowstring.h"
 using namespace web;
 
-RequestSendMessages::RequestSendMessages(MSSQLDatabase* db,answercontainerinterface* answercontainer, const ISXModel::Message& message) : IRequests(db, answercontainer), message(message)
+RequestSendMessages::RequestSendMessages(MSSQLDatabase* db,AnswerContainerInterface* answercontainer, const ISXModel::Message& message) : IRequests(db, answercontainer), message(message)
 {
 
 }
 
-json::value RequestSendMessages::DoRequest() {
+void RequestSendMessages::DoRequest() {
     json::value result;
     db->SaveMessageToDB(this->message);
     result[L"status"] = json::value::string(L"OK");

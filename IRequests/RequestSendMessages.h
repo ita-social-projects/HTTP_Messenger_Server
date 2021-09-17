@@ -11,7 +11,7 @@ class RequestSendMessages : public IRequests {
 private:
     ISXModel::Message message;
 public:
-    RequestSendMessages(MSSQLDatabase* db, answercontainerinterface* answercontainer, const ISXModel::Message& message);
-    json::value DoRequest();
+    RequestSendMessages(MSSQLDatabase* db, AnswerContainerInterface* answercontainer, const ISXModel::Message& message);
+    void DoRequest();
 };
 
