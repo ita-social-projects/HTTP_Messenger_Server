@@ -11,7 +11,7 @@ class RequestGetMessages : public IRequests {
 private:
     std::string chat_title;
 public:
-    RequestGetMessages(MSSQLDatabase* db, answercontainerinterface* answercontainer, const std::string& chatTitle);
+    RequestGetMessages(MSSQLDatabase* db, AnswerContainerInterface* answercontainer, const std::string& chatTitle);
 
-    json::value DoRequest();
+    void DoRequest();
 };

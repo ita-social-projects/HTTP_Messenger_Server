@@ -23,4 +23,3 @@ void AnswerContainerInterface::MakeDone()
 {
 	 this->done = true;
 }
-

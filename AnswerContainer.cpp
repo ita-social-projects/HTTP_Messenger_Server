@@ -8,24 +8,15 @@ using namespace web;
 using namespace web::http;
 using namespace web::http::experimental::listener;
 
-answercontainer::answercontainer(http_request request, IRequests* requestProcessor) :answercontainerinterface(request, requestProcessor) {
+AnswerContainer::AnswerContainer(http_request request, IRequests* requestProcessor) :AnswerContainerInterface(request, requestProcessor) {
 
 }
 
-void answercontainer::processrequest()
+void AnswerContainer::ProcessRequest()
 {
-	try {
-		this->answer = this->requestProcessor->DoRequest();
-		this->status_code = status_codes::Accepted;
-	}
-	catch(std::exception e){
-		json::value answer;
-		answer[L"what"] = json::value::string(to_wstring(std::string(e.what())));
-		this->status_code = status_codes::BadRequest;
-	}
-	this->done = true;
+	this->requestProcessor->DoRequest();
 }
 
-void answercontainer::respondonrequest() {
+void AnswerContainer::RespondOnRequest() {
 	this->request.reply(this->status_code, this->answer);
 }

@@ -18,9 +18,10 @@ protected:
 public:
 	AnswerContainerInterface(http_request request, IRequests* requestProcessor);
 	virtual void ProcessRequest(){}
-	virtual void RespondRequest(){}
+	virtual void RespondOnRequest(){}
 	virtual void SetAnswer(json::value answer) {}
 	virtual void SetStatusCode(status_code code) {}
 	bool IsDone();
 	void MakeDone();
+
 };

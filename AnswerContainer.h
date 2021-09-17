@@ -8,12 +8,12 @@ using namespace web;
 using namespace web::http;
 using namespace web::http::experimental::listener;
 
-class answercontainer: public answercontainerinterface{
+class AnswerContainer: public AnswerContainerInterface{
 private:
 	status_code status_code;
 	json::value answer;
 public:
-	answercontainer(http_request request,IRequests* requestProcessor);
-	void processrequest();
-	void respondonrequest();
+	AnswerContainer(http_request request,IRequests* requestProcessor);
+	void ProcessRequest();
+	void RespondOnRequest();
 };
