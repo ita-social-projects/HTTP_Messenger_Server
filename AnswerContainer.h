@@ -1,7 +1,7 @@
 #pragma once
 #include <cpprest/http_listener.h>
 #include <cpprest/json.h>
-#include "irequests.h"
+#include "IRequests/IRequests.h"
 #include "MSSQLDatabase.h"
 using namespace web;
 using namespace web::http;
@@ -13,6 +13,7 @@ private:
 	json::value value;
 	IRequests* worker;
 public:
+	bool done = false;
 	answercontainer(http_request request,IRequests* worker);
 	void processrequest();
 };
