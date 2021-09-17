@@ -5,7 +5,7 @@
 #include "../stringtowstring.h"
 using namespace web;
 
-RequestLogin::RequestLogin(MSSQLDatabase* db, const std::string& login, const std::string& password) : IRequests(db),
+RequestLogin::RequestLogin(MSSQLDatabase* db, answercontainerinterface* answercontainer, const std::string& login, const std::string& password) : IRequests(db, answercontainer),
 login(login),
 password(password) {}
 

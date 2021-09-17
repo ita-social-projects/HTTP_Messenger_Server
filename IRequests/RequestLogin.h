@@ -11,6 +11,6 @@ class RequestLogin : public IRequests {
 private:
     std::string login, password;
 public:
-    RequestLogin(MSSQLDatabase* db, const std::string& login, const std::string& password);
+    RequestLogin(MSSQLDatabase* db, answercontainerinterface* answercontainer, const std::string& login, const std::string& password);
     json::value DoRequest();
 };

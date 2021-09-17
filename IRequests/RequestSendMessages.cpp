@@ -5,7 +5,7 @@
 #include "../stringtowstring.h"
 using namespace web;
 
-RequestSendMessages::RequestSendMessages(MSSQLDatabase* db, const ISXModel::Message& message) : IRequests(db)
+RequestSendMessages::RequestSendMessages(MSSQLDatabase* db,answercontainerinterface* answercontainer, const ISXModel::Message& message) : IRequests(db, answercontainer), message(message)
 {
 
 }

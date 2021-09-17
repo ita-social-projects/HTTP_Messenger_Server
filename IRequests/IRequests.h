@@ -9,14 +9,17 @@
 #include "../model/User.h"
 #include "../model/Message.h"
 #include "../model/Chat.h"
+#include "../AnswerContainerInterface.h"
 using namespace web;
+extern class answercontainerinterface;
 
 class IRequests {
 
 protected:
     MSSQLDatabase* db;
+    answercontainerinterface* answercontainer;
 public:
-    IRequests(MSSQLDatabase* db);
+    IRequests(MSSQLDatabase* db,answercontainerinterface* answercontainer);
     virtual json::value DoRequest() {
         return json::value();
     }

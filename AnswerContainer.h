@@ -3,17 +3,17 @@
 #include <cpprest/json.h>
 #include "IRequests/IRequests.h"
 #include "MSSQLDatabase.h"
+#include "AnswerContainerInterface.h"
 using namespace web;
 using namespace web::http;
 using namespace web::http::experimental::listener;
 
-class answercontainer {
+class answercontainer: public answercontainerinterface{
 private:
-	http_request request;
-	json::value value;
-	IRequests* worker;
+	status_code status_code;
+	json::value answer;
 public:
-	bool done = false;
-	answercontainer(http_request request,IRequests* worker);
+	answercontainer(http_request request,IRequests* requestProcessor);
 	void processrequest();
+	void respondonrequest();
 };

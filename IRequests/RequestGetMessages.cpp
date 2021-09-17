@@ -4,7 +4,7 @@
 #include <cpprest/json.h>
 #include "../stringtowstring.h"
 using namespace web;
-RequestGetMessages::RequestGetMessages(MSSQLDatabase* db, const std::string& chatTitle) : IRequests(db), chat_title(chatTitle) {}
+RequestGetMessages::RequestGetMessages(MSSQLDatabase* db, answercontainerinterface* answercontainer, const std::string& chatTitle) : IRequests(db, answercontainer), chat_title(chatTitle) {}
 
 json::value RequestGetMessages::DoRequest() {
     json::value result;

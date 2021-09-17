@@ -11,7 +11,7 @@ class RequestSignUp : public IRequests {
 private:
     ISXModel::User user;
 public:
-    RequestSignUp(MSSQLDatabase* db, const ISXModel::User& user);
+    RequestSignUp(MSSQLDatabase* db, answercontainerinterface* answercontainer, const ISXModel::User& user);
     json::value DoRequest();
 };
 
