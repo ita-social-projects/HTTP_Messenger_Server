@@ -2,7 +2,6 @@
 
 #include <cstring>
 #include <fstream>
-#include <vector>
 
 #ifdef _WIN32
 #include <Windows.h>
@@ -12,35 +11,33 @@
 #include <sqltypes.h>
 #include <sql.h>
 
-#include "model/User.h"
-#include "model/Message.h"
-#include "model/Chat.h"
+#include "IDatabase.h"
 
 #define SQL_CONNECTION_STRING_LEN 1024
 
-class MSSQLDatabase
+class MSSQLDatabase final : public IDatabase
 {
 public:
 	MSSQLDatabase();
 	~MSSQLDatabase();
 
-	ISXModel::User GetUserFromDB(const std::string& user_login);
-	std::vector<ISXModel::User> GetChatParticipantsFromDB(const std::string& chat_title);
-	bool CheckUser(const ISXModel::User& user);
-	bool SaveUserToDB(const ISXModel::User& user);
-	bool AddUserToChat(const std::string& user_login, const std::string& chat_title);
-	bool RemoveUserFromChat(const std::string& user_login, const std::string& chat_title);
-	bool RemoveUserFromDB(const std::string& user_login);
+	ISXModel::User GetUserFromDB(const std::string& user_login) override;
+	std::vector<ISXModel::User> GetChatParticipantsFromDB(const std::string& chat_title) override;
+	bool CheckUser(const ISXModel::User& user) override;
+	bool SaveUserToDB(const ISXModel::User& user) override;
+	bool AddUserToChat(const std::string& user_login, const std::string& chat_title) override;
+	bool RemoveUserFromChat(const std::string& user_login, const std::string& chat_title) override;
+	bool RemoveUserFromDB(const std::string& user_login) override;
 
-	ISXModel::Message GetMessageFromDB(const unsigned long& message_id);
-	std::vector<ISXModel::Message> GetChatMessagesFromDB(const std::string& chat_title);
-	bool SaveMessageToDB(const ISXModel::Message& message);
-	bool RemoveMessageFromDB(const unsigned long& message_id);
+	ISXModel::Message GetMessageFromDB(const unsigned long& message_id) override;
+	std::vector<ISXModel::Message> GetChatMessagesFromDB(const std::string& chat_title) override;
+	bool SaveMessageToDB(const ISXModel::Message& message) override;
+	bool RemoveMessageFromDB(const unsigned long& message_id) override;
 
-	ISXModel::Chat GetChatFromDB(const std::string& chat_title);
-	std::vector<ISXModel::Chat> GetUserChatsFromDB(const std::string& user_login);
-	bool SaveChatToDB(const ISXModel::Chat& chat);
-	bool RemoveChatFromDB(const std::string& chat_title);
+	ISXModel::Chat GetChatFromDB(const std::string& chat_title) override;
+	std::vector<ISXModel::Chat> GetUserChatsFromDB(const std::string& user_login) override;
+	bool SaveChatToDB(const ISXModel::Chat& chat) override;
+	bool RemoveChatFromDB(const std::string& chat_title) override;
 
 private:
 	void InitEnvironmentHandle();
