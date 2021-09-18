@@ -1,7 +1,6 @@
 #pragma once
 
 #include <string>
-#include <ostream>
 #include <tuple>
 
 #define USER_LOGIN_LEN 21
@@ -24,7 +23,6 @@ public:
 	void set_password(const std::string& password);
 
 private:
-	friend std::ostream& operator<<(std::ostream& os, const User& user);
 	friend bool operator==(const User& lhs, const User& rhs);
 
 	unsigned long m_id;

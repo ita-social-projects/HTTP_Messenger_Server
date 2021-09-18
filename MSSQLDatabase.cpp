@@ -280,7 +280,7 @@ void MSSQLDatabase::GetConnectionStringFromFile(const std::string& filename, SQL
 
 	if (output_ptr != nullptr)
 	{
-		strcpy_s((char*) *output_ptr, SQL_CONNECTION_STRING_LEN, connection_string.c_str());
+		strncpy((char*) *output_ptr, connection_string.c_str(), SQL_CONNECTION_STRING_LEN);
 	}
 }
 

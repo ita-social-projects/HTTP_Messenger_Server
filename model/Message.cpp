@@ -71,13 +71,3 @@ void Message::set_timestamp(const std::string& timestamp)
 {
 	this->m_timestamp = timestamp;
 }
-
-namespace ISXModel
-{
-std::ostream& operator<<(std::ostream& os, const Message& message)
-{
-	os << message.m_id << " \"" << message.m_content << "\" " << message.m_sender_id
-	   << " " << message.m_chat_id << " \"" << message.m_timestamp << "\"" << std::endl;
-	return os;
-}
-};

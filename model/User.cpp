@@ -50,12 +50,6 @@ void User::set_password(const std::string& password)
 
 namespace ISXModel
 {
-std::ostream& operator<<(std::ostream& os, const User& user)
-{
-	os << user.m_id << " \"" << user.m_login << "\" \"" << user.m_password << "\"" << std::endl;
-	return os;
-}
-
 bool operator==(const User& lhs, const User& rhs)
 {
 	return std::tie(lhs.m_login, lhs.m_password)

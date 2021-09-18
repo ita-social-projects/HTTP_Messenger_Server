@@ -1,10 +1,13 @@
 #pragma once
 
-#include <iostream>
+#include <cstring>
 #include <fstream>
 #include <vector>
-#include <string>
+
+#ifdef _WIN32
 #include <Windows.h>
+#endif
+
 #include <sqlext.h>
 #include <sqltypes.h>
 #include <sql.h>

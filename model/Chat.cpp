@@ -35,12 +35,3 @@ void Chat::set_title(const std::string& title)
 {
 	this->m_title = title;
 }
-
-namespace ISXModel
-{
-std::ostream& operator<<(std::ostream& os, const Chat& chat)
-{
-	os << chat.m_id << " \"" << chat.m_title << "\"" << std::endl;
-	return os;
-}
-};

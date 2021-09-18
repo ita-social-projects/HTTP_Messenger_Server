@@ -1,7 +1,6 @@
 #pragma once
 
 #include <string>
-#include <ostream>
 
 #define CHAT_TITLE_LEN 51
 
@@ -20,8 +19,6 @@ public:
 	void set_title(const std::string& title);
 
 private:
-	friend std::ostream& operator<<(std::ostream& os, const Chat& chat);
-
 	unsigned long m_id;
 	std::string m_title;
 };
