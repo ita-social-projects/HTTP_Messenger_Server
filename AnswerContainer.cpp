@@ -7,22 +7,16 @@
 using namespace web;
 using namespace web::http;
 using namespace web::http::experimental::listener;
-answercontainer::answercontainer(http_request request, IRequests* worker )
-{
-	this->request = request;
-	this->value = request.extract_json().wait();
-	this->worker = worker;
+
+AnswerContainer::AnswerContainer(http_request request, IRequests* requestProcessor) :AnswerContainerInterface(request, requestProcessor) {
+
 }
 
-void answercontainer::processrequest()
+void AnswerContainer::ProcessRequest()
 {
-	try {
-		this->request.reply(status_codes::Accepted, this->worker->DoRequest());
-	}
-	catch(std::exception e){
-		json::value answer;
-		//answer[L"what"] = json::value::string(to_wstring(std::string(e.what())));
-		this->request.reply(status_codes::BadRequest, answer);
-	}
+	this->requestProcessor->DoRequest();
 }
 
+void AnswerContainer::RespondOnRequest() {
+	this->request.reply(this->status_code, this->answer);
+}
