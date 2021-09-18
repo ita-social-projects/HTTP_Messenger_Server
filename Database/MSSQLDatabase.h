@@ -12,6 +12,7 @@
 #include <sql.h>
 
 #include "IDatabase.h"
+#include "Exception/QueryException.h"
 
 #define SQL_CONNECTION_STRING_LEN 1024
 
