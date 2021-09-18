@@ -20,5 +20,7 @@ endif ()
 
 set(CMAKE_CXX_STANDARD 17)
 
-add_executable(HTTP_Messenger_Server MSSQLDatabase.cpp model/User.cpp model/Message.cpp model/Chat.cpp)
+file(GLOB_RECURSE PROJECT_SOURCES CONFIGURE_DEPENDS "*.cpp")
+
+add_executable(HTTP_Messenger_Server ${PROJECT_SOURCES})
 target_link_libraries(HTTP_Messenger_Server PRIVATE cpprestsdk::cpprest odbc32)

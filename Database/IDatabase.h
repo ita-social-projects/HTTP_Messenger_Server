@@ -2,9 +2,9 @@
 
 #include <vector>
 
-#include "model/User.h"
-#include "model/Message.h"
-#include "model/Chat.h"
+#include "Models/User.h"
+#include "Models/Message.h"
+#include "Models/Chat.h"
 
 class IDatabase
 {
