@@ -1,5 +1,4 @@
 #include "answercontainer.h"
-#include "MSSQLDatabase.h"
 #include "stringtowstring.h"
 #include <map>
 #include <cpprest/http_listener.h>

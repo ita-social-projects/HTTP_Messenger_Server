@@ -5,7 +5,7 @@
 #include "../stringtowstring.h"
 using namespace web;
 
-RequestSignUp::RequestSignUp(MSSQLDatabase* d,AnswerContainerInterface* answercontainer, const ISXModel::User& user) : IRequests(db, answercontainer), user(user) {}
+RequestSignUp::RequestSignUp(IDatabase* d,AnswerContainerInterface* answercontainer, const ISXModel::User& user) : IRequests(db, answercontainer), user(user) {}
 
 void RequestSignUp::DoRequest() {
     json::value result;

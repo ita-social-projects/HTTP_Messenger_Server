@@ -2,7 +2,6 @@
 #include <cpprest/http_listener.h>
 #include <cpprest/json.h>
 #include "IRequests/IRequests.h"
-#include "MSSQLDatabase.h"
 #include "AnswerContainerInterface.h"
 using namespace web;
 using namespace web::http;

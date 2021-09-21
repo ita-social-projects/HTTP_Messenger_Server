@@ -5,6 +5,6 @@
 #include "IRequests.h"
 #include "../stringtowstring.h"
 #include <vector>
-IRequests::IRequests(MSSQLDatabase* db, AnswerContainerInterface* answercontainer) : db(db) , answercontainer(answercontainer) {}
+IRequests::IRequests(IDatabase* db, AnswerContainerInterface* answercontainer) : db(db) , answercontainer(answercontainer) {}
 
 

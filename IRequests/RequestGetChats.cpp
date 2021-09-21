@@ -5,7 +5,7 @@
 #include "../stringtowstring.h"
 using namespace web;
 
-RequestGetChats::RequestGetChats(MSSQLDatabase* db, AnswerContainerInterface* answercontainer, const std::string& userLogin) : IRequests(db, answercontainer),
+RequestGetChats::RequestGetChats(IDatabase* db, AnswerContainerInterface* answercontainer, const std::string& userLogin) : IRequests(db, answercontainer),
 user_login(userLogin) {}
 
 void RequestGetChats::DoRequest() {
