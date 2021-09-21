@@ -5,10 +5,6 @@
 #pragma once
 #include <cpprest/json.h>
 #include "../MSSQLDatabase.h"
-#include "../MSSQLDatabase.h"
-#include "../model/User.h"
-#include "../model/Message.h"
-#include "../model/Chat.h"
 #include "../AnswerContainerInterface.h"
 using namespace web;
 extern class AnswerContainerInterface;

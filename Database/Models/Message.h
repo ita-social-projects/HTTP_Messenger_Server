@@ -1,7 +1,6 @@
 #pragma once
 
 #include <string>
-#include <ostream>
 
 #define MESSAGE_CONTENT_LEN 255
 #define MESSAGE_TIMESTAMP_LEN 24
@@ -27,8 +26,6 @@ public:
 	void set_timestamp(const std::string& timestamp);
 
 private:
-	friend std::ostream& operator<<(std::ostream& os, const Message& message);
-
 	unsigned long m_id;
 	std::string m_content;
 	unsigned long m_sender_id;

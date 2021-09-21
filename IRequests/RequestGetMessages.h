@@ -1,10 +1,6 @@
 #pragma once
 #include <cpprest/json.h>
 #include "../MSSQLDatabase.h"
-#include "../MSSQLDatabase.h"
-#include "../model/User.h"
-#include "../model/Message.h"
-#include "../model/Chat.h"
 using namespace web;
 
 class RequestGetMessages : public IRequests {
