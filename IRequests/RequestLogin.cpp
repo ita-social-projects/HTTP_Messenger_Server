@@ -5,7 +5,7 @@
 #include "../stringtowstring.h"
 using namespace web;
 
-RequestLogin::RequestLogin(IDatabase* db, AnswerContainerInterface* answercontainer, const std::string& login, const std::string& password) : IRequests(db, answercontainer),
+RequestLogin::RequestLogin(IDatabase* db, const std::string& login, const std::string& password) : IRequests(db),
 login(login),
 password(password) {}
 
@@ -21,11 +21,16 @@ void RequestLogin::DoRequest() {
         }
         else {
             this->answercontainer->SetStatusCode(status_codes::NotFound);
-            result[L"what"] = json::value::string(to_wstring("User not found"));
+            result[L"what"] = json::value::string(to_wstring("No such user"));
         }
-    }catch(std::exception e) {
-        result[L"what"] = json::value::string(to_wstring(e.what()));
-        this->answercontainer->SetStatusCode(status_codes::BadRequest);
+    }
+    catch (const QueryException& e) {
+        result[L"what"] = json::value::string(to_wstring("No such user"));
+        this->answercontainer->SetStatusCode(status_codes::NotFound);
+    }
+    catch (const std::exception& e) {
+        result[L"what"] = json::value::string(to_wstring("Database error"));
+        this->answercontainer->SetStatusCode(status_codes::InternalError);
     }
     this->answercontainer->SetAnswer(result);
     this->answercontainer->MakeDone();

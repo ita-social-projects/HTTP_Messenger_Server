@@ -8,7 +8,6 @@ using namespace web::http;
 using namespace web::http::experimental::listener;
 
 AnswerContainer::AnswerContainer(http_request request, IRequests* requestProcessor) :AnswerContainerInterface(request, requestProcessor) {
-
 }
 
 void AnswerContainer::ProcessRequest()

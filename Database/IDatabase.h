@@ -1,7 +1,7 @@
 #pragma once
 
 #include <vector>
-
+#include "./Exception/QueryException.h"
 #include "Models/User.h"
 #include "Models/Message.h"
 #include "Models/Chat.h"

@@ -7,6 +7,6 @@ class RequestGetChats : public IRequests {
 private:
     std::string user_login;
 public:
-    RequestGetChats(IDatabase* db, AnswerContainerInterface* answercontainer, const std::string& userLogin);
+    RequestGetChats(IDatabase* db, const std::string& userLogin);
     void DoRequest();
 };

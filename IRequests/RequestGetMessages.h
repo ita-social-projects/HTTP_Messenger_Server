@@ -6,7 +6,7 @@ class RequestGetMessages : public IRequests {
 private:
     std::string chat_title;
 public:
-    RequestGetMessages(IDatabase* db, AnswerContainerInterface* answercontainer, const std::string& chatTitle);
+    RequestGetMessages(IDatabase* db, const std::string& chatTitle);
 
     void DoRequest();
 };

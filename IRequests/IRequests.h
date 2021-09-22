@@ -15,9 +15,12 @@ protected:
     IDatabase* db;
     AnswerContainerInterface* answercontainer;
 public:
-    IRequests(IDatabase* db,AnswerContainerInterface* answercontainer);
+    IRequests(IDatabase* db);
     virtual void DoRequest() {
         
+    }
+    void setAnswerContainer(AnswerContainerInterface* answercontainer) {
+        this->answercontainer = answercontainer;
     }
 };
 

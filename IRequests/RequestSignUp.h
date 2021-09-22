@@ -6,7 +6,7 @@ class RequestSignUp : public IRequests {
 private:
     ISXModel::User user;
 public:
-    RequestSignUp(IDatabase* db, AnswerContainerInterface* answercontainer, const ISXModel::User& user);
+    RequestSignUp(IDatabase* db, const ISXModel::User& user);
     void DoRequest();
 };
 

@@ -5,8 +5,7 @@
 #include "../stringtowstring.h"
 using namespace web;
 
-RequestGetChats::RequestGetChats(IDatabase* db, AnswerContainerInterface* answercontainer, const std::string& userLogin) : IRequests(db, answercontainer),
-user_login(userLogin) {}
+RequestGetChats::RequestGetChats(IDatabase* db, const std::string& userLogin) : IRequests(db),user_login(userLogin) {}
 
 void RequestGetChats::DoRequest() {
     json::value result;
@@ -23,9 +22,13 @@ void RequestGetChats::DoRequest() {
         result[L"chats"] = chats; 
         this->answercontainer->SetStatusCode(status_codes::Accepted);
     }
-    catch (std::exception e) {
+    catch (const QueryException& e) {
         result[L"what"] = json::value::string(to_wstring(e.what()));
         this->answercontainer->SetStatusCode(status_codes::BadRequest);
+    }
+    catch (const std::exception& e) {
+        result[L"what"] = json::value::string(to_wstring("Database error"));
+        this->answercontainer->SetStatusCode(status_codes::InternalError);
     }
     this->answercontainer->SetAnswer(result);
     this->answercontainer->MakeDone();
