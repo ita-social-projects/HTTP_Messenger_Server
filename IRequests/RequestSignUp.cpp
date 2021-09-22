@@ -5,7 +5,7 @@
 #include "../stringtowstring.h"
 using namespace web;
 
-RequestSignUp::RequestSignUp(MSSQLDatabase* d,AnswerContainerInterface* answercontainer, const ISXModel::User& user) : IRequests(db, answercontainer), user(user) {}
+RequestSignUp::RequestSignUp(IDatabase* db, const ISXModel::User& user) : IRequests(db), user(user) {}
 
 void RequestSignUp::DoRequest() {
     json::value result;
@@ -16,9 +16,13 @@ void RequestSignUp::DoRequest() {
         result[L"id"] = json::value::Number(currentUser.get_id());
         this->answercontainer->SetStatusCode(status_codes::Accepted);
     }
-    catch (std::exception e) {
+    catch (const QueryException& e) {
         result[L"what"] = json::value::string(to_wstring(e.what()));
         this->answercontainer->SetStatusCode(status_codes::BadRequest);
+    }
+    catch (const std::exception& e) {
+        result[L"what"] = json::value::string(to_wstring("Database error"));
+        this->answercontainer->SetStatusCode(status_codes::InternalError);
     }
     this->answercontainer->SetAnswer(result);
     this->answercontainer->MakeDone();

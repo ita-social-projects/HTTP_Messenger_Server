@@ -1,5 +1,4 @@
 #include "answercontainer.h"
-#include "MSSQLDatabase.h"
 #include "stringtowstring.h"
 #include <map>
 #include <cpprest/http_listener.h>
@@ -9,7 +8,6 @@ using namespace web::http;
 using namespace web::http::experimental::listener;
 
 AnswerContainer::AnswerContainer(http_request request, IRequests* requestProcessor) :AnswerContainerInterface(request, requestProcessor) {
-
 }
 
 void AnswerContainer::ProcessRequest()

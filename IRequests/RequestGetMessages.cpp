@@ -4,7 +4,7 @@
 #include <cpprest/json.h>
 #include "../stringtowstring.h"
 using namespace web;
-RequestGetMessages::RequestGetMessages(MSSQLDatabase* db, AnswerContainerInterface* answercontainer, const std::string& chatTitle) : IRequests(db, answercontainer), chat_title(chatTitle) {}
+RequestGetMessages::RequestGetMessages(IDatabase* db, const std::string& chatTitle) : IRequests(db), chat_title(chatTitle) {}
 
 void RequestGetMessages::DoRequest() {
     json::value result;
@@ -22,9 +22,14 @@ void RequestGetMessages::DoRequest() {
         }
         result[L"messages"] = messages;
         this->answercontainer->SetStatusCode(status_codes::Accepted);
-    }catch(std::exception e){
+    }
+    catch (const QueryException& e) {
         result[L"what"] = json::value::string(to_wstring(e.what()));
         this->answercontainer->SetStatusCode(status_codes::BadRequest);
+    }
+    catch (const std::exception& e) {
+        result[L"what"] = json::value::string(to_wstring("Database error"));
+        this->answercontainer->SetStatusCode(status_codes::InternalError);
     }
     this->answercontainer->SetAnswer(result);
     this->answercontainer->MakeDone();

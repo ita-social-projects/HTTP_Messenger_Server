@@ -4,7 +4,7 @@
 
 #pragma once
 #include <cpprest/json.h>
-#include "../MSSQLDatabase.h"
+#include "../Database/IDatabase.h"
 #include "../AnswerContainerInterface.h"
 using namespace web;
 extern class AnswerContainerInterface;
@@ -12,12 +12,15 @@ extern class AnswerContainerInterface;
 class IRequests {
 
 protected:
-    MSSQLDatabase* db;
+    IDatabase* db;
     AnswerContainerInterface* answercontainer;
 public:
-    IRequests(MSSQLDatabase* db,AnswerContainerInterface* answercontainer);
+    IRequests(IDatabase* db);
     virtual void DoRequest() {
         
+    }
+    void setAnswerContainer(AnswerContainerInterface* answercontainer) {
+        this->answercontainer = answercontainer;
     }
 };
 

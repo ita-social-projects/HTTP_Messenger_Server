@@ -15,8 +15,14 @@
 #include <map>
 
 #include "ThreadWorker.h"
-#include "IRequests.h"
+#include "./IRequests/IRequests.h"
+#include "./IRequests/RequestGetChats.h"
+#include "./IRequests/RequestGetMessages.h"
+#include "./IRequests/RequestLogin.h"
+#include "./IRequests/RequestSignUp.h"
+#include "./IRequests/RequestSendMessages.h"
 
+#include "./Database/IDatabase.h"
 using namespace utility;                    // Common utilities like string conversions
 using namespace web;                        // Common features like URIs.
 using namespace web::http;                  // Common HTTP functionality
@@ -36,7 +42,7 @@ enum requestStatus
 class HandlerRequest
 {
 private:
-    MSSQLDatabase db;
+    IDatabase db;
     ThreadWorker  worker;
     
     void _handle_get (http_request request);
@@ -46,7 +52,7 @@ private:
     
 public:
     
-    void AddQueueThread(MSSQLDatabase &db);
+    void AddQueueThread(IDatabase &db);
     int  WhaitForRequest();
 };
 

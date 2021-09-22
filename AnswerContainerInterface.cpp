@@ -1,5 +1,4 @@
 #include "answercontainerinterface.h"
-#include "MSSQLDatabase.h"
 #include "stringtowstring.h"
 #include <map>
 #include <cpprest/http_listener.h>
@@ -12,6 +11,8 @@ AnswerContainerInterface::AnswerContainerInterface(http_request request, IReques
 {
 	this->request = request;
 	this->requestProcessor = requestProcessor;
+	this->requestProcessor->setAnswerContainer(this);
+
 }
 
 bool AnswerContainerInterface::IsDone()
