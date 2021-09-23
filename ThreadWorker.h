@@ -1,41 +1,62 @@
-//
-// Created by pavlo on 9/2/21.
-//
-#ifndef BACKEND_THREADWORKER_H
-#define BACKEND_THREADWORKER_H
 #include <vector>
 #include <thread>
 #include <queue>
 #include <memory>
 #include <mutex>
-#include "./IRequests/IRequests.h"
-#include <iostream>
+
+#include <iostream> // For Debug
+#include "IRequests.h"
+typedef std::shared_ptr<IRequests> Request;
 
 struct ThreadInfo
 {
     bool isThreadWorking;
-    std::unique_ptr<IRequests> Request;
-};
+    IRequests* Request;
+    ThreadInfo()
+    {
+        isThreadWorking = false;
+        Request = nullptr;
+    }
 
+    void set_Request(IRequests*  req)
+    {
+        Request = req;
+    }
+    ~ThreadInfo()
+    {
+        isThreadWorking = false;
+    }
+};
+typedef std::vector<std::shared_ptr<ThreadInfo>> VSptrThreadInfo;
+typedef std::queue<std::unique_ptr<IRequests>> IRequestsQueue;
 
 class ThreadWorker
 {
 private:
-    std::queue<IRequests> m_requestsQueue;
+    IRequestsQueue m_requestsQueue;
+    IRequests* globalRequest;
     std::vector<std::thread> m_Threads;
     std::thread m_processThreadPool;
     int m_threadsCount;
     std::mutex m_mutex;
     void ProcessPool();
     void InitThreads();
-    void ThreadProcess(ThreadInfo);
-
+    void ThreadProcess(std::shared_ptr<ThreadInfo>  threadInfo);
+    void JoinThreads();
 public:
     ThreadWorker();
     ~ThreadWorker();
-    std::vector<ThreadInfo> m_ThreadPool;
-    void PushRequest(IRequests req);
+    VSptrThreadInfo m_ThreadPool;
+    template <typename T>
+    void PushRequest(T*);
 
 };
 
-#endif //BACKEND_THREADWORKER_H
+template <typename T>
+void ThreadWorker::PushRequest(T* request)
+{
+    m_mutex.lock();
+    m_requestsQueue.push(std::make_unique<T> (*request));
+    m_mutex.unlock();
+}
+

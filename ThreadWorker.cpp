@@ -1,39 +1,39 @@
 #include "ThreadWorker.h"
 
+
 ThreadWorker::ThreadWorker()
 {
     m_threadsCount = std::thread::hardware_concurrency();
-    m_processThreadPool = std::thread(&ThreadWorker::ProcessPool, this);
-    //TODO Log threads count
     std::cout << m_threadsCount << std::endl;
     InitThreads();
 }
 
-void ThreadWorker::PushRequest(IRequests request)
-{
-    m_mutex.lock();
-    m_requestsQueue.push(request);
-    m_mutex.lock();
-}
 
 void ThreadWorker::InitThreads()
 {
-    for (size_t i = 0; i < m_threadsCount - 2; i++)
+    for (int i = 0; i < m_threadsCount - 3; i++)
     {
-        m_Threads.push_back(std::thread(&ThreadWorker::ThreadProcess, this, ThreadInfo()));
+        std::shared_ptr<ThreadInfo> tempShared = std::make_shared<ThreadInfo>(ThreadInfo());
+        m_Threads.push_back(std::thread(&ThreadWorker::ThreadProcess, this, tempShared));
+        m_ThreadPool.push_back(tempShared);
     }
-
+    m_processThreadPool = std::thread(&ThreadWorker::ProcessPool, this);
+    std::cout << m_ThreadPool.size();
+    JoinThreads();
 }
 
-ThreadWorker::~ThreadWorker()
+void ThreadWorker::JoinThreads()
 {
-    m_processThreadPool.detach();
     for (auto& thread : m_Threads)
     {
         thread.detach();
     }
-    //TODO Log finished
+    m_processThreadPool.detach();
 }
+
+ThreadWorker::~ThreadWorker()
+{}
+
 
 void ThreadWorker::ProcessPool()
 {
@@ -41,12 +41,15 @@ void ThreadWorker::ProcessPool()
     {
         if (!m_requestsQueue.empty())
         {
-            for (auto& thread : m_ThreadPool)
+            for (auto& threadInfo : m_ThreadPool)
             {
-                if (!thread.isThreadWorking)
+                if (!threadInfo->isThreadWorking && !m_requestsQueue.empty())
                 {
+                    IRequests* tempr = m_requestsQueue.front().get();
+                    m_requestsQueue.front().release();
                     m_mutex.lock();
-                    thread.Request = std::make_unique<IRequests> (m_requestsQueue.front());
+                    threadInfo->set_Request(tempr);
+                    threadInfo->isThreadWorking = true;
                     m_requestsQueue.pop();
                     m_mutex.unlock();
                 }
@@ -55,15 +58,19 @@ void ThreadWorker::ProcessPool()
     }
 }
 
-void ThreadWorker::ThreadProcess(ThreadInfo threadInfo)
+void ThreadWorker::ThreadProcess(std::shared_ptr<ThreadInfo> threadInfo)
 {
     while (true)
     {
-        if (threadInfo.isThreadWorking)
+        if (threadInfo->isThreadWorking)
         {
-            threadInfo.Request->DoStuff();
-            threadInfo.Request.reset();
-            threadInfo.isThreadWorking = false;
+            m_mutex.lock();
+            threadInfo->Request->DoStuff();
+            threadInfo->isThreadWorking = false;
+            delete threadInfo->Request;
+            threadInfo->Request = nullptr;
+            std::cout << m_requestsQueue.size() << std::endl;
+            m_mutex.unlock();
         }
     }
 }
