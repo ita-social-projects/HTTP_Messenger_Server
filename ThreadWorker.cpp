@@ -45,7 +45,7 @@ void ThreadWorker::ProcessPool()
             {
                 if (!threadInfo->isThreadWorking && !m_requestsQueue.empty())
                 {
-                    IRequests* tempr = m_requestsQueue.front().get();
+                    AnswerContainer* tempr = m_requestsQueue.front().get();
                     m_requestsQueue.front().release();
                     m_mutex.lock();
                     threadInfo->set_Request(tempr);
@@ -65,12 +65,40 @@ void ThreadWorker::ThreadProcess(std::shared_ptr<ThreadInfo> threadInfo)
         if (threadInfo->isThreadWorking)
         {
             m_mutex.lock();
-            threadInfo->Request->DoStuff();
-            threadInfo->isThreadWorking = false;
-            delete threadInfo->Request;
-            threadInfo->Request = nullptr;
-            std::cout << m_requestsQueue.size() << std::endl;
+            threadInfo->ProcessRequest();
             m_mutex.unlock();
         }
     }
+}
+void ThreadWorker::PushRequest(AnswerContainer* request)
+{
+    m_mutex.lock();
+    m_requestsQueue.push(std::make_unique<AnswerContainer> (*request));
+    m_mutex.unlock();
+}
+
+
+ThreadInfo::ThreadInfo()
+{
+    isThreadWorking = false;
+    Request = nullptr;
+}
+
+void ThreadInfo::set_Request(AnswerContainer* req)
+{
+    Request = req;
+}
+
+void ThreadInfo::ProcessRequest()
+{
+    Request->ProcessRequest();
+    Request->RespondOnRequest();
+    isThreadWorking = false;
+    delete Request;
+    Request = nullptr;
+}
+
+ThreadInfo::~ThreadInfo()
+{
+    isThreadWorking = false;
 }
