@@ -12,6 +12,7 @@
 #include <sql.h>
 
 #include "IDatabase.h"
+#include "ConfigFile.h"
 
 #define SQL_CONNECTION_STRING_LEN 1024
 
@@ -44,7 +45,6 @@ private:
 	void InitConnectionHandle();
 	void InitStatementHandle();
 	void FreeStatementHandle();
-	void GetConnectionStringFromFile(const std::string& filename, SQLCHAR (*output_ptr)[SQL_CONNECTION_STRING_LEN]) const;
 	bool ExecuteQuery(const std::string& query);
 	ISXModel::User GetUserFromDB() const;
 	ISXModel::Message GetMessageFromDB() const;
@@ -53,5 +53,6 @@ private:
 	SQLHANDLE m_sql_environment_handle;
 	SQLHANDLE m_sql_connection_handle;
 	SQLHANDLE m_sql_statement_handle;
+	ConfigFile m_config_file;
 };
 

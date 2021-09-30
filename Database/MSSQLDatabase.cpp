@@ -4,8 +4,10 @@ MSSQLDatabase::MSSQLDatabase()
 		: m_sql_environment_handle(SQL_NULL_HENV)
 		, m_sql_connection_handle(SQL_NULL_HDBC)
 		, m_sql_statement_handle(SQL_NULL_HSTMT)
+		, m_config_file("Database.conf")
 {
 	InitEnvironmentHandle();
+	m_config_file.CreateIfNotExists();
 	InitConnectionHandle();
 }
 
@@ -222,17 +224,19 @@ void MSSQLDatabase::InitConnectionHandle()
 		throw std::runtime_error("Error allocating connection handle");
 	}
 
-	SQLCHAR connection_string[SQL_CONNECTION_STRING_LEN] = { 0 };
-	GetConnectionStringFromFile("Database.conf", &connection_string);
+	std::string connection_string = m_config_file.GetStringWithDelimeter(';');
 
-	if (strcmp((char*) connection_string, "") == 0)
+	if (connection_string.empty())
 	{
 		throw std::runtime_error("The contents of the configuration file are empty");
 	}
 
+	SQLCHAR sql_connection_string[SQL_CONNECTION_STRING_LEN] = { 0 };
+	strncpy((char*)sql_connection_string, connection_string.c_str(), SQL_CONNECTION_STRING_LEN);
+
 	SQLRETURN return_code = SQLDriverConnect(m_sql_connection_handle,
 							 nullptr,
-							 connection_string,
+							 sql_connection_string,
 							 SQL_CONNECTION_STRING_LEN,
 							 nullptr,
 							 0,
@@ -262,28 +266,6 @@ void MSSQLDatabase::FreeStatementHandle()
 {
 	SQLFreeHandle(SQL_HANDLE_STMT, m_sql_statement_handle);
 	m_sql_statement_handle = SQL_NULL_HSTMT;
-}
-
-void MSSQLDatabase::GetConnectionStringFromFile(const std::string& filename, SQLCHAR (*output_ptr)[SQL_CONNECTION_STRING_LEN]) const
-{
-	std::string connection_string;
-	std::string line;
-	std::ifstream config_file(filename, std::ios::in);
-
-	if (!config_file.is_open())
-	{
-		throw std::runtime_error("Cannot open file: \"" + filename + "\"");
-	}
-
-	while (std::getline(config_file, line))
-	{
-		connection_string += line + ';';
-	}
-
-	if (output_ptr != nullptr)
-	{
-		strncpy((char*) *output_ptr, connection_string.c_str(), SQL_CONNECTION_STRING_LEN);
-	}
 }
 
 bool MSSQLDatabase::ExecuteQuery(const std::string& query)
