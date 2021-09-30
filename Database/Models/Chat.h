@@ -22,4 +22,4 @@ private:
 	unsigned long m_id;
 	std::string m_title;
 };
-};
+}; // namespace ISXModel

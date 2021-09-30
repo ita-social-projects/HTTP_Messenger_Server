@@ -223,8 +223,7 @@ void MSSQLDatabase::InitConnectionHandle()
 	}
 
 	SQLCHAR connection_string[SQL_CONNECTION_STRING_LEN] = { 0 };
-	SQLCHAR *connection_string_ptr = connection_string;
-	GetConnectionStringFromFile("Database.conf", &connection_string_ptr);
+	GetConnectionStringFromFile("Database.conf", &connection_string);
 
 	if (strcmp((char*) connection_string, "") == 0)
 	{
@@ -253,16 +252,19 @@ void MSSQLDatabase::InitConnectionHandle()
 
 void MSSQLDatabase::InitStatementHandle()
 {
-	SQLFreeHandle(SQL_HANDLE_STMT, m_sql_statement_handle);
-	m_sql_statement_handle = SQL_NULL_HSTMT;
-
 	if (SQLAllocHandle(SQL_HANDLE_STMT, m_sql_connection_handle, &m_sql_statement_handle) != SQL_SUCCESS)
 	{
 		throw std::runtime_error("Error allocating statement handle");
 	}
 }
 
-void MSSQLDatabase::GetConnectionStringFromFile(const std::string& filename, SQLCHAR** output_ptr) const
+void MSSQLDatabase::FreeStatementHandle()
+{
+	SQLFreeHandle(SQL_HANDLE_STMT, m_sql_statement_handle);
+	m_sql_statement_handle = SQL_NULL_HSTMT;
+}
+
+void MSSQLDatabase::GetConnectionStringFromFile(const std::string& filename, SQLCHAR (*output_ptr)[SQL_CONNECTION_STRING_LEN]) const
 {
 	std::string connection_string;
 	std::string line;
@@ -286,14 +288,9 @@ void MSSQLDatabase::GetConnectionStringFromFile(const std::string& filename, SQL
 
 bool MSSQLDatabase::ExecuteQuery(const std::string& query)
 {
-	InitStatementHandle(); // needed to do always before executing each query
-
-	if (SQLExecDirect(m_sql_statement_handle, (SQLCHAR*) query.c_str(), SQL_NTS) != SQL_SUCCESS)
-	{
-		return false;
-	}
-
-	return true;
+	FreeStatementHandle(); // needed to do always
+	InitStatementHandle(); // before executing each query
+	return SQLExecDirect(m_sql_statement_handle, (SQLCHAR*) query.c_str(), SQL_NTS) == SQL_SUCCESS;
 }
 
 ISXModel::User MSSQLDatabase::GetUserFromDB() const

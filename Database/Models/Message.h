@@ -32,4 +32,4 @@ private:
 	unsigned long m_chat_id;
 	std::string m_timestamp;
 };
-};
+}; // namespace ISXModel

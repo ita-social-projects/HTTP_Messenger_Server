@@ -55,4 +55,4 @@ bool operator==(const User& lhs, const User& rhs)
 	return std::tie(lhs.m_login, lhs.m_password)
 		== std::tie(rhs.m_login, rhs.m_password);
 }
-};
+}; // namespace ISXModel

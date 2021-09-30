@@ -5,6 +5,7 @@
 #include "Models/User.h"
 #include "Models/Message.h"
 #include "Models/Chat.h"
+#include "Exception/QueryException.h"
 
 class IDatabase
 {
