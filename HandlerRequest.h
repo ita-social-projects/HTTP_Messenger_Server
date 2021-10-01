@@ -14,45 +14,38 @@
 #include <cpprest/json.h>
 #include <map>
 
+#include "stringtowstring.h"
 #include "ThreadWorker.h"
-#include "./IRequests/IRequests.h"
-#include "./IRequests/RequestGetChats.h"
-#include "./IRequests/RequestGetMessages.h"
-#include "./IRequests/RequestLogin.h"
-#include "./IRequests/RequestSignUp.h"
-#include "./IRequests/RequestSendMessages.h"
+#include "IRequests/IRequests.h"
+#include "IRequests/RequestGetChats.h"
+#include "IRequests/RequestGetMessages.h"
+#include "IRequests/RequestLogin.h"
+#include "IRequests/RequestSendMessages.h"
+#include "IRequests/RequestSignUp.h"
+#include "Database/MSSQLDatabase.h"
+#include "Database/MSSQLDatabase.h"
 
-#include "./Database/IDatabase.h"
-using namespace utility;                    // Common utilities like string conversions
-using namespace web;                        // Common features like URIs.
-using namespace web::http;                  // Common HTTP functionality
-using namespace web::http::client;          // HTTP client features
+using namespace utility;
+using namespace web;
+using namespace web::http;
+using namespace web::http::client;
 using namespace web::http::experimental::listener;
-using namespace concurrency::streams;       // Asynchronous streams
-
-enum requestStatus
-{
-    SIGN_UP      = 1,
-    LOG_IN       = 2,
-    GET_MESSAGE  = 3,
-    SEND_MESSAGE = 4,
-    GET_CHATS    = 5
-};
+using namespace concurrency::streams;
 
 class HandlerRequest
 {
 private:
-    IDatabase db;
+    MSSQLDatabase db;
     ThreadWorker  worker;
     
-    void _handle_get (http_request request);
-    void _handle_post(http_request request);
+    void _handle_get  (http_request request);
+    void _handle_post (http_request request);
     void _handle_put  (http_request request);
     void _handle_del  (http_request request);
     
 public:
     
-    void AddQueueThread(IDatabase &db);
+    void AddQueueThread();
     int  WhaitForRequest();
 };
 

@@ -13,8 +13,9 @@ class IRequests {
 
 protected:
     IDatabase* db;
-    AnswerContainerInterface* answercontainer;
+    
 public:
+    AnswerContainerInterface* answercontainer;
     IRequests(IDatabase* db);
     virtual void DoRequest() {
         

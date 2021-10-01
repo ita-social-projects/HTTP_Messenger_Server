@@ -5,40 +5,34 @@
 #include <mutex>
 
 #include <iostream> // For Debug
-#include "IRequests.h"
-typedef std::shared_ptr<IRequests> Request;
+#include "AnswerContainer.h"
+typedef std::shared_ptr<AnswerContainer> Request;
 
 struct ThreadInfo
 {
     bool isThreadWorking;
-    IRequests* Request;
-    ThreadInfo()
-    {
-        isThreadWorking = false;
-        Request = nullptr;
-    }
+    AnswerContainer* Request;
+    ThreadInfo();
 
-    void set_Request(IRequests*  req)
-    {
-        Request = req;
-    }
-    ~ThreadInfo()
-    {
-        isThreadWorking = false;
-    }
+    void set_Request(AnswerContainer* req);
+
+    void ProcessRequest();
+
+    ~ThreadInfo();
 };
 typedef std::vector<std::shared_ptr<ThreadInfo>> VSptrThreadInfo;
-typedef std::queue<std::unique_ptr<IRequests>> IRequestsQueue;
+typedef std::queue<std::unique_ptr<AnswerContainer>> AnswerContainerQueue;
 
 class ThreadWorker
 {
 private:
-    IRequestsQueue m_requestsQueue;
-    IRequests* globalRequest;
+    AnswerContainerQueue m_requestsQueue;
+    AnswerContainer* globalRequest;
     std::vector<std::thread> m_Threads;
     std::thread m_processThreadPool;
     int m_threadsCount;
     std::mutex m_mutex;
+    VSptrThreadInfo m_ThreadPool;
     void ProcessPool();
     void InitThreads();
     void ThreadProcess(std::shared_ptr<ThreadInfo>  threadInfo);
@@ -46,17 +40,6 @@ private:
 public:
     ThreadWorker();
     ~ThreadWorker();
-    VSptrThreadInfo m_ThreadPool;
-    template <typename T>
-    void PushRequest(T*);
+    void PushRequest(AnswerContainer*);
 
 };
-
-template <typename T>
-void ThreadWorker::PushRequest(T* request)
-{
-    m_mutex.lock();
-    m_requestsQueue.push(std::make_unique<T> (*request));
-    m_mutex.unlock();
-}
-

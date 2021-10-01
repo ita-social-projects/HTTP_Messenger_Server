@@ -16,5 +16,20 @@ void AnswerContainer::ProcessRequest()
 }
 
 void AnswerContainer::RespondOnRequest() {
-	this->request.reply(this->status_code, this->answer);
+	this->request.reply(this->requestProcessor->answercontainer->code, this->requestProcessor->answercontainer->answer);
+}
+
+void AnswerContainer::SetAnswer(json::value answer)
+{
+	this->answer = answer;
+}
+
+void AnswerContainer::SetStatusCode(status_code code)
+{
+	this->code = code;
+}
+
+status_code AnswerContainer::GetStatusCode()
+{
+	return code;
 }
