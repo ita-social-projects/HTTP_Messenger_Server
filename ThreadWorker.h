@@ -35,7 +35,7 @@ private:
     void ProcessPool();
     void InitThreads();
     void ThreadProcess(std::shared_ptr<ThreadInfo>  threadInfo);
-    void JoinThreads();
+    void DetachThreads();
 public:
     ThreadWorker();
     ~ThreadWorker();

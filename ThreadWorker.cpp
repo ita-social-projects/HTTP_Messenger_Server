@@ -19,10 +19,10 @@ void ThreadWorker::InitThreads()
     }
     m_processThreadPool = std::thread(&ThreadWorker::ProcessPool, this);
     std::cout << m_ThreadPool.size();
-    JoinThreads();
+    DetachThreads();
 }
 
-void ThreadWorker::JoinThreads()
+void ThreadWorker::DetachThreads()
 {
     for (auto& thread : m_Threads)
     {
@@ -47,11 +47,11 @@ void ThreadWorker::ProcessPool()
                 {
                     AnswerContainer* tempr = m_requestsQueue.front().get();
                     m_requestsQueue.front().release();
-                    m_mutex.lock();
+                    std::unique_lock<std::mutex> lock(m_mutex);
                     threadInfo->set_Request(tempr);
                     threadInfo->isThreadWorking = true;
                     m_requestsQueue.pop();
-                    m_mutex.unlock();
+                    lock.unlock();
                 }
             }
         }
@@ -64,17 +64,17 @@ void ThreadWorker::ThreadProcess(std::shared_ptr<ThreadInfo> threadInfo)
     {
         if (threadInfo->isThreadWorking)
         {
-            m_mutex.lock();
+            std::unique_lock<std::mutex> lock(m_mutex);
             threadInfo->ProcessRequest();
-            m_mutex.unlock();
+            lock.unlock();
         }
     }
 }
 void ThreadWorker::PushRequest(AnswerContainer* request)
 {
-    m_mutex.lock();
-    m_requestsQueue.push(std::make_unique<AnswerContainer> (*request));
-    m_mutex.unlock();
+    std::unique_lock<std::mutex> lock(m_mutex);
+    m_requestsQueue.push(std::make_unique<AnswerContainer>(*request));
+    lock.unlock();
 }
 
 
