@@ -7,7 +7,7 @@
 
 
 #include "HandlerRequest.h"
-#include "AnswerContainerInterface.h"
+
 void HandlerRequest::_handle_get(http_request request) {
     
     if (request.relative_uri().to_string() == L"/get_message")
@@ -15,64 +15,73 @@ void HandlerRequest::_handle_get(http_request request) {
         const std::string FUTURE_CHAT_TITLE = "none";
         
         RequestGetMessages temp(&db, FUTURE_CHAT_TITLE);
-        worker.PushRequest(temp);
+        AnswerContainer t1(request, &temp);
+        worker.PushRequest(&t1);
         
     } else if (request.relative_uri().to_string() == L"/get_chats")
     {
         const std::string FUTURE_USER_JSON = "none";
         
-        RequestGetMessages temp(&db, FUTURE_USER_JSON);
-        worker.PushRequest(temp);
+        RequestGetChats temp(&db, FUTURE_USER_JSON);
+        AnswerContainer t1(request, &temp);
+        worker.PushRequest(&t1);
+
     }
     
-    request.reply(status_codes::OK, "OK");
 }
 
 void HandlerRequest::_handle_post(http_request request) {
-    if (request.relative_uri().to_string() == L"/login")
+    if (request.relative_uri().to_string() == L"/user/login")
     {
-        const std::string FUTURE_USER_JSON = "none";
-        const std::string FUTURE_PASS_USER_JSON = "none";
-        
-        RequestLogin temp(&db, FUTURE_USER_JSON, FUTURE_PASS_USER_JSON);
-        worker.PushRequest(temp);
-        
+        json::value *value = new json::value ( request.extract_json().wait() );
+
+
+        RequestLogin *temp = new RequestLogin( &db, "admin54t", "admin");
+
+
+        AnswerContainer *t1 = new AnswerContainer(request, temp);
+        temp->setAnswerContainer(t1);
+       
+        worker.PushRequest(t1);
+
     } else if (request.relative_uri().to_string() == L"/user/register")
     {
         const std::string FUTURE_USER_JSON = "none";
         const std::string FUTURE_PASS_USER_JSON = "none";
         
-        RequestSignUp temp(&db, ISXModel::User(FUTURE_USER_JSON, FUTURE_PASS_USER_JSON));
-        worker.PushRequest(temp);
-    }else if (request.relative_uri().to_string() == L"/user/send_message")
-    {
-        const std::string FUTURE_USER_MESSAGE = "none";
-        const unsigned long FUTURE_SENDER = 0;
-        const unsigned long FUTURE_CHAT_ID = 0;
-
-        RequestSendMessages temp(&db, ISXModel::Message(FUTURE_USER_MESSAGE, FUTURE_SENDER, FUTURE_CHAT_ID));
-        worker.PushRequest(temp);
+        RequestLogin temp(&db, FUTURE_USER_JSON, FUTURE_PASS_USER_JSON);
+        AnswerContainer t1(request, &temp);
+        worker.PushRequest(&t1);
     }
     
     std::cout << "Handling post!\n";
 }
 
 void HandlerRequest::_handle_put(http_request request) {
-
+    if (request.relative_uri().to_string() == L"/user/send_message")
+    {
+        const std::string FUTURE_USER_MESSAGE = "none";
+        const unsigned long FUTURE_SENDER       = 0;
+        const unsigned long FUTURE_CHAT_ID      = 0;
+     
+        RequestSendMessages temp(&db, ISXModel::Message(FUTURE_USER_MESSAGE, FUTURE_SENDER, FUTURE_CHAT_ID));
+        AnswerContainer t1(request, &temp);
+        worker.PushRequest(&t1);
+    }
 }
 
 void HandlerRequest::_handle_del(http_request request) {
     std::cout << "Handling delete!\n";
 }
 
-void HandlerRequest::AddQueueThread(IDatabase &db)
+void HandlerRequest::AddQueueThread()
 {
         http_listener listener(L"http://localhost:8080/restdemo");
     
-        listener.support(methods::GET,  _handle_get);
-        listener.support(methods::POST, _handle_post);
-        listener.support(methods::PUT,  _handle_put);
-        listener.support(methods::DEL,  _handle_del);
+        listener.support(methods::GET,  std::bind(&HandlerRequest::_handle_get, this, std::placeholders::_1));
+        listener.support(methods::POST, std::bind(&HandlerRequest::_handle_post, this, std::placeholders::_1));
+        listener.support(methods::PUT,  std::bind(&HandlerRequest::_handle_put, this, std::placeholders::_1));
+        listener.support(methods::DEL,  std::bind(&HandlerRequest::_handle_del, this, std::placeholders::_1));
         try
         {
             listener
@@ -90,5 +99,5 @@ void HandlerRequest::AddQueueThread(IDatabase &db)
 
 int  HandlerRequest::WhaitForRequest()
 {
-    
+    return 0;
 }

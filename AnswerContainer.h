@@ -8,11 +8,12 @@ using namespace web::http;
 using namespace web::http::experimental::listener;
 
 class AnswerContainer: public AnswerContainerInterface{
-private:
-	status_code status_code;
-	json::value answer;
 public:
 	AnswerContainer(http_request request,IRequests* requestProcessor);
 	void ProcessRequest();
 	void RespondOnRequest();
+	void SetAnswer(json::value answer) override;
+	void SetStatusCode(status_code code) override;
+	status_code GetStatusCode();
+
 };

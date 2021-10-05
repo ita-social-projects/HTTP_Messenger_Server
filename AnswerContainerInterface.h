@@ -10,16 +10,18 @@ extern class IRequests;
 class AnswerContainerInterface {
 protected:
 	http_request request;
-	IRequests* requestProcessor;
+
+	bool done = false;
+
+public:
 	json::value answer;
 	status_code code;
-	bool done = false;
-public:
+	IRequests* requestProcessor;
 	AnswerContainerInterface(http_request request, IRequests* requestProcessor);
 	virtual void ProcessRequest(){}
 	virtual void RespondOnRequest(){}
-	virtual void SetAnswer(json::value answer) {}
-	virtual void SetStatusCode(status_code code) {}
+	virtual void SetAnswer(json::value answer) = 0;
+	virtual void SetStatusCode(status_code code) = 0;
 	bool IsDone();
 	void MakeDone();
 

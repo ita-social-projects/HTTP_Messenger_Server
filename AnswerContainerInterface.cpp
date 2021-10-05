@@ -11,7 +11,6 @@ AnswerContainerInterface::AnswerContainerInterface(http_request request, IReques
 {
 	this->request = request;
 	this->requestProcessor = requestProcessor;
-	this->requestProcessor->setAnswerContainer(this);
 
 }
 
@@ -24,3 +23,4 @@ void AnswerContainerInterface::MakeDone()
 {
 	 this->done = true;
 }
+

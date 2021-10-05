@@ -20,7 +20,14 @@ endif ()
 
 set(CMAKE_CXX_STANDARD 17)
 
-file(GLOB_RECURSE PROJECT_SOURCES CONFIGURE_DEPENDS "*.cpp")
+set (EXCLUDE_DIR "/out/")
+file (GLOB_RECURSE PROJECT_SOURCES CONFIGURE_DEPENDS "*.cpp")
+foreach (TMP_PATH ${PROJECT_SOURCES})
+    string (FIND ${TMP_PATH} ${EXCLUDE_DIR} EXCLUDE_DIR_FOUND)
+    if (NOT ${EXCLUDE_DIR_FOUND} EQUAL -1)
+        list (REMOVE_ITEM PROJECT_SOURCES ${TMP_PATH})
+    endif ()
+endforeach(TMP_PATH)
 
 add_executable(HTTP_Messenger_Server ${PROJECT_SOURCES})
 target_link_libraries(HTTP_Messenger_Server PRIVATE cpprestsdk::cpprest odbc32)
