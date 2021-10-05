@@ -32,14 +32,17 @@ private:
     std::thread m_processThreadPool;
     int m_threadsCount;
     std::mutex m_mutex;
-    VSptrThreadInfo m_ThreadPool;
     void ProcessPool();
     void InitThreads();
     void ThreadProcess(std::shared_ptr<ThreadInfo>  threadInfo);
-    void JoinThreads();
+    void DetachThreads();
 public:
     ThreadWorker();
     ~ThreadWorker();
+    VSptrThreadInfo m_ThreadPool;
     void PushRequest(AnswerContainer*);
 
 };
+
+
+
