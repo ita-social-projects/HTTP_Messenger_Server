@@ -3,7 +3,7 @@ pipeline{
 
     environment{
         REPO_NAME = 'HTTP_Messenger_Server'
-        LIBRARY_PATH = ''
+        LIBRARY_PATH = 'C:/Users/akork/Desktop/HttpMessengerServer/vcpkg'
     }
 
     stages{
@@ -27,20 +27,26 @@ pipeline{
             steps{
                 dir(env.REPO_NAME){
                     bat "mkdir vcpkg"
-                    bat "copy ${env.LIBRARY_PATH} vcpkg"
+                    bat "copy -r ${env.LIBRARY_PATH} vcpkg"
                 }
             }
         }
         stage('Build'){
             steps{
                 dir(env.REPO_NAME){
-                    bat ""
+                    bat "cmake CmakeLists.txt -B ./out"
                 }
             }
         }
     }
+    post{
+        success{
+            script{
+                archiveArtifacts(
+                    artifacts: "${env.REPO_NAME}/x64/Debug/*",
+                    fingerprint: true
+                )
+            }
+        }
+    }
 }
-"""git clone https://github.com/Microsoft/vcpkg.git
-cd vcpkg
-bootstrap-vcpkg.bat
-vcpkg install cpprestsdk"""
