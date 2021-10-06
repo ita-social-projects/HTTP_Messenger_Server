@@ -46,7 +46,6 @@ private:
 public:
     
     void AddQueueThread();
-    int  WhaitForRequest();
 };
 
 
