@@ -5,26 +5,39 @@
 //  Created by Павло Коваль on 31.08.2021.
 //
 
-
 #include "HandlerRequest.h"
 
 void HandlerRequest::_handle_get(http_request request) {
     
     if (request.relative_uri().to_string() == L"/get_message")
     {
-        const std::string FUTURE_CHAT_TITLE = "none";
+        json::value value = request.extract_json().get();
+
+        const utility::string_t chat_title = value[L"chat"].to_string();
+
+        const std::string CHAT_TITLE = to_string(chat_title.substr(1, chat_title.length() - 2));
         
-        RequestGetMessages temp(&db, FUTURE_CHAT_TITLE);
-        AnswerContainer t1(request, &temp);
-        worker.PushRequest(&t1);
-        
-    } else if (request.relative_uri().to_string() == L"/get_chats")
+        RequestGetMessages* temp = new  RequestGetMessages(&db, CHAT_TITLE);
+        AnswerContainer* t1 = new AnswerContainer(request, temp);
+
+        temp->setAnswerContainer(t1);
+
+        worker.PushRequest(t1);
+    }
+    else if (request.relative_uri().to_string() == L"/get_chats")
     {
-        const std::string FUTURE_USER_JSON = "none";
+        json::value value = request.extract_json().get();
+
+        const utility::string_t login = value[L"login"].to_string();
+
+        const std::string USER_LOGIN = to_string( login.substr(1, login.length() - 2) );
         
-        RequestGetChats temp(&db, FUTURE_USER_JSON);
-        AnswerContainer t1(request, &temp);
-        worker.PushRequest(&t1);
+        RequestGetChats* temp = new  RequestGetChats(&db, USER_LOGIN);
+        AnswerContainer* t1 = new AnswerContainer(request, temp);
+
+        temp->setAnswerContainer(t1);
+
+        worker.PushRequest(t1);
 
     }
     
@@ -33,25 +46,37 @@ void HandlerRequest::_handle_get(http_request request) {
 void HandlerRequest::_handle_post(http_request request) {
     if (request.relative_uri().to_string() == L"/user/login")
     {
-        json::value *value = new json::value ( request.extract_json().wait() );
+        json::value value = request.extract_json().get();
 
+        const utility::string_t login = value[L"login"].to_string();
+        const utility::string_t pass  = value[L"pass"].to_string();
 
-        RequestLogin *temp = new RequestLogin( &db, "admin54t", "admin");
+        const std::string LOGIN_USER     = to_string(login.substr(1, login.length() - 2));
+        const std::string PASS_USER      = to_string(pass.substr(1, pass.length() - 2));
 
-
+        RequestLogin *temp = new RequestLogin( &db, LOGIN_USER, PASS_USER);
         AnswerContainer *t1 = new AnswerContainer(request, temp);
+
         temp->setAnswerContainer(t1);
        
         worker.PushRequest(t1);
-
-    } else if (request.relative_uri().to_string() == L"/user/register")
+    }
+    else if (request.relative_uri().to_string() == L"/user/sign_up")
     {
-        const std::string FUTURE_USER_JSON = "none";
-        const std::string FUTURE_PASS_USER_JSON = "none";
+        json::value value = request.extract_json().get();
+
+        const utility::string_t login = value[L"login"].to_string();
+        const utility::string_t pass  = value[L"pass"].to_string();
+
+        const std::string LOGIN_USER  = to_string(login.substr(1, login.length() - 2));
+        const std::string PASS_USER   = to_string(pass.substr(1, pass.length() - 2));
         
-        RequestLogin temp(&db, FUTURE_USER_JSON, FUTURE_PASS_USER_JSON);
-        AnswerContainer t1(request, &temp);
-        worker.PushRequest(&t1);
+        RequestSignUp*   temp = new RequestSignUp( &db, ISXModel::User(LOGIN_USER, PASS_USER) );
+        AnswerContainer* t1 =   new AnswerContainer(request, temp);
+
+        temp->setAnswerContainer(t1);
+
+        worker.PushRequest(t1);
     }
     
     std::cout << "Handling post!\n";
@@ -60,13 +85,20 @@ void HandlerRequest::_handle_post(http_request request) {
 void HandlerRequest::_handle_put(http_request request) {
     if (request.relative_uri().to_string() == L"/user/send_message")
     {
-        const std::string FUTURE_USER_MESSAGE = "none";
-        const unsigned long FUTURE_SENDER       = 0;
-        const unsigned long FUTURE_CHAT_ID      = 0;
+        json::value value = request.extract_json().get();
+
+        const utility::string_t msg = value[L"login"].to_string();
+
+        const std::string   USER_MESSAGE    = to_string(msg.substr(1, msg.length() - 2));
+        const unsigned long SENDER_ID       = value[L"sender"].as_integer();
+        const unsigned long CHAT_ID         = value[L"chat"].as_integer();
      
-        RequestSendMessages temp(&db, ISXModel::Message(FUTURE_USER_MESSAGE, FUTURE_SENDER, FUTURE_CHAT_ID));
-        AnswerContainer t1(request, &temp);
-        worker.PushRequest(&t1);
+        RequestSendMessages* temp = new RequestSendMessages(&db, ISXModel::Message(USER_MESSAGE, SENDER_ID, CHAT_ID));
+        AnswerContainer* t1 = new AnswerContainer(request, temp);
+
+        temp->setAnswerContainer(t1);
+
+        worker.PushRequest(t1);
     }
 }
 
@@ -95,9 +127,4 @@ void HandlerRequest::AddQueueThread()
             std::cout << e.what() << std::endl;
         }
     
-}
-
-int  HandlerRequest::WhaitForRequest()
-{
-    return 0;
-}
+} 
