@@ -23,14 +23,6 @@ pipeline{
                 }
             }
         }
-        stage('Copying library to the project'){
-            steps{
-                dir(env.REPO_NAME){
-                    bat "mkdir vcpkg"
-                    bat "copy -r ${env.LIBRARY_PATH} vcpkg"
-                }
-            }
-        }
         stage('Build'){
             steps{
                 dir(env.REPO_NAME){
