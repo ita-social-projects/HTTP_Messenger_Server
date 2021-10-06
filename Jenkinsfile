@@ -3,7 +3,7 @@ pipeline{
 
     environment{
         REPO_NAME = 'HTTP_Messenger_Server'
-        LIBRARY_PATH = 'C:/Users/akork/Desktop/HttpMessengerServer/vcpkg'
+        LIBRARY_PATH = 'C:\\Users\\akork\\Desktop\\HttpMessengerServer\\vcpkg'
     }
 
     stages{
