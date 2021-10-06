@@ -26,6 +26,7 @@ pipeline{
         stage('Build'){
             steps{
                 dir(env.REPO_NAME){
+                    bat "cmake --version"
                     bat "cmake CmakeLists.txt -B ./out"
                 }
             }
