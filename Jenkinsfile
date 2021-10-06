@@ -19,7 +19,7 @@ pipeline{
             steps{
                 dir(env.REPO_NAME){
                     bat "mkdir vcpkg"
-                    bat "copy ${env.LIBRARY_PATH} vcpkg"
+                    bat "echo D | Xcopy ${env.LIBRARY_PATH} .\vcpkg"
                 }
             }
         }
