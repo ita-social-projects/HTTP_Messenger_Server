@@ -26,8 +26,9 @@ pipeline{
         stage('Build'){
             steps{
                 dir(env.REPO_NAME){
-                    bat "'C:\\Program Files\\CMake\\bin\\cmake' --version"
-                    bat "'C:\\Program Files\\CMake\\bin\\cmake' . -B out"
+                    bat "cmake --version"
+                    bat "cmake . -B build"
+                    bat "cmake --build build"
                 }
             }
         }
