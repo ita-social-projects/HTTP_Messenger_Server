@@ -12,7 +12,6 @@ class IDatabase
 public:
 	virtual ISXModel::User GetUserFromDB(const std::string& user_login) = 0;
 	virtual std::vector<ISXModel::User> GetChatParticipantsFromDB(const std::string& chat_title) = 0;
-	virtual bool CheckUser(const ISXModel::User& user) = 0;
 	virtual bool SaveUserToDB(const ISXModel::User& user) = 0;
 	virtual bool AddUserToChat(const std::string& user_login, const std::string& chat_title) = 0;
 	virtual bool RemoveUserFromChat(const std::string& user_login, const std::string& chat_title) = 0;

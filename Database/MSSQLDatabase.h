@@ -1,7 +1,6 @@
 #pragma once
 
 #include <cstring>
-#include <fstream>
 
 #ifdef _WIN32
 #include <Windows.h>
@@ -24,7 +23,6 @@ public:
 
 	ISXModel::User GetUserFromDB(const std::string& user_login) override;
 	std::vector<ISXModel::User> GetChatParticipantsFromDB(const std::string& chat_title) override;
-	bool CheckUser(const ISXModel::User& user) override;
 	bool SaveUserToDB(const ISXModel::User& user) override;
 	bool AddUserToChat(const std::string& user_login, const std::string& chat_title) override;
 	bool RemoveUserFromChat(const std::string& user_login, const std::string& chat_title) override;

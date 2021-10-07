@@ -48,19 +48,6 @@ std::vector<ISXModel::User> MSSQLDatabase::GetChatParticipantsFromDB(const std::
 	return participants;
 }
 
-bool MSSQLDatabase::CheckUser(const ISXModel::User& user)
-{
-	try
-	{
-		ISXModel::User user_from_db = GetUserFromDB(user.get_login());
-		return user_from_db == user;
-	}
-	catch (const QueryException&)
-	{
-		return false; // also false if user login doesn't exist
-	}
-}
-
 bool MSSQLDatabase::SaveUserToDB(const ISXModel::User& user)
 {
 	std::string login = user.get_login();
