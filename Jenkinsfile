@@ -30,8 +30,8 @@ pipeline{
                 dir(env.REPO_NAME){
                     bat "echo '======================BUILDING========================='"
                     bat "cmake --version"
-                    bat "cmake . -B build"
-                    bat "cmake --build build"
+                    bat "cmake . -B out"
+                    bat "cmake --build out"
                 }
             }
         }
