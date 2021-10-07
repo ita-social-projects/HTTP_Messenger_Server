@@ -48,6 +48,20 @@ std::vector<ISXModel::User> MSSQLDatabase::GetChatParticipantsFromDB(const std::
 	return participants;
 }
 
+std::vector<ISXModel::User> MSSQLDatabase::GetUsersFromDBLike(const std::string& search_string)
+{
+	ExecuteQuery("select * from [User] as u where u.login like \'%" + search_string + "%\'");
+
+	std::vector<ISXModel::User> users;
+
+	while (SQLFetch(m_sql_statement_handle) == SQL_SUCCESS)
+	{
+		users.push_back(GetUserFromDB());
+	}
+
+	return users;
+}
+
 bool MSSQLDatabase::SaveUserToDB(const ISXModel::User& user)
 {
 	std::string login = user.get_login();
