@@ -1,7 +1,11 @@
 # Default ignored files
 /shelf/
 /workspace.xml
+/out/
+/.vs/
 /.idea
 /vcpkg/
 *.user
 Database.conf
+CMakeFiles
+CMakeCache.txt

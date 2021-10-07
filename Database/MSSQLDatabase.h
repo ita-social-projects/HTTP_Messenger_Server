@@ -54,4 +54,3 @@ private:
 	SQLHANDLE m_sql_statement_handle;
 	ConfigFile m_config_file;
 };
-
