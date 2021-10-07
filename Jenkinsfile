@@ -48,7 +48,7 @@ pipeline{
         success{
             script{
                 archiveArtifacts(
-                    artifacts: "/${env.REPO_NAME}/out/Debug/*.exe",
+                    artifacts: "/${env.REPO_NAME}/out/Debug/*.exe, /${env.REPO_NAME}/out/Debug/*.dll",
                     fingerprint: true
                 )
             }
