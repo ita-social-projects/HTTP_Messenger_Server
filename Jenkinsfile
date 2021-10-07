@@ -48,7 +48,7 @@ pipeline{
         success{
             script{
                 archiveArtifacts(
-                    artifacts: ".\\* ",
+                    artifacts: "./* ",
                     fingerprint: true
                 )
             }
