@@ -48,7 +48,7 @@ pipeline{
         success{
             script{
                 archiveArtifacts(
-                    artifacts: "/{env.REPO_NAME}/out/Debug",
+                    artifacts: "/{env.REPO_NAME}/out/",
                     fingerprint: true
                 )
             }
