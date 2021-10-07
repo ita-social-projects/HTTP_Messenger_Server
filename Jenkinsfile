@@ -32,6 +32,8 @@ pipeline{
                     bat "cmake --version"
                     bat "cmake . -B out"
                     bat "cmake --build out"
+                    bat "echo '======================Printing list of all directories and subfolders========================='"
+                    bat "dir"
                 }
             }
         }
@@ -40,7 +42,7 @@ pipeline{
         success{
             script{
                 archiveArtifacts(
-                    artifacts: "${env.REPO_NAME}/out/debug/*",
+                    artifacts: "${workspace}/${env.REPO_NAME}/out/debug/*.exe",
                     fingerprint: true
                 )
             }
