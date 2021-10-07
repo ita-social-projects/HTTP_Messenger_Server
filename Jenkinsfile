@@ -4,6 +4,8 @@ pipeline{
     environment{
         REPO_NAME = 'HTTP_Messenger_Server'
         LIBRARY_PATH = 'C:\\Users\\akork\\Desktop\\HttpMessengerServer\\vcpkg'
+        DLL_PATH = "${LIBRARY_PATH}\\installed\\x64-windows\\bin\\cpprest_2_10.dll"
+        
     }
 
     stages{
@@ -32,9 +34,13 @@ pipeline{
                     bat "cmake --version"
                     bat "cmake . -B out"
                     bat "cmake --build out"
-                    bat "echo '======================Printing list of all directories and subfolders========================='"
-                    bat "dir"
                 }
+            }
+        }
+        stage('Copying the file to the build'){
+            steps{
+                bat "echo '======================COPYING THE FILE========================='"
+                bat "copy ${DLL_PATH} .\\${env.REPO_NAME}\\out\\Debug"
             }
         }
     }
@@ -42,7 +48,7 @@ pipeline{
         success{
             script{
                 archiveArtifacts(
-                    artifacts: "${workspace}/${env.REPO_NAME}/out/debug/*.exe",
+                    artifacts: "./${env.REPO_NAME}/out/Debug/*.exe, ./${env.REPO_NAME}/out/Debug/*.dll ",
                     fingerprint: true
                 )
             }
