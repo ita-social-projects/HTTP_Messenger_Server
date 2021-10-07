@@ -31,7 +31,7 @@ pipeline{
                     bat "echo '======================BUILDING========================='"
                     bat "cmake --version"
                     bat "cmake . -B out"
-                    //bat "cmake --build out"
+                    bat "cmake --build out"
                 }
             }
         }
