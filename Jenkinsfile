@@ -10,6 +10,7 @@ pipeline{
         stage('Preparing the directory'){
             steps{
                 dir(env.REPO_NAME){
+                    bat "echo '======================CHECKOUTING========================='"
                     cleanWs()
                     checkout scm
                 }
@@ -18,14 +19,16 @@ pipeline{
         stage('Copying library to the project'){
             steps{
                 dir(env.REPO_NAME){
+                    bat "echo '======================COPYING LIBRARY TO THE DIRECTORY========================='"
                     bat "mkdir vcpkg"
-                    bat "echo D | Xcopy ${env.LIBRARY_PATH} .\\vcpkg"
+                    bat "echo D | Xcopy ${env.LIBRARY_PATH} .\\vcpkg  /E /H /C /I"
                 }
             }
         }
         stage('Build'){
             steps{
                 dir(env.REPO_NAME){
+                    bat "echo '======================BUILDING========================='"
                     bat "cmake --version"
                     bat "cmake . -B build"
                     bat "cmake --build build"
