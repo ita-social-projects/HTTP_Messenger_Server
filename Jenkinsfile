@@ -4,7 +4,7 @@ pipeline{
     environment{
         REPO_NAME = 'HTTP_Messenger_Server'
         LIBRARY_PATH = 'C:\\Users\\akork\\Desktop\\HttpMessengerServer\\vcpkg'
-        DLL_PATH = "${LIBRARY_PATH}\\installed\\x64-windows\\bin\\cpprest_2_10.dll"
+        DLL_PATH = "${LIBRARY_PATH}\\installed\\x64-windows\\bin\\cpprest_2_10d.dll"
         
     }
 
