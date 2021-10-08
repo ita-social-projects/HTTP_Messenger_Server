@@ -15,7 +15,7 @@ void RequestLogin::DoRequest() {
     try {
         ISXModel::User currentUser = db->GetUserFromDB(this->login);
         if (currentUser.get_password() == this->password) {
-            result[L"id"] = json::value::Number(currentUser.get_id());
+            result[L"id"] = (int)currentUser.get_id();
             result[L"Login"] = json::value::string(to_wstring(currentUser.get_login()));
             this->answercontainer->SetStatusCode(status_codes::OK);
         }

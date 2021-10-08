@@ -13,7 +13,7 @@ void RequestSignUp::DoRequest() {
         db->SaveUserToDB(this->user);
         ISXModel::User currentUser = db->GetUserFromDB(this->user.get_login());
         result[L"Login"] = json::value::string(to_wstring(currentUser.get_login()));
-        result[L"id"] = json::value::Number(currentUser.get_id());
+        result[L"id"] = (int)currentUser.get_id();
         this->answercontainer->SetStatusCode(status_codes::Accepted);
     }
     catch (const QueryException& e) {

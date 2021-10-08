@@ -15,7 +15,7 @@ void RequestGetChats::DoRequest() {
         json::value chats;
         for (int i = 0; i < chatList.size(); i++) {
             json::value current = json::value();
-            current[L"id"] = json::value::Number(chatList[i].get_id());
+            current[L"id"] = (int)chatList[i].get_id();
             current[L"title"] = json::value::string(to_wstring(chatList[i].get_title()));
             chats[i] = current;
         }
