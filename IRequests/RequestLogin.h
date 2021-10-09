@@ -7,5 +7,5 @@ private:
     std::string login, password;
 public:
     RequestLogin(IDatabase* db, const std::string login, const std::string password);
-    void DoRequest();
+    std::pair<json::value, int> DoRequest();
 };

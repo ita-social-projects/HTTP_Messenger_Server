@@ -12,22 +12,14 @@ AnswerContainer::AnswerContainer(http_request request, IRequests* requestProcess
 
 void AnswerContainer::ProcessRequest()
 {
-	this->requestProcessor->DoRequest();
+	std::pair<json::value,int> result = this->requestProcessor->DoRequest();
+	this->answer = result.first;
 }
 
 void AnswerContainer::RespondOnRequest() {
-	this->request.reply(this->requestProcessor->answercontainer->code, this->requestProcessor->answercontainer->answer);
+	this->request.reply(status_codes::Accepted, this->answer);
 }
 
-void AnswerContainer::SetAnswer(json::value answer)
-{
-	this->answer = answer;
-}
-
-void AnswerContainer::SetStatusCode(status_code code)
-{
-	this->code = code;
-}
 
 status_code AnswerContainer::GetStatusCode()
 {

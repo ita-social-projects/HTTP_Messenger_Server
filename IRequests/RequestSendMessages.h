@@ -7,6 +7,6 @@ private:
     ISXModel::Message message;
 public:
     RequestSendMessages(IDatabase* db, const ISXModel::Message& message);
-    void DoRequest();
+    std::pair<json::value, int>  DoRequest();
 };
 

@@ -8,5 +8,5 @@ private:
     std::string user_login;
 public:
     RequestGetChats(IDatabase* db, const std::string& userLogin);
-    void DoRequest();
+    std::pair<json::value, int>  DoRequest();
 };

@@ -8,5 +8,5 @@ private:
 public:
     RequestGetMessages(IDatabase* db, const std::string& chatTitle);
 
-    void DoRequest();
+    std::pair<json::value, int>  DoRequest();
 };

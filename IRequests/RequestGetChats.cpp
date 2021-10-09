@@ -7,8 +7,9 @@ using namespace web;
 
 RequestGetChats::RequestGetChats(IDatabase* db, const std::string& userLogin) : IRequests(db),user_login(userLogin) {}
 
-void RequestGetChats::DoRequest() {
+std::pair<json::value, int>  RequestGetChats::DoRequest() {
     json::value result;
+    status_code code;
     try{
         std::vector<ISXModel::Chat> chatList = db->GetUserChatsFromDB(this->user_login);
         result[L"size"] = json::value::Number(chatList.size());
@@ -20,16 +21,15 @@ void RequestGetChats::DoRequest() {
             chats[i] = current;
         }
         result[L"chats"] = chats; 
-        this->answercontainer->SetStatusCode(status_codes::Accepted);
+        code = status_codes::Accepted;
     }
     catch (const QueryException& e) {
         result[L"what"] = json::value::string(to_wstring(e.what()));
-        this->answercontainer->SetStatusCode(status_codes::BadRequest);
+        code = status_codes::BadRequest;
     }
     catch (const std::exception& e) {
         result[L"what"] = json::value::string(to_wstring("Database error"));
-        this->answercontainer->SetStatusCode(status_codes::InternalError);
+        code = status_codes::InternalError;
     }
-    this->answercontainer->SetAnswer(result);
-    this->answercontainer->MakeDone();
+    return {result,0};
 }

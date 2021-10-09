@@ -7,6 +7,6 @@ private:
     ISXModel::User user;
 public:
     RequestSignUp(IDatabase* db, const ISXModel::User& user);
-    void DoRequest();
+    std::pair<json::value, int>  DoRequest();
 };
 

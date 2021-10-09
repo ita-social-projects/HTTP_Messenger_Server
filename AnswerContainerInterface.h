@@ -18,10 +18,9 @@ public:
 	status_code code;
 	IRequests* requestProcessor;
 	AnswerContainerInterface(http_request request, IRequests* requestProcessor);
+	virtual ~AnswerContainerInterface();
 	virtual void ProcessRequest(){}
 	virtual void RespondOnRequest(){}
-	virtual void SetAnswer(json::value answer) = 0;
-	virtual void SetStatusCode(status_code code) = 0;
 	bool IsDone();
 	void MakeDone();
 

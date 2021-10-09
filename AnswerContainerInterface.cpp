@@ -14,6 +14,11 @@ AnswerContainerInterface::AnswerContainerInterface(http_request request, IReques
 
 }
 
+AnswerContainerInterface::~AnswerContainerInterface()
+{
+	delete this->requestProcessor;
+}
+
 bool AnswerContainerInterface::IsDone()
 {
 	return this->done;

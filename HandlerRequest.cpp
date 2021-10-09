@@ -20,8 +20,6 @@ void HandlerRequest::_handle_get(http_request request) {
         RequestGetMessages* temp = new  RequestGetMessages(&db, CHAT_TITLE);
         AnswerContainer* t1 = new AnswerContainer(request, temp);
 
-        temp->setAnswerContainer(t1);
-
         worker.PushRequest(t1);
     }
     else if (request.relative_uri().to_string() == L"/get_chats")
@@ -35,10 +33,7 @@ void HandlerRequest::_handle_get(http_request request) {
         RequestGetChats* temp = new  RequestGetChats(&db, USER_LOGIN);
         AnswerContainer* t1 = new AnswerContainer(request, temp);
 
-        temp->setAnswerContainer(t1);
-
         worker.PushRequest(t1);
-
     }
     
 }
@@ -56,8 +51,6 @@ void HandlerRequest::_handle_post(http_request request) {
 
         RequestLogin *temp = new RequestLogin( &db, LOGIN_USER, PASS_USER);
         AnswerContainer *t1 = new AnswerContainer(request, temp);
-
-        temp->setAnswerContainer(t1);
        
         worker.PushRequest(t1);
     }
@@ -73,8 +66,6 @@ void HandlerRequest::_handle_post(http_request request) {
         
         RequestSignUp*   temp = new RequestSignUp( &db, ISXModel::User(LOGIN_USER, PASS_USER) );
         AnswerContainer* t1 =   new AnswerContainer(request, temp);
-
-        temp->setAnswerContainer(t1);
 
         worker.PushRequest(t1);
     }
@@ -95,8 +86,6 @@ void HandlerRequest::_handle_put(http_request request) {
      
         RequestSendMessages* temp = new RequestSendMessages(&db, ISXModel::Message(USER_MESSAGE, SENDER_ID, CHAT_ID));
         AnswerContainer* t1 = new AnswerContainer(request, temp);
-
-        temp->setAnswerContainer(t1);
 
         worker.PushRequest(t1);
     }

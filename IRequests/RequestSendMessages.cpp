@@ -10,25 +10,23 @@ RequestSendMessages::RequestSendMessages(IDatabase* db, const ISXModel::Message&
 
 }
 
-void RequestSendMessages::DoRequest() {
+std::pair<json::value, int>  RequestSendMessages::DoRequest() {
     json::value result;
+    status_code code;
     try {
         db->SaveMessageToDB(this->message);
         result[L"status"] = json::value::string(L"OK");
-        this->answercontainer->SetStatusCode(status_codes::Accepted);
+        code = status_codes::Accepted;
     }
     catch (const QueryException& e) {
         result[L"what"] = json::value::string(to_wstring(e.what()));
-        this->answercontainer->SetStatusCode(status_codes::BadRequest);
+        code = status_codes::BadRequest;
     }
     catch (const std::exception& e) {
         result[L"what"] = json::value::string(to_wstring("Database error"));
-        this->answercontainer->SetStatusCode(status_codes::InternalError);
+        code = status_codes::BadRequest;
     }
-    this->answercontainer->SetAnswer(result);
-    this->answercontainer->MakeDone();
-
-    
+    return {result,0};
 }
 
 

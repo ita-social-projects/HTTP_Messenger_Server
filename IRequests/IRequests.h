@@ -15,14 +15,10 @@ protected:
     IDatabase* db;
     
 public:
-    AnswerContainerInterface* answercontainer;
     IRequests(IDatabase* db);
-    virtual void DoRequest() {
-        
-    }
-    void setAnswerContainer(AnswerContainerInterface* answercontainer) {
-        this->answercontainer = answercontainer;
-    }
+    ~IRequests();
+    virtual std::pair<json::value,int> DoRequest() = 0;
+
 };
 
 
