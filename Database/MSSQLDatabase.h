@@ -1,7 +1,5 @@
 #pragma once
 
-#include <cstring>
-
 #ifdef _WIN32
 #include <Windows.h>
 #endif
@@ -22,9 +20,9 @@ public:
 	MSSQLDatabase();
 	~MSSQLDatabase();
 
-	ISXModel::User GetUserFromDB(const std::string& user_login, const std::string& user_password) override;
-	std::vector<ISXModel::User> GetChatParticipantsFromDB(const unsigned long& chat_id) override;
+	ISXModel::User GetUserFromDB(const unsigned long& user_id) override;
 	std::vector<ISXModel::User> GetUsersFromDBLike(const std::string& search_string) override;
+	std::vector<ISXModel::User> GetChatParticipantsFromDB(const unsigned long& chat_id) override;
 	std::string GenerateUserAccessToken(const std::string& user_login, const std::string& user_password) override;
 	bool SaveUserToDB(const ISXModel::User& user) override;
 	bool AddUserToChat(const unsigned long& user_id, const unsigned long& chat_id) override;
@@ -51,6 +49,7 @@ private:
 	ISXModel::User GetUserFromDB() const;
 	ISXModel::Message GetMessageFromDB() const;
 	ISXModel::Chat GetChatFromDB() const;
+	void CheckUserCredentialsInDB(const std::string& user_login, const std::string& user_password);
 	unsigned long GetUserIdByAccessToken(const std::string& user_access_token);
 	bool SaveUserAccessTokenToDB(const std::string& user_login, const std::string& user_access_token);
 

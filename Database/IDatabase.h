@@ -1,7 +1,7 @@
 #pragma once
 
 #include <vector>
-#include "./Exception/QueryException.h"
+
 #include "Models/User.h"
 #include "Models/Message.h"
 #include "Models/Chat.h"
@@ -10,9 +10,9 @@
 class IDatabase
 {
 public:
-	virtual ISXModel::User GetUserFromDB(const std::string& user_login, const std::string& user_password) = 0;
-	virtual std::vector<ISXModel::User> GetChatParticipantsFromDB(const unsigned long& chat_id) = 0;
+	virtual ISXModel::User GetUserFromDB(const unsigned long& user_id) = 0;
 	virtual std::vector<ISXModel::User> GetUsersFromDBLike(const std::string& search_string) = 0;
+	virtual std::vector<ISXModel::User> GetChatParticipantsFromDB(const unsigned long& chat_id) = 0;
 	virtual std::string GenerateUserAccessToken(const std::string& user_login, const std::string& user_password) = 0;
 	virtual bool SaveUserToDB(const ISXModel::User& user) = 0;
 	virtual bool AddUserToChat(const unsigned long& user_id, const unsigned long& chat_id) = 0;

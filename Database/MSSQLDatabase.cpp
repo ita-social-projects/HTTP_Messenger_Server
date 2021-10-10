@@ -20,16 +20,30 @@ MSSQLDatabase::~MSSQLDatabase()
 	SQLFreeHandle(SQL_HANDLE_ENV, m_sql_environment_handle);
 }
 
-ISXModel::User MSSQLDatabase::GetUserFromDB(const std::string& user_login, const std::string& user_password)
+ISXModel::User MSSQLDatabase::GetUserFromDB(const unsigned long& user_id)
 {
-	ExecuteQuery("select * from [User] as u where u.login=\'" + user_login + "\' and u.password=\'" + user_password + "\'");
+	ExecuteQuery("select * from [User] as u where u.user_id=" + std::to_string(user_id));
 
 	if (SQLFetch(m_sql_statement_handle) != SQL_SUCCESS)
 	{
-		throw QueryException("Invalid login or password");
+		throw QueryException("No such user");
 	}
 
 	return GetUserFromDB();
+}
+
+std::vector<ISXModel::User> MSSQLDatabase::GetUsersFromDBLike(const std::string& search_string)
+{
+	ExecuteQuery("select * from [User] as u where u.login like \'%" + search_string + "%\'");
+
+	std::vector<ISXModel::User> users;
+
+	while (SQLFetch(m_sql_statement_handle) == SQL_SUCCESS)
+	{
+		users.push_back(GetUserFromDB());
+	}
+
+	return users;
 }
 
 std::vector<ISXModel::User> MSSQLDatabase::GetChatParticipantsFromDB(const unsigned long& chat_id)
@@ -49,23 +63,9 @@ std::vector<ISXModel::User> MSSQLDatabase::GetChatParticipantsFromDB(const unsig
 	return participants;
 }
 
-std::vector<ISXModel::User> MSSQLDatabase::GetUsersFromDBLike(const std::string& search_string)
-{
-	ExecuteQuery("select * from [User] as u where u.login like \'%" + search_string + "%\'");
-
-	std::vector<ISXModel::User> users;
-
-	while (SQLFetch(m_sql_statement_handle) == SQL_SUCCESS)
-	{
-		users.push_back(GetUserFromDB());
-	}
-
-	return users;
-}
-
 std::string MSSQLDatabase::GenerateUserAccessToken(const std::string& user_login, const std::string& user_password)
 {
-	GetUserFromDB(user_login, user_password); // check if user login and password matches the database values
+	CheckUserCredentialsInDB(user_login, user_password);
 
 	char access_token[USER_ACCESS_TOKEN_LEN] = { 0 };
 	char *access_token_ptr = access_token;
@@ -299,9 +299,9 @@ bool MSSQLDatabase::ExecuteQuery(const std::string& query)
 ISXModel::User MSSQLDatabase::GetUserFromDB() const
 {
 	unsigned long id = 0;
-	char login[USER_LOGIN_LEN];
-	char password[USER_PASSWORD_LEN];
-	char access_token[USER_ACCESS_TOKEN_LEN];
+	char login[USER_LOGIN_LEN] = { 0 };
+	char password[USER_PASSWORD_LEN] = { 0 };
+	char access_token[USER_ACCESS_TOKEN_LEN] = { 0 };
 
 	SQLGetData(m_sql_statement_handle, 1, SQL_C_ULONG, &id, sizeof(unsigned long), nullptr);
 	SQLGetData(m_sql_statement_handle, 2, SQL_C_CHAR, login, USER_LOGIN_LEN, nullptr);
@@ -314,10 +314,10 @@ ISXModel::User MSSQLDatabase::GetUserFromDB() const
 ISXModel::Message MSSQLDatabase::GetMessageFromDB() const
 {
 	unsigned long id = 0;
-	char content[MESSAGE_CONTENT_LEN];
+	char content[MESSAGE_CONTENT_LEN] = { 0 };
 	unsigned long sender_id = 0;
 	unsigned long chat_id = 0;
-	char timestamp[MESSAGE_TIMESTAMP_LEN];
+	char timestamp[MESSAGE_TIMESTAMP_LEN] = { 0 };
 
 	SQLGetData(m_sql_statement_handle, 1, SQL_C_ULONG, &id, sizeof(unsigned long), nullptr);
 	SQLGetData(m_sql_statement_handle, 2, SQL_C_CHAR, content, MESSAGE_CONTENT_LEN, nullptr);
@@ -331,12 +331,22 @@ ISXModel::Message MSSQLDatabase::GetMessageFromDB() const
 ISXModel::Chat MSSQLDatabase::GetChatFromDB() const
 {
 	unsigned long id = 0;
-	char title[CHAT_TITLE_LEN];
+	char title[CHAT_TITLE_LEN] = { 0 };
 
 	SQLGetData(m_sql_statement_handle, 1, SQL_C_ULONG, &id, sizeof(unsigned long), nullptr);
 	SQLGetData(m_sql_statement_handle, 2, SQL_C_CHAR, title, CHAT_TITLE_LEN, nullptr);
 
 	return ISXModel::Chat(id, title);
+}
+
+void MSSQLDatabase::CheckUserCredentialsInDB(const std::string& user_login, const std::string& user_password)
+{
+	ExecuteQuery("select * from [User] as u where u.login=\'" + user_login + "\' and u.password=\'" + user_password + "\'");
+
+	if (SQLFetch(m_sql_statement_handle) != SQL_SUCCESS)
+	{
+		throw QueryException("Invalid login or password");
+	}
 }
 
 unsigned long MSSQLDatabase::GetUserIdByAccessToken(const std::string& user_access_token)
@@ -348,9 +358,7 @@ unsigned long MSSQLDatabase::GetUserIdByAccessToken(const std::string& user_acce
 		throw QueryException("Invalid access token");
 	}
 
-	unsigned long id = 0;
-	SQLGetData(m_sql_statement_handle, 1, SQL_C_ULONG, &id, sizeof(unsigned long), nullptr);
-	return id;
+	return GetUserFromDB().get_id();
 }
 
 bool MSSQLDatabase::SaveUserAccessTokenToDB(const std::string& user_login, const std::string& user_access_token)
