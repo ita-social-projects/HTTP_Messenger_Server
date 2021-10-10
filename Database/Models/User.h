@@ -1,7 +1,6 @@
 #pragma once
 
 #include <string>
-#include <tuple>
 
 #define USER_LOGIN_LEN 21
 #define USER_PASSWORD_LEN 21
@@ -23,10 +22,8 @@ public:
 	void set_password(const std::string& password);
 
 private:
-	friend bool operator==(const User& lhs, const User& rhs);
-
 	unsigned long m_id;
 	std::string m_login;
 	std::string m_password;
 };
-};
+}; // namespace ISXModel

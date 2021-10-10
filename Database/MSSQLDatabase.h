@@ -1,7 +1,6 @@
 #pragma once
 
 #include <cstring>
-#include <fstream>
 
 #ifdef _WIN32
 #include <Windows.h>
@@ -12,7 +11,7 @@
 #include <sql.h>
 
 #include "IDatabase.h"
-#include "Exception/QueryException.h"
+#include "ConfigFile.h"
 
 #define SQL_CONNECTION_STRING_LEN 1024
 
@@ -24,7 +23,7 @@ public:
 
 	ISXModel::User GetUserFromDB(const std::string& user_login) override;
 	std::vector<ISXModel::User> GetChatParticipantsFromDB(const std::string& chat_title) override;
-	bool CheckUser(const ISXModel::User& user) override;
+	std::vector<ISXModel::User> GetUsersFromDBLike(const std::string& search_string) override;
 	bool SaveUserToDB(const ISXModel::User& user) override;
 	bool AddUserToChat(const std::string& user_login, const std::string& chat_title) override;
 	bool RemoveUserFromChat(const std::string& user_login, const std::string& chat_title) override;
@@ -44,7 +43,7 @@ private:
 	void InitEnvironmentHandle();
 	void InitConnectionHandle();
 	void InitStatementHandle();
-	void GetConnectionStringFromFile(const std::string& filename, SQLCHAR** output_ptr) const;
+	void FreeStatementHandle();
 	bool ExecuteQuery(const std::string& query);
 	ISXModel::User GetUserFromDB() const;
 	ISXModel::Message GetMessageFromDB() const;
@@ -53,5 +52,5 @@ private:
 	SQLHANDLE m_sql_environment_handle;
 	SQLHANDLE m_sql_connection_handle;
 	SQLHANDLE m_sql_statement_handle;
+	ConfigFile m_config_file;
 };
-
