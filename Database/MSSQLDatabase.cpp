@@ -78,16 +78,24 @@ std::string MSSQLDatabase::GenerateUserAccessToken(const std::string& user_login
 bool MSSQLDatabase::SaveUserToDB(const ISXModel::User& user)
 {
 	std::string login = user.get_login();
+
+	CheckIfUserExists(login);
+
 	std::string password = user.get_password();
 
-	ExecuteQuery("select * from [User] as u where u.login=\'" + login + "\'"); // check if user login exists
-
-	if (SQLFetch(m_sql_statement_handle) == SQL_SUCCESS)
-	{
-		throw QueryException("User login already exists");
-	}
-
 	return ExecuteQuery("insert into [User](login, password) values(\'" + login + "\', \'" + password + "\')");
+}
+
+bool MSSQLDatabase::UpdateUserLoginInDB(const std::string& user_access_token, const std::string& user_login)
+{
+	CheckIfUserExists(user_login);
+
+	return ExecuteQuery("update u set u.login=\'" + user_login + "\' from [User] u where u.access_token=\'" + user_access_token + "\'");
+}
+
+bool MSSQLDatabase::UpdateUserPasswordInDB(const std::string& user_access_token, const std::string& user_password)
+{
+	return ExecuteQuery("update u set u.password=\'" + user_password + "\' from [User] u where u.access_token=\'" + user_access_token + "\'");
 }
 
 bool MSSQLDatabase::AddUserToChat(const unsigned long& user_id, const unsigned long& chat_id)
@@ -156,7 +164,6 @@ std::vector<ISXModel::Message> MSSQLDatabase::GetChatMessagesFromDB(const unsign
 
 bool MSSQLDatabase::SaveMessageToDB(const std::string& user_access_token, const ISXModel::Message& message)
 {
-	std::string content = message.get_content();
 	std::string sender_id = std::to_string(GetUserIdByAccessToken(user_access_token));
 	std::string chat_id = std::to_string(message.get_chat_id());
 
@@ -167,6 +174,8 @@ bool MSSQLDatabase::SaveMessageToDB(const std::string& user_access_token, const 
 	{
 		throw QueryException("User is not participant of the chat");
 	}
+
+	std::string content = message.get_content();
 
 	return ExecuteQuery("insert into Message([content], sender_id, chat_id)"
 					   " values(\'" + content + "\', " + sender_id + ", " + chat_id + ")");
@@ -215,7 +224,7 @@ bool MSSQLDatabase::SaveChatToDB(const std::string& user_access_token, const ISX
 		throw QueryException("New chat has not been saved");
 	}
 
-	unsigned long saved_chat_id = GetChatFromDB().get_id();
+	const unsigned long saved_chat_id = GetChatFromDB().get_id();
 
 	return AddUserToChat(GetUserIdByAccessToken(user_access_token), saved_chat_id);
 }
@@ -337,6 +346,16 @@ ISXModel::Chat MSSQLDatabase::GetChatFromDB() const
 	SQLGetData(m_sql_statement_handle, 2, SQL_C_CHAR, title, CHAT_TITLE_LEN, nullptr);
 
 	return ISXModel::Chat(id, title);
+}
+
+void MSSQLDatabase::CheckIfUserExists(const std::string& user_login)
+{
+	ExecuteQuery("select * from [User] as u where u.login=\'" + user_login + "\'");
+
+	if (SQLFetch(m_sql_statement_handle) == SQL_SUCCESS)
+	{
+		throw QueryException("User login already exists");
+	}
 }
 
 void MSSQLDatabase::CheckUserCredentialsInDB(const std::string& user_login, const std::string& user_password)

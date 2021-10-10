@@ -15,6 +15,8 @@ public:
 	virtual std::vector<ISXModel::User> GetChatParticipantsFromDB(const unsigned long& chat_id) = 0;
 	virtual std::string GenerateUserAccessToken(const std::string& user_login, const std::string& user_password) = 0;
 	virtual bool SaveUserToDB(const ISXModel::User& user) = 0;
+	virtual bool UpdateUserLoginInDB(const std::string& user_access_token, const std::string& user_login) = 0;
+	virtual bool UpdateUserPasswordInDB(const std::string& user_access_token, const std::string& user_password) = 0;
 	virtual bool AddUserToChat(const unsigned long& user_id, const unsigned long& chat_id) = 0;
 	virtual bool RemoveUserFromChat(const unsigned long& user_id, const unsigned long& chat_id) = 0;
 	virtual bool RemoveUserAccessToken(const std::string& user_access_token) = 0;

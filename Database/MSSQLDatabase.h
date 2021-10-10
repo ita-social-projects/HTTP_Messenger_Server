@@ -25,6 +25,8 @@ public:
 	std::vector<ISXModel::User> GetChatParticipantsFromDB(const unsigned long& chat_id) override;
 	std::string GenerateUserAccessToken(const std::string& user_login, const std::string& user_password) override;
 	bool SaveUserToDB(const ISXModel::User& user) override;
+	bool UpdateUserLoginInDB(const std::string& user_access_token, const std::string& user_login) override;
+	bool UpdateUserPasswordInDB(const std::string& user_access_token, const std::string& user_password) override;
 	bool AddUserToChat(const unsigned long& user_id, const unsigned long& chat_id) override;
 	bool RemoveUserFromChat(const unsigned long& user_id, const unsigned long& chat_id) override;
 	bool RemoveUserAccessToken(const std::string& user_access_token) override;
@@ -49,6 +51,7 @@ private:
 	ISXModel::User GetUserFromDB() const;
 	ISXModel::Message GetMessageFromDB() const;
 	ISXModel::Chat GetChatFromDB() const;
+	void CheckIfUserExists(const std::string& user_login);
 	void CheckUserCredentialsInDB(const std::string& user_login, const std::string& user_password);
 	unsigned long GetUserIdByAccessToken(const std::string& user_access_token);
 	bool SaveUserAccessTokenToDB(const std::string& user_login, const std::string& user_access_token);
