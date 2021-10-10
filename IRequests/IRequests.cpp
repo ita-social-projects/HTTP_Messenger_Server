@@ -9,7 +9,7 @@ IRequests::IRequests(IDatabase* db) : db(db) {}
 
 IRequests::~IRequests()
 {
-	this->db = nullptr;
+	//delete this->db;
 	
 }
 

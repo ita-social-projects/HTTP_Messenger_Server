@@ -84,7 +84,7 @@ void HandlerRequest::_handle_put(http_request request) {
         const unsigned long SENDER_ID       = value[L"sender"].as_integer();
         const unsigned long CHAT_ID         = value[L"chat"].as_integer();
      
-        RequestSendMessages* temp = new RequestSendMessages(&db, ISXModel::Message(USER_MESSAGE, SENDER_ID, CHAT_ID));
+        RequestSendMessages* temp = new RequestSendMessages(new MSSQLDatabase, ISXModel::Message(USER_MESSAGE, SENDER_ID, CHAT_ID));
         AnswerContainer* t1 = new AnswerContainer(request, temp);
 
         worker.PushRequest(t1);
