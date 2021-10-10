@@ -11,7 +11,7 @@ class Message
 {
 public:
 	Message();
-	Message(const std::string& content, unsigned long sender_id, unsigned long chat_id);
+	Message(const std::string& content, unsigned long chat_id);
 	Message(unsigned long id, const std::string& content, unsigned long sender_id, unsigned long chat_id, const std::string& timestamp);
 
 	unsigned long get_id() const;

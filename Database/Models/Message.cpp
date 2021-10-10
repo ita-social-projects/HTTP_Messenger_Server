@@ -10,8 +10,8 @@ Message::Message()
 		, m_timestamp("")
 {}
 
-Message::Message(const std::string& content, unsigned long sender_id, unsigned long chat_id)
-		: Message(0, content, sender_id, chat_id, "")
+Message::Message(const std::string& content, unsigned long chat_id)
+		: Message(0, content, 0, chat_id, "")
 {}
 
 Message::Message(unsigned long id, const std::string& content, unsigned long sender_id, unsigned long chat_id, const std::string& timestamp)
