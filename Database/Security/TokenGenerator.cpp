@@ -1,9 +1,9 @@
 #include "TokenGenerator.h"
 
 TokenGenerator::TokenGenerator(const std::uint32_t token_length)
-	: m_alphabet(TOKEN_CHARS_ALLOWED)
-	, m_alphabet_length(strlen(TOKEN_CHARS_ALLOWED))
-	, m_increment(TOKEN_INCREMENT)
+		: m_alphabet(TOKEN_CHARS_ALLOWED)
+		, m_alphabet_length(strlen(TOKEN_CHARS_ALLOWED))
+		, m_increment(TOKEN_INCREMENT)
 {
 	if (token_length == 0)
 	{

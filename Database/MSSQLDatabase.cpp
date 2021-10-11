@@ -71,7 +71,11 @@ std::string MSSQLDatabase::GenerateUserAccessToken(const std::string& user_login
 	char *access_token_ptr = access_token;
 	m_token_generator.GetNextToken(access_token_ptr);
 
-	SaveUserAccessTokenToDB(user_login, access_token);
+	if (!SaveUserAccessTokenToDB(user_login, access_token))
+	{
+		throw QueryException("Cannot save access token");
+	}
+
 	return access_token;
 }
 
