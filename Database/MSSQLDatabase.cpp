@@ -81,7 +81,7 @@ bool MSSQLDatabase::SaveUserToDB(const ISXModel::User& user)
 
 	CheckIfUserExists(login);
 
-	std::string password = user.get_password();
+	std::string password = m_sha256.GenerateHash(user.get_password());
 
 	return ExecuteQuery("insert into [User](login, password) values(\'" + login + "\', \'" + password + "\')");
 }
@@ -95,7 +95,8 @@ bool MSSQLDatabase::UpdateUserLoginInDB(const std::string& user_access_token, co
 
 bool MSSQLDatabase::UpdateUserPasswordInDB(const std::string& user_access_token, const std::string& user_password)
 {
-	return ExecuteQuery("update u set u.password=\'" + user_password + "\' from [User] u where u.access_token=\'" + user_access_token + "\'");
+	return ExecuteQuery("update u set u.password=\'" + m_sha256.GenerateHash(user_password) + "\' from [User] u"
+					   " where u.access_token=\'" + user_access_token + "\'");
 }
 
 bool MSSQLDatabase::AddUserToChat(const unsigned long& user_id, const unsigned long& chat_id)
@@ -360,7 +361,9 @@ void MSSQLDatabase::CheckIfUserExists(const std::string& user_login)
 
 void MSSQLDatabase::CheckUserCredentialsInDB(const std::string& user_login, const std::string& user_password)
 {
-	ExecuteQuery("select * from [User] as u where u.login=\'" + user_login + "\' and u.password=\'" + user_password + "\'");
+	ExecuteQuery("select * from [User] as u"
+				" where u.login=\'" + user_login + "\'"
+				" and u.password=\'" + m_sha256.GenerateHash(user_password) + "\'");
 
 	if (SQLFetch(m_sql_statement_handle) != SQL_SUCCESS)
 	{

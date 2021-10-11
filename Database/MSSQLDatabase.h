@@ -10,6 +10,7 @@
 
 #include "IDatabase.h"
 #include "ConfigFile.h"
+#include "Security/SHA256.h"
 #include "Security/TokenGenerator.h"
 
 #define SQL_CONNECTION_STRING_LEN 1024
@@ -60,5 +61,6 @@ private:
 	SQLHANDLE m_sql_connection_handle;
 	SQLHANDLE m_sql_statement_handle;
 	ConfigFile m_config_file;
+	SHA256 m_sha256;
 	TokenGenerator m_token_generator;
 };
