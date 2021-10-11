@@ -53,6 +53,13 @@ void HandlerRequest::_handle_post(http_request request) {
         AnswerContainer *t1 = new AnswerContainer(request, temp);
        
         worker.PushRequest(t1);
+        while (!t1->IsDone())
+    {
+    }
+
+    std::this_thread::sleep_for(std::chrono::milliseconds(500));
+
+    delete t1;
     }
     else if (request.relative_uri().to_string() == L"/user/sign_up")
     {
