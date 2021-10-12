@@ -28,8 +28,3 @@ void AnswerContainer::SetStatusCode(status_code code)
 {
 	this->code = code;
 }
-
-status_code AnswerContainer::GetStatusCode()
-{
-	return code;
-}
