@@ -20,8 +20,9 @@ MSSQLDatabase::~MSSQLDatabase()
 	SQLFreeHandle(SQL_HANDLE_ENV, m_sql_environment_handle);
 }
 
-ISXModel::User MSSQLDatabase::GetUserFromDB(const unsigned long& user_id)
+ISXModel::User MSSQLDatabase::GetUserFromDB(const std::string& user_access_token, const unsigned long& user_id)
 {
+	CheckIfUserAccessTokenValid(user_access_token);
 	ExecuteQuery("select * from [User] as u where u.user_id=" + std::to_string(user_id));
 
 	if (SQLFetch(m_sql_statement_handle) != SQL_SUCCESS)
@@ -32,8 +33,9 @@ ISXModel::User MSSQLDatabase::GetUserFromDB(const unsigned long& user_id)
 	return GetUserFromDB();
 }
 
-std::vector<ISXModel::User> MSSQLDatabase::GetUsersFromDBLike(const std::string& search_string)
+std::vector<ISXModel::User> MSSQLDatabase::GetUsersFromDBLike(const std::string& user_access_token, const std::string& search_string)
 {
+	CheckIfUserAccessTokenValid(user_access_token);
 	ExecuteQuery("select * from [User] as u where u.login like \'%" + search_string + "%\'");
 
 	std::vector<ISXModel::User> users;
@@ -46,8 +48,9 @@ std::vector<ISXModel::User> MSSQLDatabase::GetUsersFromDBLike(const std::string&
 	return users;
 }
 
-std::vector<ISXModel::User> MSSQLDatabase::GetChatParticipantsFromDB(const unsigned long& chat_id)
+std::vector<ISXModel::User> MSSQLDatabase::GetChatParticipantsFromDB(const std::string& user_access_token, const unsigned long& chat_id)
 {
+	CheckIfUserAccessTokenValid(user_access_token);
 	ExecuteQuery("select u.* from [User] as u"
 				" inner join ChatParticipant as cp"
 				" on cp.participant_id = u.user_id"
@@ -69,6 +72,7 @@ std::string MSSQLDatabase::GenerateUserAccessToken(const std::string& user_login
 
 	char access_token[USER_ACCESS_TOKEN_LEN] = { 0 };
 	char *access_token_ptr = access_token;
+
 	m_token_generator.GetNextToken(access_token_ptr);
 
 	if (!SaveUserAccessTokenToDB(user_login, access_token))
@@ -92,28 +96,26 @@ bool MSSQLDatabase::SaveUserToDB(const ISXModel::User& user)
 
 bool MSSQLDatabase::UpdateUserLoginInDB(const std::string& user_access_token, const std::string& user_login)
 {
+	CheckIfUserAccessTokenValid(user_access_token);
 	CheckIfUserExists(user_login);
-
 	return ExecuteQuery("update u set u.login=\'" + user_login + "\' from [User] u where u.access_token=\'" + user_access_token + "\'");
 }
 
 bool MSSQLDatabase::UpdateUserPasswordInDB(const std::string& user_access_token, const std::string& user_password)
 {
+	CheckIfUserAccessTokenValid(user_access_token);
 	return ExecuteQuery("update u set u.password=\'" + m_sha256.GenerateHash(user_password) + "\' from [User] u"
 					   " where u.access_token=\'" + user_access_token + "\'");
 }
 
-bool MSSQLDatabase::AddUserToChat(const unsigned long& user_id, const unsigned long& chat_id)
+bool MSSQLDatabase::AddUserToChat(const std::string& user_access_token, const unsigned long& user_id, const unsigned long& chat_id)
 {
+	CheckIfUserAccessTokenValid(user_access_token);
+
 	std::string user_id_str = std::to_string(user_id);
 	std::string chat_id_str = std::to_string(chat_id);
 
-	// check if user is already participant of the chat
-	ExecuteQuery("select * from ChatParticipant as cp"
-				" where cp.chat_id=" + chat_id_str +
-				" AND cp.participant_id=" + user_id_str);
-
-	if (SQLFetch(m_sql_statement_handle) == SQL_SUCCESS)
+	if (IsUserParticipantOfChat(user_id_str, chat_id_str))
 	{
 		throw QueryException("User is already participant of the chat");
 	}
@@ -121,8 +123,9 @@ bool MSSQLDatabase::AddUserToChat(const unsigned long& user_id, const unsigned l
 	return ExecuteQuery("insert into ChatParticipant values(" + chat_id_str + ", " + user_id_str + ")");
 }
 
-bool MSSQLDatabase::RemoveUserFromChat(const unsigned long& user_id, const unsigned long& chat_id)
+bool MSSQLDatabase::RemoveUserFromChat(const std::string& user_access_token, const unsigned long& user_id, const unsigned long& chat_id)
 {
+	CheckIfUserAccessTokenValid(user_access_token);
 	return ExecuteQuery("delete cp from ChatParticipant as cp"
 						" where cp.chat_id=" + std::to_string(chat_id) +
 						" AND cp.participant_id=" + std::to_string(user_id));
@@ -135,11 +138,13 @@ bool MSSQLDatabase::RemoveUserAccessToken(const std::string& user_access_token)
 
 bool MSSQLDatabase::RemoveUserFromDB(const std::string& user_access_token)
 {
+	CheckIfUserAccessTokenValid(user_access_token);
 	return ExecuteQuery("delete u from [User] as u where u.access_token=\'" + user_access_token + "\'");
 }
 
-ISXModel::Message MSSQLDatabase::GetMessageFromDB(const unsigned long& message_id)
+ISXModel::Message MSSQLDatabase::GetMessageFromDB(const std::string& user_access_token, const unsigned long& message_id)
 {
+	CheckIfUserAccessTokenValid(user_access_token);
 	ExecuteQuery("select * from Message as m where m.message_id=" + std::to_string(message_id));
 
 	if (SQLFetch(m_sql_statement_handle) != SQL_SUCCESS)
@@ -150,8 +155,9 @@ ISXModel::Message MSSQLDatabase::GetMessageFromDB(const unsigned long& message_i
 	return GetMessageFromDB();
 }
 
-std::vector<ISXModel::Message> MSSQLDatabase::GetChatMessagesFromDB(const unsigned long& chat_id)
+std::vector<ISXModel::Message> MSSQLDatabase::GetChatMessagesFromDB(const std::string& user_access_token, const unsigned long& chat_id)
 {
+	CheckIfUserAccessTokenValid(user_access_token);
 	ExecuteQuery("select m.* from Message as m"
 				" inner join Chat as c"
 				" on c.chat_id = m.chat_id"
@@ -169,13 +175,12 @@ std::vector<ISXModel::Message> MSSQLDatabase::GetChatMessagesFromDB(const unsign
 
 bool MSSQLDatabase::SaveMessageToDB(const std::string& user_access_token, const ISXModel::Message& message)
 {
+	CheckIfUserAccessTokenValid(user_access_token);
+
 	std::string sender_id = std::to_string(GetUserIdByAccessToken(user_access_token));
 	std::string chat_id = std::to_string(message.get_chat_id());
 
-	// check if user is participant of the chat
-	ExecuteQuery("select * from ChatParticipant as cp where cp.chat_id=" + chat_id + " AND cp.participant_id=" + sender_id);
-
-	if (SQLFetch(m_sql_statement_handle) != SQL_SUCCESS)
+	if (!IsUserParticipantOfChat(sender_id, chat_id))
 	{
 		throw QueryException("User is not participant of the chat");
 	}
@@ -186,13 +191,15 @@ bool MSSQLDatabase::SaveMessageToDB(const std::string& user_access_token, const 
 					   " values(\'" + content + "\', " + sender_id + ", " + chat_id + ")");
 }
 
-bool MSSQLDatabase::RemoveMessageFromDB(const unsigned long& message_id)
+bool MSSQLDatabase::RemoveMessageFromDB(const std::string& user_access_token, const unsigned long& message_id)
 {
+	CheckIfUserAccessTokenValid(user_access_token);
 	return ExecuteQuery("delete m from Message as m where m.message_id=" + std::to_string(message_id));
 }
 
-ISXModel::Chat MSSQLDatabase::GetChatFromDB(const unsigned long& chat_id)
+ISXModel::Chat MSSQLDatabase::GetChatFromDB(const std::string& user_access_token, const unsigned long& chat_id)
 {
+	CheckIfUserAccessTokenValid(user_access_token);
 	ExecuteQuery("select * from Chat as c where c.chat_id=" + std::to_string(chat_id));
 
 	if (SQLFetch(m_sql_statement_handle) != SQL_SUCCESS)
@@ -205,6 +212,7 @@ ISXModel::Chat MSSQLDatabase::GetChatFromDB(const unsigned long& chat_id)
 
 std::vector<ISXModel::Chat> MSSQLDatabase::GetUserChatsFromDB(const std::string& user_access_token)
 {
+	CheckIfUserAccessTokenValid(user_access_token);
 	ExecuteQuery("select c.* from Chat as c"
 				" inner join ChatParticipant as cp"
 				" on cp.chat_id = c.chat_id"
@@ -222,6 +230,7 @@ std::vector<ISXModel::Chat> MSSQLDatabase::GetUserChatsFromDB(const std::string&
 
 bool MSSQLDatabase::SaveChatToDB(const std::string& user_access_token, const ISXModel::Chat& chat)
 {
+	CheckIfUserAccessTokenValid(user_access_token);
 	ExecuteQuery("insert into Chat(title) output inserted.chat_id values(\'" + chat.get_title() + "\')");
 
 	if (SQLFetch(m_sql_statement_handle) != SQL_SUCCESS)
@@ -231,11 +240,12 @@ bool MSSQLDatabase::SaveChatToDB(const std::string& user_access_token, const ISX
 
 	const unsigned long saved_chat_id = GetChatFromDB().get_id();
 
-	return AddUserToChat(GetUserIdByAccessToken(user_access_token), saved_chat_id);
+	return AddUserToChat(user_access_token, GetUserIdByAccessToken(user_access_token), saved_chat_id);
 }
 
-bool MSSQLDatabase::RemoveChatFromDB(const unsigned long& chat_id)
+bool MSSQLDatabase::RemoveChatFromDB(const std::string& user_access_token, const unsigned long& chat_id)
 {
+	CheckIfUserAccessTokenValid(user_access_token);
 	return ExecuteQuery("delete c from Chat as c where c.chat_id=" + std::to_string(chat_id));
 }
 
@@ -353,16 +363,6 @@ ISXModel::Chat MSSQLDatabase::GetChatFromDB() const
 	return ISXModel::Chat(id, title);
 }
 
-void MSSQLDatabase::CheckIfUserExists(const std::string& user_login)
-{
-	ExecuteQuery("select * from [User] as u where u.login=\'" + user_login + "\'");
-
-	if (SQLFetch(m_sql_statement_handle) == SQL_SUCCESS)
-	{
-		throw QueryException("User login already exists");
-	}
-}
-
 void MSSQLDatabase::CheckUserCredentialsInDB(const std::string& user_login, const std::string& user_password)
 {
 	ExecuteQuery("select * from [User] as u"
@@ -375,7 +375,17 @@ void MSSQLDatabase::CheckUserCredentialsInDB(const std::string& user_login, cons
 	}
 }
 
-unsigned long MSSQLDatabase::GetUserIdByAccessToken(const std::string& user_access_token)
+void MSSQLDatabase::CheckIfUserExists(const std::string& user_login)
+{
+	ExecuteQuery("select * from [User] as u where u.login=\'" + user_login + "\'");
+
+	if (SQLFetch(m_sql_statement_handle) == SQL_SUCCESS)
+	{
+		throw QueryException("User login already exists");
+	}
+}
+
+void MSSQLDatabase::CheckIfUserAccessTokenValid(const std::string& user_access_token)
 {
 	ExecuteQuery("select u.user_id from [User] as u where u.access_token=\'" + user_access_token + "\'");
 
@@ -383,11 +393,21 @@ unsigned long MSSQLDatabase::GetUserIdByAccessToken(const std::string& user_acce
 	{
 		throw QueryException("Invalid access token");
 	}
+}
 
+unsigned long MSSQLDatabase::GetUserIdByAccessToken(const std::string& user_access_token)
+{
+	CheckIfUserAccessTokenValid(user_access_token);
 	return GetUserFromDB().get_id();
 }
 
 bool MSSQLDatabase::SaveUserAccessTokenToDB(const std::string& user_login, const std::string& user_access_token)
 {
 	return ExecuteQuery("update u set u.access_token=\'" + user_access_token + "\' from [User] u where u.login=\'" + user_login + "\'");
+}
+
+bool MSSQLDatabase::IsUserParticipantOfChat(const std::string& user_id_str, const std::string& chat_id_str)
+{
+	ExecuteQuery("select * from ChatParticipant as cp where cp.chat_id=" + chat_id_str + " AND cp.participant_id=" + user_id_str);
+	return SQLFetch(m_sql_statement_handle) == SQL_SUCCESS;
 }
