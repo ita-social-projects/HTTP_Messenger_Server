@@ -145,7 +145,10 @@ bool MSSQLDatabase::RemoveUserFromDB(const std::string& user_access_token)
 ISXModel::Message MSSQLDatabase::GetMessageFromDB(const std::string& user_access_token, const unsigned long& message_id)
 {
 	CheckIfUserAccessTokenValid(user_access_token);
-	ExecuteQuery("select * from Message as m where m.message_id=" + std::to_string(message_id));
+	ExecuteQuery("select m.message_id, m.content,"
+				" (select u.login from [User] as u where u.user_id = m.sender_id) as sender,"
+				" m.chat_id, m.timestamp"
+				" from Message as m where m.message_id=" + std::to_string(message_id));
 
 	if (SQLFetch(m_sql_statement_handle) != SQL_SUCCESS)
 	{
@@ -158,7 +161,10 @@ ISXModel::Message MSSQLDatabase::GetMessageFromDB(const std::string& user_access
 std::vector<ISXModel::Message> MSSQLDatabase::GetChatMessagesFromDB(const std::string& user_access_token, const unsigned long& chat_id)
 {
 	CheckIfUserAccessTokenValid(user_access_token);
-	ExecuteQuery("select m.* from Message as m"
+	ExecuteQuery("select m.message_id, m.content,"
+				" (select u.login from [User] as u where u.user_id = m.sender_id) as sender,"
+				" m.chat_id, m.timestamp"
+				" from Message as m"
 				" inner join Chat as c"
 				" on c.chat_id = m.chat_id"
 				" where m.chat_id = " + std::to_string(chat_id));
@@ -324,32 +330,28 @@ ISXModel::User MSSQLDatabase::GetUserFromDB() const
 {
 	unsigned long id = 0;
 	char login[USER_LOGIN_LEN] = { 0 };
-	char password[USER_PASSWORD_LEN] = { 0 };
-	char access_token[USER_ACCESS_TOKEN_LEN] = { 0 };
 
 	SQLGetData(m_sql_statement_handle, 1, SQL_C_ULONG, &id, sizeof(unsigned long), nullptr);
 	SQLGetData(m_sql_statement_handle, 2, SQL_C_CHAR, login, USER_LOGIN_LEN, nullptr);
-	SQLGetData(m_sql_statement_handle, 3, SQL_C_CHAR, password, USER_PASSWORD_LEN, nullptr);
-	SQLGetData(m_sql_statement_handle, 4, SQL_C_CHAR, access_token, USER_ACCESS_TOKEN_LEN, nullptr);
 
-	return ISXModel::User(id, login, password, access_token);
+	return ISXModel::User(id, login);
 }
 
 ISXModel::Message MSSQLDatabase::GetMessageFromDB() const
 {
 	unsigned long id = 0;
 	char content[MESSAGE_CONTENT_LEN] = { 0 };
-	unsigned long sender_id = 0;
+	char sender[USER_LOGIN_LEN] = { 0 };
 	unsigned long chat_id = 0;
 	char timestamp[MESSAGE_TIMESTAMP_LEN] = { 0 };
 
 	SQLGetData(m_sql_statement_handle, 1, SQL_C_ULONG, &id, sizeof(unsigned long), nullptr);
 	SQLGetData(m_sql_statement_handle, 2, SQL_C_CHAR, content, MESSAGE_CONTENT_LEN, nullptr);
-	SQLGetData(m_sql_statement_handle, 3, SQL_C_ULONG, &sender_id, sizeof(unsigned long), nullptr);
+	SQLGetData(m_sql_statement_handle, 3, SQL_C_CHAR, sender, USER_LOGIN_LEN, nullptr);
 	SQLGetData(m_sql_statement_handle, 4, SQL_C_ULONG, &chat_id, sizeof(unsigned long), nullptr);
 	SQLGetData(m_sql_statement_handle, 5, SQL_C_CHAR, timestamp, MESSAGE_TIMESTAMP_LEN, nullptr);
 
-	return ISXModel::Message(id, content, sender_id, chat_id, timestamp);
+	return ISXModel::Message(id, content, sender, chat_id, timestamp);
 }
 
 ISXModel::Chat MSSQLDatabase::GetChatFromDB() const

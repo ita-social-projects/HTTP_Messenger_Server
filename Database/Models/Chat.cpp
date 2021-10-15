@@ -2,11 +2,6 @@
 
 using namespace ISXModel;
 
-Chat::Chat()
-		: m_id(0)
-		, m_title("")
-{}
-
 Chat::Chat(const std::string& title)
 		: Chat(0, title)
 {}
@@ -24,14 +19,4 @@ unsigned long Chat::get_id() const
 const std::string& Chat::get_title() const
 {
 	return m_title;
-}
-
-void Chat::set_id(unsigned long id)
-{
-	this->m_id = id;
-}
-
-void Chat::set_title(const std::string& title)
-{
-	this->m_title = title;
 }
