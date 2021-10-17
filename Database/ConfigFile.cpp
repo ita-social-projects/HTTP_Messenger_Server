@@ -2,11 +2,12 @@
 
 ConfigFile::ConfigFile(const std::string& filename)
 {
-	const char* home_dir = std::getenv(USER_HOME_DIR);
+	const char* const home_dir = std::getenv(USER_HOME_DIR);
 
 	if (home_dir == nullptr)
 	{
-		throw std::runtime_error("The environment variable \"" + std::string(USER_HOME_DIR) + "\" not set");
+		LOG_FATAL("Environment variable \"" + std::string(USER_HOME_DIR) + "\" is not set");
+		throw std::runtime_error("Environment variable \"" + std::string(USER_HOME_DIR) + "\" is not set");
 	}
 
 	m_config_filename = std::string(home_dir) + "/" + filename;
@@ -14,6 +15,7 @@ ConfigFile::ConfigFile(const std::string& filename)
 
 void ConfigFile::CreateIfNotExists() const
 {
+	LOG_DEBUG("Checking if config file exists");
 	if (FileExists(m_config_filename))
 	{
 		return;
@@ -25,6 +27,7 @@ void ConfigFile::CreateIfNotExists() const
 	{
 		SQLInfo default_sql_info;
 
+		LOG_DEBUG("Saving default configuration settings to file");
 		config_file << "DRIVER=" << default_sql_info.driver << "\n";
 		config_file << "SERVER=" << default_sql_info.server << "\n";
 		config_file << "DATABASE=" << default_sql_info.database << "\n";
@@ -35,6 +38,7 @@ void ConfigFile::CreateIfNotExists() const
 	}
 	else
 	{
+		LOG_FATAL("Cannot open file \"" + m_config_filename + "\" for writing");
 		throw std::runtime_error("Cannot open file \"" + m_config_filename + "\" for writing");
 	}
 }
@@ -47,9 +51,11 @@ std::string ConfigFile::GetStringWithDelimeter(const char delimeter) const
 
 	if (!config_file.is_open())
 	{
+		LOG_FATAL("Cannot open file: \"" + m_config_filename + "\"");
 		throw std::runtime_error("Cannot open file: \"" + m_config_filename + "\"");
 	}
 
+	LOG_DEBUG("Receiving configuration settings from file");
 	while (std::getline(config_file, line))
 	{
 		string += line + delimeter;

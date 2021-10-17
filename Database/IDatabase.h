@@ -6,6 +6,7 @@
 #include "Models/Message.h"
 #include "Models/Chat.h"
 #include "Exception/QueryException.h"
+#include "../Logger/Logger.h"
 
 class IDatabase
 {

@@ -7,19 +7,21 @@ TokenGenerator::TokenGenerator(const std::uint32_t token_length)
 {
 	if (token_length == 0)
 	{
-		throw std::runtime_error("Token length cannot be zero");
+		LOG_FATAL("The length of the token cannot be zero");
+		throw std::runtime_error("The length of the token cannot be zero");
 	}
 
 	m_token_length = token_length;
 	m_modulus = BinaryPow(m_alphabet_length, m_token_length) - 1;
 
-	ResetGenerator();
+	ReseedGenerator();
 }
 
 void TokenGenerator::GetNextToken(char*& output_token_ptr)
 {
 	std::uint64_t number;
 
+	LOG_DEBUG("Generating token");
 	for (std::uint32_t i = GENERATED_TOKEN_LEN; i <= m_token_length; i += GENERATED_TOKEN_LEN)
 	{
 		number = GenerateNextNumber();
@@ -36,8 +38,9 @@ void TokenGenerator::GetNextToken(char*& output_token_ptr)
 	}
 }
 
-void TokenGenerator::ResetGenerator()
+void TokenGenerator::ReseedGenerator()
 {
+	LOG_DEBUG("Setting new seed to generator");
 	std::uint64_t seed = GenerateSeed();
 	m_multiplier = seed;
 	m_init_generated_number = m_last_generated_number = seed % m_modulus;
@@ -47,11 +50,13 @@ void TokenGenerator::GetTokenFromNumber(const std::uint64_t token_number, char*&
 {
 	if (output_token_ptr == nullptr)
 	{
+		LOG_FATAL("Output token is not initialized");
 		throw std::runtime_error("Output token is not initialized");
 	}
 
 	if (token_number < 0 || token_number >= m_modulus)
 	{
+		LOG_FATAL("Token number is beyond the necessary limits");
 		throw std::runtime_error("Token number is beyond the necessary limits");
 	}
 
@@ -71,7 +76,7 @@ std::uint64_t TokenGenerator::GenerateNextNumber()
 		return number;
 	}
 
-	ResetGenerator();
+	ReseedGenerator();
 	return GenerateNextNumber();
 }
 

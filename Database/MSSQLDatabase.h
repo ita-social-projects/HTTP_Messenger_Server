@@ -47,6 +47,8 @@ private:
 	void InitEnvironmentHandle();
 	void InitConnectionHandle();
 	void InitStatementHandle();
+	void FreeEnvironmentHandle();
+	void FreeConnectionHandle();
 	void FreeStatementHandle();
 	bool ExecuteQuery(const std::string& query);
 	ISXModel::User GetUserFromDB() const;
