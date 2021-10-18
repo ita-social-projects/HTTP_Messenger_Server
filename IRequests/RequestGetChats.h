@@ -5,7 +5,7 @@ using namespace web;
 
 class RequestGetChats : public IRequests {
 private:
-    std::string user_login;
+    std::string user_token;
 public:
     RequestGetChats(IDatabase* db, const std::string& userLogin);
     void DoRequest();

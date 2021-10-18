@@ -4,12 +4,12 @@
 #include <cpprest/json.h>
 #include "../stringtowstring.h"
 using namespace web;
-RequestGetMessages::RequestGetMessages(IDatabase* db, const std::string& chatTitle) : IRequests(db), chat_title(chatTitle) {}
+RequestGetMessages::RequestGetMessages(IDatabase* db, const std::string& userToken,const unsigned long& chatId) : IRequests(db), user_token(userToken), chat_id(chatId) {}
 
 void RequestGetMessages::DoRequest() {
     json::value result;
     try {
-        std::vector<ISXModel::Message> messageList = db->GetChatMessagesFromDB(this->chat_title);
+        std::vector<ISXModel::Message> messageList = db->GetChatMessagesFromDB(this->user_token,this->chat_id);
         result[L"size"] = messageList.size();
         json::value messages;
         for (int i = 0; i < messageList.size(); i++) {

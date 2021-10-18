@@ -6,13 +6,13 @@
 using namespace web;
 
 RequestJoinToTheChat::RequestJoinToTheChat(IDatabase* db, const std::string userLogin, const std::string chatTitle) : IRequests(db),
-user_login(userLogin),
+user_token(userLogin),
 chat_title(chatTitle) {}
 
 void RequestJoinToTheChat::DoRequest() {
     json::value result;
     try {
-        if (this->db->AddUserToChat(this->user_login, this->chat_title)) {
+        if (this->db->AddUserToChat(this->user_token, this->chat_title)) {
             result[L"status"] = json::value::string(L"OK");
         }
         else {

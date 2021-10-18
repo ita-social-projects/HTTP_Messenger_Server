@@ -5,12 +5,12 @@
 #include "../stringtowstring.h"
 using namespace web;
 
-RequestGetChats::RequestGetChats(IDatabase* db, const std::string& userLogin) : IRequests(db),user_login(userLogin) {}
+RequestGetChats::RequestGetChats(IDatabase* db, const std::string& userLogin) : IRequests(db),user_token(userLogin) {}
 
 void RequestGetChats::DoRequest() {
     json::value result;
     try{
-        std::vector<ISXModel::Chat> chatList = db->GetUserChatsFromDB(this->user_login);
+        std::vector<ISXModel::Chat> chatList = db->GetUserChatsFromDB(this->user_token);
         result[L"size"] = json::value::Number(chatList.size());
         json::value chats;
         for (int i = 0; i < chatList.size(); i++) {

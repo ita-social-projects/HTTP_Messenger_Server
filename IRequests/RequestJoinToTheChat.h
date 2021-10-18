@@ -2,10 +2,10 @@
 #include <cpprest/json.h>
 using namespace web;
 
-class RequestLogin : public IRequests {
+class RequestJoinToTheChat : public IRequests {
 private:
-    std::string user_login, chat_title;
+    std::string user_token, chat_title;
 public:
-    RequestLogin(IDatabase* db, const std::string user_login, const std::string chat_title);
+    RequestJoinToTheChat(IDatabase* db, const std::string user_token, const std::string chat_title);
     void DoRequest();
 };

@@ -6,6 +6,8 @@
 #include <cpprest/json.h>
 #include "../Database/IDatabase.h"
 #include "../AnswerContainerInterface.h"
+#include "../stringtowstring.h"
+
 using namespace web;
 extern class AnswerContainerInterface;
 
