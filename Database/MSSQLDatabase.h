@@ -27,9 +27,9 @@ public:
 	std::string GenerateUserAccessToken(const std::string& user_login, const std::string& user_password) override;
 	bool SaveUserToDB(const ISXModel::User& user) override;
 	bool UpdateUserLoginInDB(const std::string& user_access_token, const std::string& user_login) override;
-	bool UpdateUserPasswordInDB(const std::string& user_access_token, const std::string& user_password) override;
-	bool AddUserToChat(const std::string& user_access_token, const unsigned long& user_id, const unsigned long& chat_id) override;
-	bool RemoveUserFromChat(const std::string& user_access_token, const unsigned long& user_id, const unsigned long& chat_id) override;
+	bool UpdateUserPasswordInDB(const std::string& user_access_token, const std::string& old_password, const std::string& new_password) override;
+	bool AddUserToChat(const std::string& user_access_token, const std::string& user_login, const unsigned long& chat_id) override;
+	bool RemoveUserFromChat(const std::string& user_access_token, const std::string& user_login, const unsigned long& chat_id) override;
 	bool RemoveUserAccessToken(const std::string& user_access_token) override;
 	bool RemoveUserFromDB(const std::string& user_access_token) override;
 
@@ -47,17 +47,21 @@ private:
 	void InitEnvironmentHandle();
 	void InitConnectionHandle();
 	void InitStatementHandle();
+	void FreeEnvironmentHandle();
+	void FreeConnectionHandle();
 	void FreeStatementHandle();
 	bool ExecuteQuery(const std::string& query);
 	ISXModel::User GetUserFromDB() const;
 	ISXModel::Message GetMessageFromDB() const;
 	ISXModel::Chat GetChatFromDB() const;
 	void CheckUserCredentialsInDB(const std::string& user_login, const std::string& user_password);
+	void CheckUserPasswordInDB(const std::string& user_password);
 	void CheckIfUserExists(const std::string& user_login);
 	void CheckIfUserAccessTokenValid(const std::string& user_access_token);
-	unsigned long GetUserIdByAccessToken(const std::string& user_access_token);
+	ISXModel::User GetUserByAccessToken(const std::string& user_access_token);
 	bool SaveUserAccessTokenToDB(const std::string& user_login, const std::string& user_access_token);
-	bool IsUserParticipantOfChat(const std::string& user_id_str, const std::string& chat_id_str);
+	bool IsUserParticipantOfChat(const std::string& user_login, const std::string& chat_id_str);
+	bool ChatHaveParticipants(const std::string& chat_id_str);
 
 	SQLHANDLE m_sql_environment_handle;
 	SQLHANDLE m_sql_connection_handle;

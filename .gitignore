@@ -5,6 +5,7 @@
 /.vs/
 /.idea
 /vcpkg/
+/Logger/
 *.user
 Database.conf
 CMakeFiles

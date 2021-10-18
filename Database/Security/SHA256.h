@@ -6,6 +6,7 @@
 #include <openssl/evp.h>
 
 #include "IHash.h"
+#include "../../Logger/Logger.h"
 
 #define HEX_WIDTH 2
 

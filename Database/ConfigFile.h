@@ -4,6 +4,8 @@
 #include <fstream>
 #include <sys/stat.h>
 
+#include "../Logger/Logger.h"
+
 #ifdef _WIN32
 #define USER_HOME_DIR "USERPROFILE"
 #else

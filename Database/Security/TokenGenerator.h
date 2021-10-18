@@ -6,6 +6,8 @@
 #include <ctime>
 #include <stdexcept>
 
+#include "../../Logger/Logger.h"
+
 #define GENERATED_TOKEN_LEN 8
 #define TOKEN_CHARS_ALLOWED "1234567890bcdfghjklnmnpqrstvwxyz"
 
@@ -17,7 +19,7 @@ class TokenGenerator
 public:
 	TokenGenerator(const std::uint32_t token_length = GENERATED_TOKEN_LEN);
 	void GetNextToken(char*& output_token_ptr);
-	void ResetGenerator();
+	void ReseedGenerator();
 
 private:
 	void GetTokenFromNumber(const std::uint64_t token_number, char*& output_token_ptr, const std::uint32_t token_length) const;

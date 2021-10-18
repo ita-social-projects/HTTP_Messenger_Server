@@ -10,25 +10,20 @@ namespace ISXModel
 class Message
 {
 public:
-	Message();
+	Message() = delete;
 	Message(const std::string& content, unsigned long chat_id);
-	Message(unsigned long id, const std::string& content, unsigned long sender_id, unsigned long chat_id, const std::string& timestamp);
+	Message(unsigned long id, const std::string& content, const std::string& sender, unsigned long chat_id, const std::string& timestamp);
 
 	unsigned long get_id() const;
 	const std::string& get_content() const;
-	unsigned long get_sender_id() const;
+	const std::string& get_sender() const;
 	unsigned long get_chat_id() const;
 	const std::string& get_timestamp() const;
-	void set_id(unsigned long id);
-	void set_content(const std::string& content);
-	void set_sender_id(unsigned long sender_id);
-	void set_chat_id(unsigned long chat_id);
-	void set_timestamp(const std::string& timestamp);
 
 private:
 	unsigned long m_id;
 	std::string m_content;
-	unsigned long m_sender_id;
+	std::string m_sender;
 	unsigned long m_chat_id;
 	std::string m_timestamp;
 };
