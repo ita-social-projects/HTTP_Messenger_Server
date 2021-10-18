@@ -1,7 +1,3 @@
-//
-// Created by pavlo on 9/2/21.
-//
-
 #pragma once
 #include <cpprest/json.h>
 #include "../Database/IDatabase.h"
