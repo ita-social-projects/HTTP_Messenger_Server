@@ -1,19 +1,19 @@
 #include "RequestGetChatParticipants.h"
 
-RequestGetChatParticipants::RequestGetChatParticipants(IDatabase* db, const std::string& chatTitle) : IRequests(db), chat_title(chatTitle) {}
+RequestGetChatParticipants::RequestGetChatParticipants(IDatabase* db,const std::string& userToken, const unsigned long& chatId) : IRequests(db), user_token(userToken), chat_id(chatId) {}
 
 void RequestGetChatParticipants::DoRequest()
 {
     json::value result;
     try {
-        std::vector<ISXModel::User> userList = db->GetChatParticipantsFromDB(this->chat);
+        std::vector<ISXModel::User> userList = db->GetChatParticipantsFromDB(this->user_token,this->chat_id);
         result[L"size"] = json::value::Number(userList.size());
         json::value users;
-        for (int i = 0; i < chatList.size(); i++) {
+        for (int i = 0; i < userList.size(); i++) {
             json::value current = json::value();
-            current[L"id"] = (int)userList[i].get_id();
+            current[L"token"] = json::value::string(to_wstring(userList[i].get_access_token()));
             current[L"login"] = json::value::string(to_wstring(userList[i].get_login()));
-            chats[i] = current;
+            users[i] = current;
         }
         result[L"users"] = users;
         this->answercontainer->SetStatusCode(status_codes::Accepted);

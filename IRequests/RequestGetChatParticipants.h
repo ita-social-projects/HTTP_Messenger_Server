@@ -5,8 +5,9 @@ using namespace web;
 
 class RequestGetChatParticipants : public IRequests {
 private:
-    std::string chat_title;
+    std::string user_token;
+    unsigned long chat_id;
 public:
-    RequestGetChatParticipants(IDatabase* db, const std::string& chatTitle);
+    RequestGetChatParticipants(IDatabase* db, const std::string& userToken,const unsigned long& chatId );
     void DoRequest();
 };

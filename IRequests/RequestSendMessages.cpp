@@ -5,7 +5,7 @@
 #include "../stringtowstring.h"
 using namespace web;
 
-RequestSendMessages::RequestSendMessages(IDatabase* db, const ISXModel::Message& message) : IRequests(db), message(message)
+RequestSendMessages::RequestSendMessages(IDatabase* db, const std::string& token, const ISXModel::Message& message) : IRequests(db), token(token), message(message)
 {
 
 }
@@ -13,7 +13,7 @@ RequestSendMessages::RequestSendMessages(IDatabase* db, const ISXModel::Message&
 void RequestSendMessages::DoRequest() {
     json::value result;
     try {
-        if(db->SaveMessageToDB(this->message)){
+        if(db->SaveMessageToDB(this->token,this->message)){
             result[L"status"] = json::value::string(L"OK");
             this->answercontainer->SetStatusCode(status_codes::Accepted);
         }
