@@ -95,7 +95,7 @@ std::string MSSQLDatabase::GenerateUserAccessToken(const std::string& user_login
 	return access_token;
 }
 
-bool MSSQLDatabase::SaveUserToDB(const ISXModel::User& user)
+unsigned long MSSQLDatabase::SaveUserToDB(const ISXModel::User& user)
 {
 	const std::string login = user.get_login();
 
@@ -104,7 +104,15 @@ bool MSSQLDatabase::SaveUserToDB(const ISXModel::User& user)
 	const std::string password = m_sha256.GenerateHash(user.get_password());
 
 	LOG_DEBUG("Saving new user");
-	return ExecuteQuery("insert into [User](login, password) values(\'" + login + "\', \'" + password + "\')");
+	ExecuteQuery("insert into [User](login, password) output inserted.user_id values(\'" + login + "\', \'" + password + "\')");
+
+	if (SQLFetch(m_sql_statement_handle) != SQL_SUCCESS)
+	{
+		LOG_ERROR("Unable to get id of new user");
+		throw QueryException("Cannot save new user");
+	}
+
+	return GetUserFromDB().get_id();
 }
 
 bool MSSQLDatabase::UpdateUserLoginInDB(const std::string& user_access_token, const std::string& user_login)
@@ -160,9 +168,16 @@ bool MSSQLDatabase::RemoveUserFromChat(const std::string& user_access_token, con
 	}
 
 	LOG_DEBUG("Deleting user from chat with id: " + chat_id_str);
-	return ExecuteQuery("delete cp from ChatParticipant as cp"
+	bool success = ExecuteQuery("delete cp from ChatParticipant as cp"
 						" where cp.chat_id = " + chat_id_str +
 						" AND cp.participant_id = (select u.user_id from [User] as u where u.login=\'" + user_login + "\')");
+
+	if (!ChatHaveParticipants(chat_id_str))
+	{
+		RemoveChatFromDB(user_access_token, chat_id);
+	}
+
+	return success;
 }
 
 bool MSSQLDatabase::RemoveUserAccessToken(const std::string& user_access_token)
@@ -189,7 +204,8 @@ ISXModel::Message MSSQLDatabase::GetMessageFromDB(const std::string& user_access
 	ExecuteQuery("select m.message_id, m.content,"
 				" (select u.login from [User] as u where u.user_id = m.sender_id) as sender,"
 				" m.chat_id, m.timestamp"
-				" from Message as m where m.message_id=" + message_id_str);
+				" from Message as m"
+				" where m.message_id=" + message_id_str);
 
 	if (SQLFetch(m_sql_statement_handle) != SQL_SUCCESS)
 	{
@@ -200,7 +216,9 @@ ISXModel::Message MSSQLDatabase::GetMessageFromDB(const std::string& user_access
 	return GetMessageFromDB();
 }
 
-std::vector<ISXModel::Message> MSSQLDatabase::GetChatMessagesFromDB(const std::string& user_access_token, const unsigned long& chat_id)
+std::vector<ISXModel::Message> MSSQLDatabase::GetChatMessagesFromDB(const std::string& user_access_token,
+																	const unsigned long& chat_id,
+																	const unsigned long& last_message_id)
 {
 	CheckIfUserAccessTokenValid(user_access_token);
 
@@ -213,7 +231,8 @@ std::vector<ISXModel::Message> MSSQLDatabase::GetChatMessagesFromDB(const std::s
 				" from Message as m"
 				" inner join Chat as c"
 				" on c.chat_id = m.chat_id"
-				" where m.chat_id = " + chat_id_str);
+				" where m.chat_id = " + chat_id_str +
+				" and m.message_id > " + std::to_string(last_message_id));
 
 	std::vector<ISXModel::Message> messages;
 
@@ -226,7 +245,7 @@ std::vector<ISXModel::Message> MSSQLDatabase::GetChatMessagesFromDB(const std::s
 	return messages;
 }
 
-bool MSSQLDatabase::SaveMessageToDB(const std::string& user_access_token, const ISXModel::Message& message)
+unsigned long MSSQLDatabase::SaveMessageToDB(const std::string& user_access_token, const ISXModel::Message& message)
 {
 	const ISXModel::User sender = GetUserByAccessToken(user_access_token);
 	const std::string chat_id_str = std::to_string(message.get_chat_id());
@@ -240,8 +259,16 @@ bool MSSQLDatabase::SaveMessageToDB(const std::string& user_access_token, const 
 	std::string content = message.get_content();
 
 	LOG_DEBUG("Saving new message with content: " + content);
-	return ExecuteQuery("insert into Message([content], sender_id, chat_id)"
+	ExecuteQuery("insert into Message([content], sender_id, chat_id) output inserted.message_id"
 					   " values(\'" + content + "\', " + std::to_string(sender.get_id()) + ", " + chat_id_str + ")");
+
+	if (SQLFetch(m_sql_statement_handle) != SQL_SUCCESS)
+	{
+		LOG_ERROR("Unable to get id of new message");
+		throw QueryException("Cannot save new message");
+	}
+
+	return GetMessageFromDB().get_id();
 }
 
 bool MSSQLDatabase::RemoveMessageFromDB(const std::string& user_access_token, const unsigned long& message_id)
@@ -293,7 +320,7 @@ std::vector<ISXModel::Chat> MSSQLDatabase::GetUserChatsFromDB(const std::string&
 	return chats;
 }
 
-bool MSSQLDatabase::SaveChatToDB(const std::string& user_access_token, const ISXModel::Chat& chat)
+unsigned long MSSQLDatabase::SaveChatToDB(const std::string& user_access_token, const ISXModel::Chat& chat)
 {
 	CheckIfUserAccessTokenValid(user_access_token);
 
@@ -310,7 +337,9 @@ bool MSSQLDatabase::SaveChatToDB(const std::string& user_access_token, const ISX
 
 	const unsigned long saved_chat_id = GetChatFromDB().get_id();
 
-	return AddUserToChat(user_access_token, GetUserByAccessToken(user_access_token).get_login(), saved_chat_id);
+	AddUserToChat(user_access_token, GetUserByAccessToken(user_access_token).get_login(), saved_chat_id);
+
+	return saved_chat_id;
 }
 
 bool MSSQLDatabase::RemoveChatFromDB(const std::string& user_access_token, const unsigned long& chat_id)
