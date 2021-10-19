@@ -11,7 +11,7 @@ void RequestCreateNewChat::DoRequest() {
     json::value result;
     try{
         ISXModel::Chat new_chat(chat_title);
-        unsigned long new_chat_id = this->db->SaveChatToDB(this->user_access_token, this->new_chat);
+        unsigned long new_chat_id = this->db->SaveChatToDB(this->user_access_token, new_chat);
         new_chat = this->db->GetChatFromDB(this->user_access_token, new_chat_id);
         result[L"id"] = (int)new_chat.get_id();
         result[L"title"] = json::value::string(to_wstring(new_chat.get_title()));
