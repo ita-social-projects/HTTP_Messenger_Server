@@ -10,7 +10,7 @@ RequestGetMessages::RequestGetMessages(IDatabase* db, const std::string& userAcc
 void RequestGetMessages::DoRequest() {
     json::value result;
     try {
-        std::vector<ISXModel::Message> messageList = db->GetChatMessagesFromDB(this->user_access_token,this->chat_id);
+        std::vector<ISXModel::Message> messageList = db->GetChatMessagesFromDB(this->user_access_token,this->chat_id, this->last_message_id);
         result[L"size"] = (int)messageList.size();
         json::value messages;
         for (int i = 0; i < messageList.size(); i++) {
