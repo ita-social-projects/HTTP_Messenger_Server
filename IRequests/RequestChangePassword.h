@@ -7,8 +7,8 @@ using namespace web;
 class RequestChangePassword : public IRequests {
 private:
     std::string new_password,old_password;
-    std::string access_token;
+    std::string user_acccess_token;
 public:
-    RequestChangePassword(IDatabase* db, const std::string& accessToken,const std::string& oldPassword, const std::string& newPassword);
+    RequestChangePassword(IDatabase* db, const std::string& userAccessToken,const std::string& oldPassword, const std::string& newPassword);
     void DoRequest();
 };

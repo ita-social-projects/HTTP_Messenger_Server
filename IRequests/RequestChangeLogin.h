@@ -8,9 +8,8 @@ using namespace web;
 class RequestChangeLogin : public IRequests {
 private:
     std::string new_login;
-    unsigned long id;
-    std::string access_token;
+    std::string user_access_token;
 public:
-    RequestChangeLogin(IDatabase* db, const std::string& accessToken,const unsigned long& id, const std::string& newLogin);
+    RequestChangeLogin(IDatabase* db, const std::string& userAccessToken, const std::string& newLogin);
     void DoRequest();
 };

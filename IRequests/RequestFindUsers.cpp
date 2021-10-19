@@ -1,17 +1,16 @@
 #include "RequestFindUsers.h"
 
-RequestFindUsers::RequestFindUsers(IDatabase* db, const std::string& userToken, const std::string& userLoginPart) : IRequests(db), user_token(userToken), user_login_part(userLoginPart) {}
+RequestFindUsers::RequestFindUsers(IDatabase* db, const std::string& userAccesToken, const std::string& userLoginPart) : IRequests(db), user_access_token(userAccesToken), user_login_part(userLoginPart) {}
 
 void RequestFindUsers::DoRequest()
 {
     json::value result;
     try {
-        std::vector<ISXModel::User> userList = db->GetUsersFromDBLike(this->user_login_part);
+        std::vector<ISXModel::User> userList = db->GetUsersFromDBLike(this->user_access_token,this->user_login_part);
         result[L"size"] = json::value::Number(userList.size());
         json::value users;
         for (int i = 0; i < userList.size(); i++) {
             json::value current = json::value();
-            current[L"id"] = (int)userList[i].get_id();
             current[L"login"] = json::value::string(to_wstring(userList[i].get_login()));
             users[i] = current;
         }

@@ -1,12 +1,12 @@
 #include "RequestChangeLogin.h"
 
-RequestChangeLogin::RequestChangeLogin(IDatabase* db, const std::string& accessToken,const unsigned long& id,const std::string& newLogin) : IRequests(db), id(id), new_login(newLogin) {}
+RequestChangeLogin::RequestChangeLogin(IDatabase* db, const std::string& userAccessToken,const std::string& newLogin) : IRequests(db),user_access_token(userAccessToken), new_login(newLogin) {}
 
 void RequestChangeLogin::DoRequest()
 {
     json::value result;
     try {
-        if (this->db->UpdateUserLoginInDB(this->access_token, this->new_login)) {
+        if (this->db->UpdateUserLoginInDB(this->user_access_token, this->new_login)) {
             result[L"status"] = json::value::string(to_wstring("OK"));
             this->answercontainer->SetStatusCode(status_codes::OK);
         }

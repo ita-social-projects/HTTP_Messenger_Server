@@ -5,7 +5,7 @@
 #include "../stringtowstring.h"
 using namespace web;
 
-RequestLogin::RequestLogin(IDatabase* db, const std::string login, const std::string password) : IRequests(db),
+RequestLogin::RequestLogin(IDatabase* db, const std::string& login, const std::string& password) : IRequests(db),
 login(login),
 password(password) {}
 
@@ -13,9 +13,9 @@ password(password) {}
 void RequestLogin::DoRequest() {
     json::value result;
     try {
-        std::string token = db->GenerateUserAccessToken(this->login,this->password);
-        result[L"token"] = json::value::string(to_wstring(token));
-        result[L"login"] = json::value::string(to_wstring(login));
+        std::string user_access_token = db->GenerateUserAccessToken(this->login,this->password);
+        result[L"token"] = json::value::string(to_wstring(user_access_token));
+        result[L"login"] = json::value::string(to_wstring(this->login));
         this->answercontainer->SetStatusCode(status_codes::OK);
     }
     catch (const QueryException& e) {

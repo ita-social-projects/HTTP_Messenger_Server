@@ -1,12 +1,12 @@
 #include "RequestChangePassword.h"
 
-RequestChangePassword::RequestChangePassword(IDatabase* db, const std::string& accessToken,const std::string& oldPassword, const std::string& newPassword) : IRequests(db), old_password(oldPassword), new_password(newPassword) {}
+RequestChangePassword::RequestChangePassword(IDatabase* db, const std::string& userAccessToken,const std::string& oldPassword, const std::string& newPassword) : IRequests(db), user_acccess_token(userAccessToken), old_password(oldPassword), new_password(newPassword) {}
 
 void RequestChangePassword::DoRequest()
 {
     json::value result;
     try {
-        if (this->db->UpdateUserPasswordInDB(this->access_token, this->new_password)) {
+        if (this->db->UpdateUserPasswordInDB(this->user_access_token,this->old_password,this->new_password)) {
             result[L"status"] = json::value::string(to_wstring("OK"));
             this->answercontainer->SetStatusCode(status_codes::OK);
         }

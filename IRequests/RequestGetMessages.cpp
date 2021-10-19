@@ -4,19 +4,20 @@
 #include <cpprest/json.h>
 #include "../stringtowstring.h"
 using namespace web;
-RequestGetMessages::RequestGetMessages(IDatabase* db, const std::string& userToken,const unsigned long& chatId) : IRequests(db), user_token(userToken), chat_id(chatId) {}
+RequestGetMessages::RequestGetMessages(IDatabase* db, const std::string& userAccessToken,const unsigned long& chatId) : IRequests(db), user_access_token(userAccessToken), chat_id(chatId) {}
 
 void RequestGetMessages::DoRequest() {
     json::value result;
     try {
-        std::vector<ISXModel::Message> messageList = db->GetChatMessagesFromDB(this->user_token,this->chat_id);
-        result[L"size"] = messageList.size();
+        std::vector<ISXModel::Message> messageList = db->GetChatMessagesFromDB(this->user_access_token,this->chat_id);
+        result[L"size"] = (int)messageList.size();
         json::value messages;
         for (int i = 0; i < messageList.size(); i++) {
             json::value current = json::value();
-            current[L"message_id"] = json::value::Number(messageList[i].get_id());
-            current[L"sender_id"] = json::value::Number(messageList[i].get_sender_id());
-            current[L"chat_id"] = json::value::Number(messageList[i].get_chat_id());
+            current[L"message_id"] = (int)messageList[i].get_id();
+            current[L"sender"] = json::value::string(to_wstring(messageList[i].get_sender()));
+            current[L"chat_id"] = (int)messageList[i].get_chat_id();
+            current[L"timestamp"] = json::value::string(to_wstring(messageList[i].get_timestamp()));
             current[L"text"] = json::value::string(to_wstring(messageList[i].get_content()));
             messages[i] = current;
         }
