@@ -4,7 +4,8 @@
 #include <cpprest/json.h>
 #include "../stringtowstring.h"
 using namespace web;
-RequestGetMessages::RequestGetMessages(IDatabase* db, const std::string& userAccessToken,const unsigned long& chatId) : IRequests(db), user_access_token(userAccessToken), chat_id(chatId) {}
+RequestGetMessages::RequestGetMessages(IDatabase* db, const std::string& userAccessToken,const unsigned long& chatId, const unsigned long& lastMessageId) :
+    IRequests(db), user_access_token(userAccessToken), chat_id(chatId), last_message_id(lastMessageId) {}
 
 void RequestGetMessages::DoRequest() {
     json::value result;
@@ -16,9 +17,8 @@ void RequestGetMessages::DoRequest() {
             json::value current = json::value();
             current[L"message_id"] = (int)messageList[i].get_id();
             current[L"sender"] = json::value::string(to_wstring(messageList[i].get_sender()));
-            current[L"chat_id"] = (int)messageList[i].get_chat_id();
             current[L"timestamp"] = json::value::string(to_wstring(messageList[i].get_timestamp()));
-            current[L"text"] = json::value::string(to_wstring(messageList[i].get_content()));
+            current[L"content"] = json::value::string(to_wstring(messageList[i].get_content()));
             messages[i] = current;
         }
         result[L"messages"] = messages;

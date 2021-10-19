@@ -10,7 +10,12 @@ RequestCreateNewChat::RequestCreateNewChat(IDatabase* db, const std::string& use
 void RequestCreateNewChat::DoRequest() {
     json::value result;
     try{
-
+        ISXModel::Chat new_chat(chat_title);
+        unsigned long new_chat_id = this->db->SaveChatToDB(new_chat);
+        new_chat = this->db->GetChatFromDB(this->user_access_token, this->new_chat_id);
+        result[L"id"] = (int)new_chat.get_id();
+        result[L"title"] = json::value::string(to_wstring(new_chat.get_title()));
+        this->answercontainer->SetStatusCode(status_codes::Accepted);
     }
     catch (const QueryException& e) {
         result[L"what"] = json::value::string(to_wstring(e.what()));
