@@ -1,6 +1,10 @@
 #include "RequestChangePassword.h"
 
-RequestChangePassword::RequestChangePassword(IDatabase* db, const std::string& userAccessToken,const std::string& oldPassword, const std::string& newPassword) : IRequests(db), user_acccess_token(userAccessToken), old_password(oldPassword), new_password(newPassword) {}
+RequestChangePassword::RequestChangePassword(IDatabase* db, const std::string& userAccessToken,const std::string& oldPassword, const std::string& newPassword)
+    : IRequests(db), 
+    user_access_token(userAccessToken), 
+    old_password(oldPassword), 
+    new_password(newPassword) {}
 
 void RequestChangePassword::DoRequest()
 {

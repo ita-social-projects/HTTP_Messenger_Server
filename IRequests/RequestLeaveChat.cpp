@@ -1,6 +1,6 @@
 #pragma once
 #include "IRequests.h"
-#include "RequestAddUserToTheChat.h"
+#include "RequestLeaveChat.h"
 #include <cpprest/json.h>
 #include "../stringtowstring.h"
 using namespace web;

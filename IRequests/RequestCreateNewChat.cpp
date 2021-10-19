@@ -1,11 +1,11 @@
 #pragma once
 #include "IRequests.h"
-#include "RequestGetUserChats.h"
+#include "RequestCreateNewChat.h"
 #include <cpprest/json.h>
 #include "../stringtowstring.h"
 using namespace web;
 
-RequestCreateNewChat::RequestCreateNewChat(IDatabase* db, const std::string& userAccessToken, std::string& chatTitle) : IRequests(db),user_access_token(userAccessToken),chat_title(chatTitle) {}
+RequestCreateNewChat::RequestCreateNewChat(IDatabase* db, const std::string& userAccessToken,const std::string& chatTitle) : IRequests(db),user_access_token(userAccessToken),chat_title(chatTitle) {}
 
 void RequestCreateNewChat::DoRequest() {
     json::value result;
