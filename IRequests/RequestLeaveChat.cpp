@@ -5,18 +5,18 @@
 #include "../stringtowstring.h"
 using namespace web;
 
-RequestAddUserToTheChat::RequestAddUserToTheChat(IDatabase* db, const std::string& userAccessToken, const unsigned long& chatId, const std::string& userLogin) : IRequests(db),
+RequestLeaveChat::RequestLeaveChat(IDatabase* db, const std::string& userAccessToken, const unsigned long& chatId, const std::string& userLogin) : IRequests(db),
 user_access_token(userAccessToken),
 chat_id(chatId),user_login(userLogin) {}
 
-void RequestAddUserToTheChat::DoRequest() {
+void RequestLeaveChat::DoRequest() {
     json::value result;
     try {
-        if (this->db->AddUserToChat(this->user_access_token, this->user_login,this->chat_id)) {
+        if (this->db->RemoveUserFromChat(this->user_access_token, this->user_login,this->chat_id)) {
             result[L"status"] = json::value::string(L"OK");
         }
         else {
-            result[L"what"] = json::value::string(to_wstring("Cannot join to this chat"));
+            result[L"what"] = json::value::string(to_wstring("Cannot leave the chat"));
             this->answercontainer->SetStatusCode(status_codes::Forbidden);
         }
     }

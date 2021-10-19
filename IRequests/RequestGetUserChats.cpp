@@ -5,9 +5,9 @@
 #include "../stringtowstring.h"
 using namespace web;
 
-RequestGetChats::RequestGetChats(IDatabase* db, const std::string& userAccessToken) : IRequests(db),user_access_token(userAccessToken) {}
+RequestGetUserChats::RequestGetUserChats(IDatabase* db, const std::string& userAccessToken) : IRequests(db),user_access_token(userAccessToken) {}
 
-void RequestGetChats::DoRequest() {
+void RequestGetUserChats::DoRequest() {
     json::value result;
     try{
         std::vector<ISXModel::Chat> chatList = db->GetUserChatsFromDB(this->user_access_token);

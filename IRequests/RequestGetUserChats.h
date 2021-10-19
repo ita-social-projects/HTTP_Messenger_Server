@@ -3,10 +3,10 @@
 #include <cpprest/json.h>
 using namespace web;
 
-class RequestGetChats : public IRequests {
+class RequestGetUserChats : public IRequests {
 private:
     std::string user_access_token;
 public:
-    RequestGetChats(IDatabase* db, const std::string& userAccessToken);
+    RequestGetUserChats(IDatabase* db, const std::string& userAccessToken);
     void DoRequest();
 };
