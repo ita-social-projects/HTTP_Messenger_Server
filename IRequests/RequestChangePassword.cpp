@@ -1,23 +1,22 @@
-#pragma once
-#include "IRequests.h"
-#include "RequestSignUp.h"
-#include <cpprest/json.h>
-#include "../stringtowstring.h"
-using namespace web;
+#include "RequestChangePassword.h"
 
-RequestSignUp::RequestSignUp(IDatabase* db, const ISXModel::User& user) : IRequests(db), user(user) {}
+RequestChangePassword::RequestChangePassword(IDatabase* db, const std::string& userAccessToken,const std::string& oldPassword, const std::string& newPassword)
+    : IRequests(db), 
+    user_access_token(userAccessToken), 
+    old_password(oldPassword), 
+    new_password(newPassword) {}
 
-void RequestSignUp::DoRequest() {
+void RequestChangePassword::DoRequest()
+{
     json::value result;
     try {
-        if (db->SaveUserToDB(this->user)) {
+        if (this->db->UpdateUserPasswordInDB(this->user_access_token,this->old_password,this->new_password)) {
             result[L"status"] = json::value::string(to_wstring("OK"));
             this->answercontainer->SetStatusCode(status_codes::OK);
-
         }
         else {
-            result[L"what"] = json::value::string(to_wstring("Cannot process request"));
-            this->answercontainer->SetStatusCode(status_codes::BadRequest);
+            result[L"status"] = json::value::string(to_wstring("Cannot process request."));
+            this->answercontainer->SetStatusCode(status_codes::Unauthorized);
         }
     }
     catch (const QueryException& e) {
@@ -31,4 +30,3 @@ void RequestSignUp::DoRequest() {
     this->answercontainer->SetAnswer(result);
     this->answercontainer->MakeDone();
 }
-

@@ -14,6 +14,8 @@ public:
 	void RespondOnRequest();
 	void SetAnswer(json::value answer) override;
 	void SetStatusCode(status_code code) override;
-	status_code GetStatusCode();
+	status_code GetStatusCode() {
+		return this->code;
+	}
 
 };

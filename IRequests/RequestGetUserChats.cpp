@@ -1,21 +1,21 @@
 #pragma once
 #include "IRequests.h"
-#include "RequestGetChats.h"
+#include "RequestGetUserChats.h"
 #include <cpprest/json.h>
 #include "../stringtowstring.h"
 using namespace web;
 
-RequestGetChats::RequestGetChats(IDatabase* db, const std::string& userLogin) : IRequests(db),user_login(userLogin) {}
+RequestGetUserChats::RequestGetUserChats(IDatabase* db, const std::string& userAccessToken) : IRequests(db),user_access_token(userAccessToken) {}
 
-void RequestGetChats::DoRequest() {
+void RequestGetUserChats::DoRequest() {
     json::value result;
     try{
-        std::vector<ISXModel::Chat> chatList = db->GetUserChatsFromDB(this->user_login);
-        result[L"size"] = json::value::Number(chatList.size());
+        std::vector<ISXModel::Chat> chatList = db->GetUserChatsFromDB(this->user_access_token);
+        result[L"size"] = (int)chatList.size();
         json::value chats;
         for (int i = 0; i < chatList.size(); i++) {
             json::value current = json::value();
-            current[L"id"] = json::value::Number(chatList[i].get_id());
+            current[L"id"] = (int)chatList[i].get_id();
             current[L"title"] = json::value::string(to_wstring(chatList[i].get_title()));
             chats[i] = current;
         }
