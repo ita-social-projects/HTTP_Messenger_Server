@@ -57,18 +57,18 @@ private:
     void _requestChangeLogin         (const http_request& request);
     void _requestChangePassword      (const http_request& request);
     void _requestLogout              (const http_request& request);
-    void _requestFindUser            (const http_request& request);
+    void _requestFindUsers           (const http_request& request);
+    void _requestGetUserChats        (const http_request& request);
 
     // /chat/....
     void _requestGetChatParticipants (const http_request& request);
-    void _requestGetUserChats        (const http_request& request);
     void _requestCreateNewChat       (const http_request& request);
     void _requestAddUserToChat       (const http_request& request);
     void _requestLeaveChat           (const http_request& request);
 
     // /messages/...
     void _requestGetMessages         (const http_request& request);
-    void _requestSendMessage         (const http_request& request);
+    void _requestSendMessages        (const http_request& request);
 
 
 

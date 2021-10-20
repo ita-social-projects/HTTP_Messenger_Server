@@ -1,6 +1,8 @@
 #include "HandlerRequest.h"
 
-void HandlerRequest::_requestLogin           (const http_request& request)
+
+// /user/...
+void HandlerRequest::_requestLogin(const http_request& request)
 {
     json::value value = request.extract_json().get();
 
@@ -26,7 +28,7 @@ void HandlerRequest::_requestLogin           (const http_request& request)
     worker.PushRequest(t1);
 }
 
-void HandlerRequest::_requestSignUp          (const http_request& request)
+void HandlerRequest::_requestSignUp              (const http_request& request)
 {
     json::value value = request.extract_json().get();
 
@@ -52,7 +54,7 @@ void HandlerRequest::_requestSignUp          (const http_request& request)
     worker.PushRequest(t1);
 }
 
-void HandlerRequest::_requestChangeLogin     (const http_request& request)
+void HandlerRequest::_requestChangeLogin         (const http_request& request)
 {
     json::value value = request.extract_json().get();
 
@@ -78,7 +80,7 @@ void HandlerRequest::_requestChangeLogin     (const http_request& request)
     worker.PushRequest(t1);
 }
 
-void HandlerRequest::_requestChangePassword  (const http_request& request)
+void HandlerRequest::_requestChangePassword      (const http_request& request)
 {
     json::value value = request.extract_json().get();
 
@@ -106,7 +108,7 @@ void HandlerRequest::_requestChangePassword  (const http_request& request)
     worker.PushRequest(t1);
 }
 
-void HandlerRequest::_requestLogout          (const http_request& request)
+void HandlerRequest::_requestLogout              (const http_request& request)
 {
     json::value value = request.extract_json().get();
 
@@ -130,14 +132,14 @@ void HandlerRequest::_requestLogout          (const http_request& request)
     worker.PushRequest(t1);
 }
 
-void HandlerRequest::_requestFindUser        (const http_request& request)
+void HandlerRequest::_requestFindUsers            (const http_request& request)
 {
     json::value value = request.extract_json().get();
 
     const json::value token = value[L"token"];
-    const json::value find_user = value[L"find_user"];
+    const json::value search_string = value[L"search_string"];
 
-    if ( token.is_null() || find_user.is_null() )
+    if ( token.is_null() || search_string.is_null() )
     {
         LOG_ERROR("Inalid JSON");
         request.reply(status_codes::BadRequest, "Invalid JSON");
@@ -146,11 +148,202 @@ void HandlerRequest::_requestFindUser        (const http_request& request)
     }
 
     const std::string TOKEN = to_string(token.as_string());
-    const std::string FIND_USER = to_string(find_user.as_string());
+    const std::string SEARCH_STRING = to_string(search_string.as_string());
 
-    IRequests* temp = new RequestFindUsers(&db, TOKEN, FIND_USER);
+    IRequests* temp = new RequestFindUsers(&db, TOKEN, SEARCH_STRING);
     AnswerContainer* t1 = new AnswerContainer(request, temp);
 
+    temp->setAnswerContainer(t1);
+
+    worker.PushRequest(t1);
+}
+
+void HandlerRequest::_requestGetUserChats        (const http_request& request)
+{
+    json::value value = request.extract_json().get();
+
+    const json::value token = value[L"token"];
+
+    if (token.is_null())
+    {
+        LOG_ERROR("Inalid JSON");
+        request.reply(status_codes::BadRequest, "Invalid JSON");
+
+        return;
+    }
+
+    const std::string TOKEN = to_string(token.as_string());
+
+    IRequests* temp = new RequestGetUserChats(&db, TOKEN);
+    AnswerContainer* t1 = new AnswerContainer(request, temp);
+
+    temp->setAnswerContainer(t1);
+
+    worker.PushRequest(t1);
+}
+
+
+// /chat/....
+void HandlerRequest::_requestGetChatParticipants (const http_request& request)
+{
+    json::value value = request.extract_json().get();
+
+    const json::value token = value[L"token"];
+    const json::value chat_id = value[L"chat_id"];
+
+    if (token.is_null() || chat_id.is_null())
+    {
+        LOG_ERROR("Inalid JSON");
+        request.reply(status_codes::BadRequest, "Invalid JSON");
+
+        return;
+    }
+
+    const std::string TOKEN = to_string(token.as_string());
+    const unsigned long CHAT_ID = (chat_id.as_number().to_uint32());
+
+    IRequests* temp = new RequestGetChatParticipants(&db, TOKEN, CHAT_ID);
+    AnswerContainer* t1 = new AnswerContainer(request, temp);
+
+    temp->setAnswerContainer(t1);
+
+    worker.PushRequest(t1);
+}
+
+void HandlerRequest::_requestCreateNewChat       (const http_request& request) {
+    json::value value = request.extract_json().get();
+
+    const json::value token = value[L"token"];
+    const json::value chat_title = value[L"chat_title"];
+
+    if (token.is_null() || chat_title.is_null())
+    {
+        LOG_ERROR("Inalid JSON");
+        request.reply(status_codes::BadRequest, "Invalid JSON");
+
+        return;
+    }
+
+    const std::string TOKEN = to_string(token.as_string());
+    const std::string CHAT_TITLE = to_string(chat_title.as_string());
+
+    IRequests* temp = new RequestCreateNewChat(&db, TOKEN, CHAT_TITLE);
+    AnswerContainer* t1 = new AnswerContainer(request, temp);
+
+    temp->setAnswerContainer(t1);
+
+    worker.PushRequest(t1);
+}
+
+void HandlerRequest::_requestAddUserToChat       (const http_request& request)
+{
+    json::value value = request.extract_json().get();
+
+    const json::value token = value[L"token"];
+    const json::value chat_id = value[L"chat_id"];
+    const json::value user_login = value[L"user_login"];
+
+
+    if (token.is_null() || chat_id.is_null() || user_login.is_null())
+    {
+        LOG_ERROR("Inalid JSON");
+        request.reply(status_codes::BadRequest, "Invalid JSON");
+
+        return;
+    }
+
+    const std::string TOKEN = to_string(token.as_string());
+    const unsigned long CHAT_ID = (chat_id.as_number().to_uint32());
+    const std::string USER_LOGIN = to_string(user_login.as_string());
+
+    IRequests* temp = new RequestAddUserToTheChat(&db, TOKEN, CHAT_ID, USER_LOGIN);
+    AnswerContainer* t1 = new AnswerContainer(request, temp);
+
+    temp->setAnswerContainer(t1);
+
+    worker.PushRequest(t1);
+}
+
+void HandlerRequest::_requestLeaveChat           (const http_request& request)
+{
+    json::value value = request.extract_json().get();
+
+    const json::value token = value[L"token"];
+    const json::value chat_id = value[L"chat_id"];
+    const json::value user_login = value[L"user_login"];
+
+
+    if (token.is_null() || chat_id.is_null() || user_login.is_null())
+    {
+        LOG_ERROR("Inalid JSON");
+        request.reply(status_codes::BadRequest, "Invalid JSON");
+
+        return;
+    }
+
+    const std::string TOKEN = to_string(token.as_string());
+    const unsigned long CHAT_ID = (chat_id.as_number().to_uint32());
+    const std::string USER_LOGIN = to_string(user_login.as_string());
+
+    IRequests* temp = new RequestLeaveChat(&db, TOKEN, CHAT_ID, USER_LOGIN);
+    AnswerContainer* t1 = new AnswerContainer(request, temp);
+
+    temp->setAnswerContainer(t1);
+
+    worker.PushRequest(t1);
+}
+
+
+// /messages/...
+void HandlerRequest::_requestSendMessages         (const http_request& request)
+{
+    json::value value = request.extract_json().get();
+
+    const json::value token = value[L"token"];
+    const json::value message = value[L"message"];
+    const json::value chat_id = value[L"chat_id"];
+
+    if (token.is_null() || message.is_null() || chat_id.is_null())
+    {
+        LOG_ERROR("Inalid JSON");
+        request.reply(status_codes::BadRequest, "Invalid JSON");
+
+        return;
+    }
+
+    const std::string TOKEN = to_string(token.as_string());
+    const std::string MESSAGE = to_string(message.as_string());
+    const unsigned long CHAT_ID = (chat_id.as_number().to_uint32());
+
+    IRequests* temp = new RequestSendMessages(&db, TOKEN, ISXModel::Message(MESSAGE, CHAT_ID));
+    AnswerContainer* t1 = new AnswerContainer(request, temp);
+    temp->setAnswerContainer(t1);
+
+    worker.PushRequest(t1);
+}
+
+void HandlerRequest::_requestGetMessages         (const http_request& request)
+{
+    json::value value = request.extract_json().get();
+
+    const json::value token = value[L"token"];
+    const json::value chat_id = value[L"chat_id"];
+    const json::value last_message_id = value[L"last_message_id"];
+
+    if (token.is_null() ||   chat_id.is_null() || last_message_id.is_null())
+    {
+        LOG_ERROR("Inalid JSON");
+        request.reply(status_codes::BadRequest, "Invalid JSON");
+
+        return;
+    }
+
+    const std::string TOKEN = to_string(token.as_string());
+    const unsigned long LAST_MESSAGE_ID = (last_message_id.as_number().to_uint32());
+    const unsigned long CHAT_ID = (chat_id.as_number().to_uint32());
+
+    IRequests* temp = new RequestGetMessages(&db, TOKEN, CHAT_ID, LAST_MESSAGE_ID);
+    AnswerContainer* t1 = new AnswerContainer(request, temp);
     temp->setAnswerContainer(t1);
 
     worker.PushRequest(t1);

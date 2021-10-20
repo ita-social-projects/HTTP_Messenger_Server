@@ -22,18 +22,44 @@ void HandlerRequest::_groupUser (const http_request& request, const std::string 
     {
         _requestLogout(request);
     }
-    else if (urlRequest == "/find_user")
+    else if (urlRequest == "/find_users")
     {
-        _requestFindUser(request);
+        _requestFindUsers(request);
+    }
+    else if (urlRequest == "/get_user_chats")
+    {
+        _requestGetUserChats(request);
     }
 }
 void HandlerRequest::_groupChat(const http_request& request, const std::string urlRequest)
 {
-
+    if (urlRequest == "/get_participants")
+    {
+        _requestGetChatParticipants(request);
+    }
+    else if (urlRequest == "/create_new")
+    {
+        _requestCreateNewChat(request);
+    }
+    else if (urlRequest == "/add_user")
+    {
+        _requestAddUserToChat(request);
+    }
+    else if (urlRequest == "/leave")
+    {
+        _requestLeaveChat(request);
+    }
 }
 void HandlerRequest::_groupMessages(const http_request& request, const std::string urlRequest)
 {
-
+    if (urlRequest == "/get")
+    {
+        _requestGetMessages(request);
+    }
+    else if (urlRequest == "/send")
+    {
+        _requestSendMessages(request);
+    }
 }
 
 void HandlerRequest::_handle_get(http_request request) {

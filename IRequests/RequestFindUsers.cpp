@@ -7,7 +7,7 @@ void RequestFindUsers::DoRequest()
     json::value result;
     try {
         std::vector<ISXModel::User> userList = db->GetUsersFromDBLike(this->user_access_token,this->user_login_part);
-        result[L"size"] = json::value::Number(userList.size());
+        result[L"size"] = int(userList.size());
         json::value users;
         for (int i = 0; i < userList.size(); i++) {
             json::value current = json::value();
