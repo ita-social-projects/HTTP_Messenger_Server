@@ -1,5 +1,6 @@
 #include "ThreadWorker.h"
 
+using std::min;
 
 ThreadWorker::ThreadWorker()
 {
@@ -10,7 +11,7 @@ ThreadWorker::ThreadWorker()
 
 void ThreadWorker::InitThreads()
 {
-    for (int i = 0; i < std::min(m_threadsCount, 1); i++)
+    for (int i = 0; i < min(m_threadsCount, 1); i++)
     {
         std::shared_ptr<ThreadInfo> tempShared = std::make_shared<ThreadInfo>(ThreadInfo());
         m_Threads.push_back(std::thread(&ThreadWorker::ThreadProcess, this, tempShared));
