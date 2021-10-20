@@ -1,6 +1,6 @@
-#include "SHA256.h"
+#include "SHA256Crypt.h"
 
-SHA256::SHA256()
+SHA256Crypt::SHA256Crypt()
 		: m_context(EVP_MD_CTX_new())
 		, m_hash(std::make_unique<unsigned char[]>(EVP_MAX_MD_SIZE))
 		, m_hash_length(0)
@@ -12,13 +12,13 @@ SHA256::SHA256()
 	}
 }
 
-SHA256::~SHA256()
+SHA256Crypt::~SHA256Crypt()
 {
 	m_hash.reset();
 	EVP_MD_CTX_free(m_context);
 }
 
-std::string SHA256::GenerateHash(const std::string& string)
+const std::string SHA256Crypt::GenerateHash(const std::string& string)
 {
 	Init();
 	Update(string);
@@ -27,7 +27,17 @@ std::string SHA256::GenerateHash(const std::string& string)
 	return GetHashString();
 }
 
-void SHA256::Init()
+const std::string SHA256Crypt::GenerateSaltedHash(const std::string& string, const std::string& salt)
+{
+	Init();
+	Update(salt);
+	Update(string);
+	Final();
+
+	return GetHashString();
+}
+
+void SHA256Crypt::Init()
 {
 	if (!EVP_DigestInit_ex(m_context, EVP_sha256(), nullptr))
 	{
@@ -36,7 +46,7 @@ void SHA256::Init()
 	}
 }
 
-void SHA256::Update(const std::string& string)
+void SHA256Crypt::Update(const std::string& string)
 {
 	if (!EVP_DigestUpdate(m_context, string.c_str(), string.length()))
 	{
@@ -45,7 +55,7 @@ void SHA256::Update(const std::string& string)
 	}
 }
 
-void SHA256::Final()
+void SHA256Crypt::Final()
 {
 	if (!EVP_DigestFinal_ex(m_context, m_hash.get(), &m_hash_length))
 	{
@@ -54,7 +64,7 @@ void SHA256::Final()
 	}
 }
 
-std::string SHA256::GetHashString() const
+std::string SHA256Crypt::GetHashString() const
 {
 	std::stringstream ss;
 

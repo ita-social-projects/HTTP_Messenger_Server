@@ -5,7 +5,7 @@ MSSQLDatabase::MSSQLDatabase()
 		, m_sql_connection_handle(SQL_NULL_HDBC)
 		, m_sql_statement_handle(SQL_NULL_HSTMT)
 		, m_config_file("Database.conf")
-		, m_token_generator(USER_ACCESS_TOKEN_LEN - 1)
+		, m_token_generator(USER_MAX_ACCESS_TOKEN_LEN - 1)
 {
 	InitEnvironmentHandle();
 	m_config_file.CreateIfNotExists();
@@ -81,7 +81,7 @@ std::string MSSQLDatabase::GenerateUserAccessToken(const std::string& user_login
 {
 	CheckUserCredentialsInDB(user_login, user_password);
 
-	char access_token[USER_ACCESS_TOKEN_LEN] = { 0 };
+	char access_token[USER_MAX_ACCESS_TOKEN_LEN] = { 0 };
 	char* access_token_ptr = access_token;
 
 	m_token_generator.GetNextToken(access_token_ptr);
@@ -101,7 +101,7 @@ unsigned long MSSQLDatabase::SaveUserToDB(const ISXModel::User& user)
 
 	CheckIfUserExists(login);
 
-	const std::string password = m_sha256.GenerateHash(user.get_password());
+	const std::string password = m_sha256_crypt.GenerateHash(user.get_password());
 
 	LOG_DEBUG("Saving new user");
 	ExecuteQuery("insert into [User](login, password) output inserted.user_id values(\'" + login + "\', \'" + password + "\')");
@@ -130,7 +130,7 @@ bool MSSQLDatabase::UpdateUserPasswordInDB(const std::string& user_access_token,
 	CheckUserPasswordInDB(old_password);
 
 	LOG_DEBUG("Updating user password");
-	return ExecuteQuery("update u set u.password=\'" + m_sha256.GenerateHash(new_password) + "\' from [User] u"
+	return ExecuteQuery("update u set u.password=\'" + m_sha256_crypt.GenerateHash(new_password) + "\' from [User] u"
 					   " where u.access_token=\'" + user_access_token + "\'");
 }
 
@@ -450,10 +450,10 @@ bool MSSQLDatabase::ExecuteQuery(const std::string& query)
 ISXModel::User MSSQLDatabase::GetUserFromDB() const
 {
 	unsigned long id = 0;
-	char login[USER_LOGIN_LEN] = { 0 };
+	char login[USER_MAX_LOGIN_LEN] = { 0 };
 
 	SQLGetData(m_sql_statement_handle, 1, SQL_C_ULONG, &id, sizeof(unsigned long), nullptr);
-	SQLGetData(m_sql_statement_handle, 2, SQL_C_CHAR, login, USER_LOGIN_LEN, nullptr);
+	SQLGetData(m_sql_statement_handle, 2, SQL_C_CHAR, login, USER_MAX_LOGIN_LEN, nullptr);
 
 	return ISXModel::User(id, login);
 }
@@ -461,16 +461,16 @@ ISXModel::User MSSQLDatabase::GetUserFromDB() const
 ISXModel::Message MSSQLDatabase::GetMessageFromDB() const
 {
 	unsigned long id = 0;
-	char content[MESSAGE_CONTENT_LEN] = { 0 };
-	char sender[USER_LOGIN_LEN] = { 0 };
+	char content[MESSAGE_MAX_CONTENT_LEN] = { 0 };
+	char sender[USER_MAX_LOGIN_LEN] = { 0 };
 	unsigned long chat_id = 0;
-	char timestamp[MESSAGE_TIMESTAMP_LEN] = { 0 };
+	char timestamp[MESSAGE_MAX_TIMESTAMP_LEN] = { 0 };
 
 	SQLGetData(m_sql_statement_handle, 1, SQL_C_ULONG, &id, sizeof(unsigned long), nullptr);
-	SQLGetData(m_sql_statement_handle, 2, SQL_C_CHAR, content, MESSAGE_CONTENT_LEN, nullptr);
-	SQLGetData(m_sql_statement_handle, 3, SQL_C_CHAR, sender, USER_LOGIN_LEN, nullptr);
+	SQLGetData(m_sql_statement_handle, 2, SQL_C_CHAR, content, MESSAGE_MAX_CONTENT_LEN, nullptr);
+	SQLGetData(m_sql_statement_handle, 3, SQL_C_CHAR, sender, USER_MAX_LOGIN_LEN, nullptr);
 	SQLGetData(m_sql_statement_handle, 4, SQL_C_ULONG, &chat_id, sizeof(unsigned long), nullptr);
-	SQLGetData(m_sql_statement_handle, 5, SQL_C_CHAR, timestamp, MESSAGE_TIMESTAMP_LEN, nullptr);
+	SQLGetData(m_sql_statement_handle, 5, SQL_C_CHAR, timestamp, MESSAGE_MAX_TIMESTAMP_LEN, nullptr);
 
 	return ISXModel::Message(id, content, sender, chat_id, timestamp);
 }
@@ -478,10 +478,10 @@ ISXModel::Message MSSQLDatabase::GetMessageFromDB() const
 ISXModel::Chat MSSQLDatabase::GetChatFromDB() const
 {
 	unsigned long id = 0;
-	char title[CHAT_TITLE_LEN] = { 0 };
+	char title[CHAT_MAX_TITLE_LEN] = { 0 };
 
 	SQLGetData(m_sql_statement_handle, 1, SQL_C_ULONG, &id, sizeof(unsigned long), nullptr);
-	SQLGetData(m_sql_statement_handle, 2, SQL_C_CHAR, title, CHAT_TITLE_LEN, nullptr);
+	SQLGetData(m_sql_statement_handle, 2, SQL_C_CHAR, title, CHAT_MAX_TITLE_LEN, nullptr);
 
 	return ISXModel::Chat(id, title);
 }
@@ -491,7 +491,7 @@ void MSSQLDatabase::CheckUserCredentialsInDB(const std::string& user_login, cons
 	LOG_DEBUG("Checking user credentials");
 	ExecuteQuery("select u.user_id from [User] as u"
 				" where u.login=\'" + user_login + "\'"
-				" and u.password=\'" + m_sha256.GenerateHash(user_password) + "\'");
+				" and u.password=\'" + m_sha256_crypt.GenerateHash(user_password) + "\'");
 
 	if (SQLFetch(m_sql_statement_handle) != SQL_SUCCESS)
 	{
@@ -503,7 +503,7 @@ void MSSQLDatabase::CheckUserCredentialsInDB(const std::string& user_login, cons
 void MSSQLDatabase::CheckUserPasswordInDB(const std::string& user_password)
 {
 	LOG_DEBUG("Checking current user password");
-	ExecuteQuery("select u.user_id from [User] as u and u.password=\'" + m_sha256.GenerateHash(user_password) + "\'");
+	ExecuteQuery("select u.user_id from [User] as u where u.password=\'" + m_sha256_crypt.GenerateHash(user_password) + "\'");
 
 	if (SQLFetch(m_sql_statement_handle) != SQL_SUCCESS)
 	{
