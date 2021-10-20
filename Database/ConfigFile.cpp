@@ -2,22 +2,31 @@
 
 ConfigFile::ConfigFile(const std::string& filename)
 {
-	const char* const home_dir = std::getenv(USER_HOME_DIR);
+	const char* const program_data_dir = std::getenv(PROGRAM_DATA_DIR);
 
-	if (home_dir == nullptr)
+	if (program_data_dir == nullptr)
 	{
-		LOG_FATAL("Environment variable \"" + std::string(USER_HOME_DIR) + "\" is not set");
-		throw std::runtime_error("Environment variable \"" + std::string(USER_HOME_DIR) + "\" is not set");
+		LOG_FATAL("Environment variable \"" + std::string(PROGRAM_DATA_DIR) + "\" is not set");
+		throw std::runtime_error("Environment variable \"" + std::string(PROGRAM_DATA_DIR) + "\" is not set");
 	}
 
-	m_config_filename = std::string(home_dir) + "/" + filename;
+	const std::string http_messenger_server_dir = std::string(program_data_dir) + "\\" + HTTP_MESSENGER_SERVER_DIR;
+
+	if (!IsPathExists(http_messenger_server_dir))
+	{
+		LOG_DEBUG("Creating directory: \"" + http_messenger_server_dir + "\"");
+		CreateDirectoryA(http_messenger_server_dir.c_str(), nullptr);
+	}
+
+	m_config_filename = http_messenger_server_dir + "\\" + filename;
 }
 
 void ConfigFile::CreateIfNotExists() const
 {
 	LOG_DEBUG("Checking if config file exists");
-	if (FileExists(m_config_filename))
+	if (IsPathExists(m_config_filename))
 	{
+		LOG_DEBUG("Config file exists");
 		return;
 	}
 
@@ -65,7 +74,7 @@ std::string ConfigFile::GetStringWithDelimeter(const char delimeter) const
 	return string;
 }
 
-inline bool ConfigFile::FileExists(const std::string& filename) const
+inline bool ConfigFile::IsPathExists(const std::string& filename) const
 {
 	struct stat buffer;
 	return (stat(filename.c_str(), &buffer) == 0);
