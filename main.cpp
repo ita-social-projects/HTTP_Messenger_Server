@@ -84,7 +84,7 @@ int main(int argc, char* argv[])
     }
     else
     {
-        LOG_DEBUG("Sarting Service");
+        LOG_DEBUG("Starting Service");
         SERVICE_TABLE_ENTRY ServiceTable[] =
         {
             {SERVICE_NAME, (LPSERVICE_MAIN_FUNCTION)ServiceStarter::ServiceMain},

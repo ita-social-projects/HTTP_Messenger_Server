@@ -6,11 +6,8 @@
 
 #include "../Logger/Logger.h"
 
-#ifdef _WIN32
-#define USER_HOME_DIR "USERPROFILE"
-#else
-#define USER_HOME_DIR "HOME"
-#endif
+#define PROGRAM_DATA_DIR "ProgramData"
+#define HTTP_MESSENGER_SERVER_DIR "HTTP_Messenger_Server"
 
 class ConfigFile
 {
@@ -20,7 +17,7 @@ public:
 	std::string GetStringWithDelimeter(const char delimeter) const;
 
 private:
-	bool FileExists(const std::string& filename) const;
+	bool IsPathExists(const std::string& filename) const;
 
 	std::string m_config_filename;
 

@@ -13,6 +13,7 @@ void RequestLogout::DoRequest() {
     try {
         if (this->db->RemoveUserAccessToken(this->user_access_token)) {
             result[L"status"] = json::value::string(L"OK");
+            this->answercontainer->SetStatusCode(status_codes::OK);
         }
         else {
             result[L"what"] = json::value::string(to_wstring("Cannot leave the app"));
@@ -20,7 +21,7 @@ void RequestLogout::DoRequest() {
         }
     }
     catch (const QueryException& e) {
-        result[L"what"] = json::value::string(to_wstring("No such user"));
+        result[L"what"] = json::value::string(to_wstring(e.what()));
         this->answercontainer->SetStatusCode(status_codes::Unauthorized);
     }
     catch (const std::exception& e) {
