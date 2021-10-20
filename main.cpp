@@ -39,15 +39,9 @@ int main(int argc, char* argv[])
     }
     else
     {
-        SERVICE_TABLE_ENTRY ServiceTable[] =
-        {
-            {SERVICE_NAME, (LPSERVICE_MAIN_FUNCTION)ServiceStarter::ServiceMain},
-            {NULL, NULL}
-        };
-
-        if (StartServiceCtrlDispatcher(ServiceTable) == FALSE)
-        {
-            return GetLastError();
-        }
+        HandlerRequest h;
+        bool ServerWorking = 1;
+        h.AddQueueThread(ServerWorking);
     }
+
 }
