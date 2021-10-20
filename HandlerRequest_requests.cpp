@@ -2,7 +2,7 @@
 
 
 // /user/...
-void HandlerRequest::_requestLogin(const http_request& request)
+void HandlerRequest::_requestLogin               (const http_request& request)
 {
     json::value value = request.extract_json().get();
 
@@ -59,7 +59,7 @@ void HandlerRequest::_requestChangeLogin         (const http_request& request)
     json::value value = request.extract_json().get();
 
     const json::value token = value[L"token"];
-    const json::value new_login = value[L"new_login"];
+    const json::value new_login = value[L"login"];
 
     if (token.is_null() || new_login.is_null())
     {
@@ -85,8 +85,8 @@ void HandlerRequest::_requestChangePassword      (const http_request& request)
     json::value value = request.extract_json().get();
 
     const json::value token = value[L"token"];
-    const json::value old_password = value[L"old_password"];
-    const json::value new_password = value[L"new_password"];
+    const json::value old_password = value[L"pass"];
+    const json::value new_password = value[L"new_pass"];
 
     if ( token.is_null() || old_password.is_null() || new_password.is_null() )
     {
@@ -132,7 +132,7 @@ void HandlerRequest::_requestLogout              (const http_request& request)
     worker.PushRequest(t1);
 }
 
-void HandlerRequest::_requestFindUsers            (const http_request& request)
+void HandlerRequest::_requestFindUsers           (const http_request& request)
 {
     json::value value = request.extract_json().get();
 
@@ -241,7 +241,7 @@ void HandlerRequest::_requestAddUserToChat       (const http_request& request)
 
     const json::value token = value[L"token"];
     const json::value chat_id = value[L"chat_id"];
-    const json::value user_login = value[L"user_login"];
+    const json::value user_login = value[L"login"];
 
 
     if (token.is_null() || chat_id.is_null() || user_login.is_null())
@@ -270,7 +270,7 @@ void HandlerRequest::_requestLeaveChat           (const http_request& request)
 
     const json::value token = value[L"token"];
     const json::value chat_id = value[L"chat_id"];
-    const json::value user_login = value[L"user_login"];
+    const json::value user_login = value[L"login"];
 
 
     if (token.is_null() || chat_id.is_null() || user_login.is_null())
