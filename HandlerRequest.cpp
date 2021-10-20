@@ -106,7 +106,7 @@ void HandlerRequest::_handle_del(http_request request) {
     std::cout << "Handling delete!\n";
 }
 
-void HandlerRequest::AddQueueThread()
+void HandlerRequest::AddQueueThread(bool&)
 {
         http_listener listener(L"http://localhost:8080/restdemo");
     
