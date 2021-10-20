@@ -17,7 +17,7 @@
 #include "stringtowstring.h"
 #include "ThreadWorker.h"
 #include "IRequests/IRequests.h"
-#include "IRequests/RequestGetChats.h"
+#include "IRequests/RequestGetUserChats.h"
 #include "IRequests/RequestGetMessages.h"
 #include "IRequests/RequestLogin.h"
 #include "IRequests/RequestSendMessages.h"

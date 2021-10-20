@@ -1,25 +1,9 @@
 #include "ServiceController.h"
-template <class T>
-void logFile(T text);
-
+#include "../Logger/Logger.h"
 namespace fs = std::filesystem;
-
-#define DFILEPATH "D:\\programming\\Soft\\SoftProject\\WindowsServiceApplication\\out.txt"
-extern std::ofstream dFile;
-
-template <class T>
-void logFile(T text)
-{
-	dFile.open(DFILEPATH, std::ios_base::app);
-
-	dFile << text << '\n';
-	dFile.close();
-}
-
 
 bool ServiceController::InstallService()
 {
-	
 	if (!m_OpenSCManager(m_hSCManager))
 	{
 		return 0;
@@ -43,31 +27,31 @@ bool ServiceController::InstallService()
 		int err = GetLastError();
 		switch (err) {
 		case ERROR_ACCESS_DENIED:
-			logFile ("Error: ERROR_ACCESS_DENIED");
+			LOG_FATAL("Error: ERROR_ACCESS_DENIED");
 			break;
 		case ERROR_CIRCULAR_DEPENDENCY:
-			logFile("Error: ERROR_CIRCULAR_DEPENDENCY");
+			LOG_FATAL("Error: ERROR_CIRCULAR_DEPENDENCY");
 			break;
 		case ERROR_DUPLICATE_SERVICE_NAME:
-			logFile("Error: ERROR_DUPLICATE_SERVICE_NAME");
+			LOG_FATAL("Error: ERROR_DUPLICATE_SERVICE_NAME");
 			break;
 		case ERROR_INVALID_HANDLE:
-			logFile("Error: ERROR_INVALID_HANDLE");
+			LOG_FATAL("Error: ERROR_INVALID_HANDLE");
 			break;
 		case ERROR_INVALID_NAME:
-			logFile("Error: ERROR_INVALID_NAME");
+			LOG_FATAL("Error: ERROR_INVALID_NAME");
 			break;
 		case ERROR_INVALID_PARAMETER:
-			logFile("Error: ERROR_INVALID_PARAMETER");
+			LOG_FATAL("Error: ERROR_INVALID_PARAMETER");
 			break;
 		case ERROR_INVALID_SERVICE_ACCOUNT:
-			logFile("Error: ERROR_INVALID_SERVICE_ACCOUNT");
+			LOG_FATAL("Error: ERROR_INVALID_SERVICE_ACCOUNT");
 			break;
 		case ERROR_SERVICE_EXISTS:
-			logFile("Error: ERROR_SERVICE_EXISTS");
+			LOG_FATAL("Error: ERROR_SERVICE_EXISTS");
 			break;
 		default:
-			logFile("Error: Undefined");
+			LOG_FATAL("Error: Undefined");
 		}
 		CloseServiceHandle(m_hSCManager);
 		return 0;
@@ -75,7 +59,7 @@ bool ServiceController::InstallService()
 	CloseServiceHandle(m_hService);
 
 	CloseServiceHandle(m_hSCManager);
-	logFile("Success install service!");
+	LOG_DEBUG("Success install service!");
 	return 1;
 }
 
@@ -87,7 +71,7 @@ bool ServiceController::UninstallService()
 	}
 	m_hService = OpenService(m_hSCManager, get_LPCSTR_ServiceName(), SERVICE_STOP | DELETE);
 	if (!m_hService) {
-		logFile("Error: Can't remove service");
+		LOG_FATAL("Error: Can't remove service");
 		CloseServiceHandle(m_hSCManager);
 		return 0;
 	}
@@ -95,7 +79,7 @@ bool ServiceController::UninstallService()
 	DeleteService(m_hService);
 	CloseServiceHandle(m_hService);
 	CloseServiceHandle(m_hSCManager);
-	logFile("Success remove service!");
+	LOG_DEBUG("Success remove service!");
 	return 1;
 }
 
@@ -109,10 +93,10 @@ bool ServiceController::StartService_()
 	m_hService = OpenService(m_hSCManager, get_LPCSTR_ServiceName(), SERVICE_START);
 	if (!StartService(m_hService, 0, NULL)) {
 		CloseServiceHandle(m_hSCManager);
-		logFile("Error: Can't start service");
+		LOG_FATAL("Error: Can't start service");
 		return 0;
 	}
-
+	LOG_DEBUG("Success start service!");
 	CloseServiceHandle(m_hService);
 	CloseServiceHandle(m_hSCManager);
 	return 1;
@@ -127,8 +111,7 @@ bool ServiceController::StopService()
 	m_hService = OpenService(m_hSCManager, get_LPCSTR_ServiceName(), SERVICE_STOP);
 	SERVICE_STATUS ss;
 	if (!ControlService(m_hService, SERVICE_CONTROL_STOP, &ss)) {
-		logFile("Error: Can't stop service");
-		logFile(GetLastError());
+		LOG_FATAL("Error: Can't stop service");
 		CloseServiceHandle(m_hSCManager);
 		return 0;
 	}	
@@ -136,8 +119,19 @@ bool ServiceController::StopService()
 	DeleteService(m_hService);
 	CloseServiceHandle(m_hService);
 	CloseServiceHandle(m_hSCManager);
-	logFile("Success stop service!");
+	LOG_DEBUG("Success stop service!");
 	return 1;
+}
+
+void ServiceController::Help()
+{
+	std::cout << "You can must use this parameters:\n"
+		<< "Install   - for install service\n"
+		<< "Start     - to start Windows Service\n"
+		<< "Stop      - to stop Windows Service\n"
+		<< "Uninstall - to uninstall Windows Service\n"
+		<< "Help      - to see this text\n"
+		<< "!!! Programm must be running as Administrator !!!\n";
 }
 
 
@@ -145,7 +139,7 @@ bool ServiceController::m_OpenSCManager(SC_HANDLE& m_hSCManager)
 {
 	m_hSCManager = OpenSCManager(NULL, NULL, SC_MANAGER_ALL_ACCESS);
 	if (!m_hSCManager) {
-		logFile("Error: Can't open Service Control Manager");
+		LOG_FATAL("Error: Can't open Service Control Manager");
 		return 0;
 	}
 	return 1;

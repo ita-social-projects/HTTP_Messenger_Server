@@ -106,7 +106,7 @@ void HandlerRequest::_handle_del(http_request request) {
     std::cout << "Handling delete!\n";
 }
 
-void HandlerRequest::AddQueueThread(bool&)
+void HandlerRequest::AddQueueThread(bool& RunningServer)
 {
         http_listener listener(L"http://localhost:8080/restdemo");
     
@@ -120,7 +120,7 @@ void HandlerRequest::AddQueueThread(bool&)
                     .open()
                     .then([&listener](){std::cout<<"Starting..."<<std::endl;})
                     .wait();
-            while (true);
+            while (RunningServer);
         }
         catch (std::exception const & e)
         {

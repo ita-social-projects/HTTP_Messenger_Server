@@ -4,7 +4,7 @@ SERVICE_STATUS_HANDLE ServiceStarter::g_StatusHandle = NULL;
 SERVICE_STATUS        ServiceStarter::g_ServiceStatus = { 0 };
 HANDLE ServiceStarter::g_ServiceStopEvent = INVALID_HANDLE_VALUE;
 bool ServiceStarter::RunningServer = true;
-std::ofstream dFile;
+
 
 
 VOID WINAPI ServiceStarter::ServiceMain(DWORD argc, LPTSTR* argv)
@@ -30,14 +30,13 @@ VOID WINAPI ServiceStarter::ServiceMain(DWORD argc, LPTSTR* argv)
 
     if (SetServiceStatus(g_StatusHandle, &g_ServiceStatus) == FALSE)
     {
-        logFile("My Sample Service: ServiceMain: SetServiceStatus returned error");
+        LOG_FATAL("SetServiceStatus returned error");
     }
 
-    logFile("Start init");
+    LOG_DEBUG("Start init");
 
 
 
-    logFile("End init");
     // Create a service stop event to wait on later
     g_ServiceStopEvent = CreateEvent(NULL, TRUE, FALSE, NULL);
     if (g_ServiceStopEvent == NULL)
@@ -51,7 +50,7 @@ VOID WINAPI ServiceStarter::ServiceMain(DWORD argc, LPTSTR* argv)
 
         if (SetServiceStatus(g_StatusHandle, &g_ServiceStatus) == FALSE)
         {
-            logFile("My Sample Service: ServiceMain: SetServiceStatus returned error");
+            LOG_FATAL("SetServiceStatus returned error");
         }
         return;
     }
@@ -64,7 +63,7 @@ VOID WINAPI ServiceStarter::ServiceMain(DWORD argc, LPTSTR* argv)
 
     if (SetServiceStatus(g_StatusHandle, &g_ServiceStatus) == FALSE)
     {
-        logFile("My Sample Service: ServiceMain: SetServiceStatus returned error");
+        LOG_FATAL("SetServiceStatus returned error");
     }
 
     // Start a thread that will perform the main task of the service
@@ -77,7 +76,7 @@ VOID WINAPI ServiceStarter::ServiceMain(DWORD argc, LPTSTR* argv)
     /*
         * Perform any cleanup tasks
     */
-    logFile("Cleaning\n");
+    LOG_FATAL("Exiting service\n");
 
     CloseHandle(g_ServiceStopEvent);
 
@@ -89,7 +88,7 @@ VOID WINAPI ServiceStarter::ServiceMain(DWORD argc, LPTSTR* argv)
 
     if (SetServiceStatus(g_StatusHandle, &g_ServiceStatus) == FALSE)
     {
-        logFile("My Sample Service: ServiceMain: SetServiceStatus returned error");
+        LOG_FATAL("SetServiceStatus returned error");
     }
 
 
@@ -117,7 +116,7 @@ VOID WINAPI ServiceStarter::ServiceCtrlHandler(DWORD CtrlCode)
 
         if (SetServiceStatus(g_StatusHandle, &g_ServiceStatus) == FALSE)
         {
-            logFile("My Sample Service: ServiceCtrlHandler: SetServiceStatus returned error");
+            LOG_FATAL("SetServiceStatus returned error");
         }
 
         // This will signal the worker thread to start shutting down
@@ -142,20 +141,10 @@ DWORD WINAPI ServiceStarter::ServiceWorkerThread(LPVOID lpParam)
         }
         catch (const std::exception& ex)
         {
-            logFile(ex.what());
+            LOG_FATAL(ex.what());
 
         }
-
     }
-
+    
     return ERROR_SUCCESS;
-}
-
-template <class T>
-void logFile(T text)
-{
-    dFile.open(DFILEPATH, std::ios_base::app);
-
-    dFile << text << '\n';
-    dFile.close();
 }

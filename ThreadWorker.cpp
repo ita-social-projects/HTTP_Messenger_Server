@@ -7,16 +7,19 @@ ThreadWorker::ThreadWorker()
     InitThreads();
 }
 
-
+using std::min;
 void ThreadWorker::InitThreads()
 {
-    for (int i = 0; i < std::min(m_threadsCount, 1); i++)
+    int ThreadsCount = min(m_threadsCount, 1);
+   
+    for (int i = 0; i < ThreadsCount; i++)
     {
         std::shared_ptr<ThreadInfo> tempShared = std::make_shared<ThreadInfo>(ThreadInfo());
         m_Threads.push_back(std::thread(&ThreadWorker::ThreadProcess, this, tempShared));
         m_ThreadPool.push_back(tempShared);
     }
     DetachThreads();
+    LOG_DEBUG("Programm is using such count of threads: ", ThreadsCount);
 }
 
 void ThreadWorker::DetachThreads()
@@ -60,6 +63,7 @@ void ThreadWorker::ThreadProcess(std::shared_ptr<ThreadInfo> threadInfo)
         {
             std::unique_lock<std::mutex> lock(m_mutex);
             threadInfo->ProcessRequest();
+            LOG_DEBUG("Request Processed successfully");
             lock.unlock();
         }
     }
@@ -67,6 +71,7 @@ void ThreadWorker::ThreadProcess(std::shared_ptr<ThreadInfo> threadInfo)
 void ThreadWorker::PushRequest(AnswerContainer* request)
 {
     std::unique_lock<std::mutex> lock(m_mutex);
+    LOG_DEBUG("New request pushed");
     m_requestsQueue.push(std::make_unique<AnswerContainer>(*request));
     lock.unlock();
 }
