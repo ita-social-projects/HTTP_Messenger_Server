@@ -45,7 +45,7 @@ private:
     
 public:
     
-    void AddQueueThread();
+    void AddQueueThread(bool&);
 };
 
 

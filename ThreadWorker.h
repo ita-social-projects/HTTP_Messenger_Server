@@ -27,7 +27,6 @@ class ThreadWorker
 {
 private:
     AnswerContainerQueue m_requestsQueue;
-    AnswerContainer* globalRequest;
     std::vector<std::thread> m_Threads;
     std::thread m_processThreadPool;
     int m_threadsCount;
