@@ -42,7 +42,7 @@ void TokenGenerator::ReseedGenerator()
 {
 	LOG_DEBUG("Setting new seed to generator");
 	std::uint64_t seed = GenerateSeed();
-	m_multiplier = seed;
+	m_multiplier = (m_modulus / seed) + 1;
 	m_init_generated_number = m_last_generated_number = seed % m_modulus;
 }
 
@@ -54,10 +54,10 @@ void TokenGenerator::GetTokenFromNumber(const std::uint64_t token_number, char*&
 		throw std::runtime_error("Output token is not initialized");
 	}
 
-	if (token_number < 0 || token_number >= m_modulus)
+	if (token_number >= m_modulus)
 	{
-		LOG_FATAL("Token number is beyond the necessary limits");
-		throw std::runtime_error("Token number is beyond the necessary limits");
+		LOG_FATAL("Token number exceeds the number of permutations of possible tokens");
+		throw std::runtime_error("Token number exceeds the number of permutations of possible tokens");
 	}
 
 	for (std::uint32_t i = 0; i < output_token_length; ++i)
