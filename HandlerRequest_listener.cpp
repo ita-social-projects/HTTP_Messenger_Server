@@ -26,7 +26,7 @@ void HandlerRequest::_groupUser (const http_request& request, const std::string 
     {
         _requestFindUsers(request);
     }
-    else if (urlRequest == "/get_user_chats")
+    else if (urlRequest == "/get_chats")
     {
         _requestGetUserChats(request);
     }
