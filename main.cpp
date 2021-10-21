@@ -6,9 +6,9 @@ void InitLogger();
 #include <cstdlib>
 int main(int argc, char* argv[])
 {
+    InitLogger();
     if (argc > 1)
     {
-        InitLogger();
         ServiceController::set_ExecutableName(argv[0]);
         ServiceController::set_ServiceName("HTTP_MESSENGER_SERVER");
         

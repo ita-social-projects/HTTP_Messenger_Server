@@ -10,6 +10,12 @@ bool ServiceController::InstallService()
 	}
 	m_ExePath = fs::current_path().string();
 	m_ExePath += '\\' + m_ExeName;
+	if (!fs::exists(m_ExePath))
+	{
+		std::cout << "Error! You must use raw cmd to run this exe!\n";
+		LOG_FATAL("No exe exists");
+		return 0;
+	}
 	m_hService = CreateService(
 		m_hSCManager,
 		get_LPCSTR_ServiceName(),
