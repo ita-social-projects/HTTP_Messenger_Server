@@ -50,7 +50,7 @@ pipeline{
         stage('Copying the file to the build'){
             steps{
                 bat "echo '======================COPYING THE FILE========================='"
-                bat "echo D | Xcopy ${env.TO_EXE} ${env.REPO_NAME}\\out\\Debug  /E /H /C /I"
+                bat "echo D | Xcopy ${env.REQUIRED_FILES} ${env.REPO_NAME}\\out\\Debug  /E /H /C /I"
             }
         }
     }
