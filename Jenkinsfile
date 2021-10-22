@@ -32,8 +32,8 @@ pipeline{
             steps{
                 dir(env.REPO_NAME){
                     bat "echo '======================COPYING LOGGER TO THE DIRECTORY========================='"
-                    bat "mkdir vcpkg"
-                    bat "echo D | Xcopy ${env.LOGGER_PATH} .\\vcpkg  /E /H /C /I"
+                    bat "mkdir Logger"
+                    bat "echo D | Xcopy ${env.LOGGER_PATH} .\\Logger  /E /H /C /I"
                 }
             }
         }
