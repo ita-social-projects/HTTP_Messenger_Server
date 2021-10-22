@@ -4,7 +4,8 @@ pipeline{
     environment{
         REPO_NAME = 'HTTP_Messenger_Server'
         LIBRARY_PATH = 'C:\\Users\\akork\\Desktop\\HttpMessengerServer\\vcpkg'
-        DLL_PATH = "${LIBRARY_PATH}\\installed\\x64-windows\\debug\\bin\\cpprest_2_10d.dll"
+        LOGGER_PATH = 'C:\\Users\\akork\\Desktop\\HttpMessengerServer\\Logger'
+        REQUIRED_FILES = 'C:\\Users\\akork\\Desktop\\HttpMessengerServer\\to_exe'
         
     }
 
@@ -27,6 +28,15 @@ pipeline{
                 }
             }
         }
+        stage('Copying logger to the project'){
+            steps{
+                dir(env.REPO_NAME){
+                    bat "echo '======================COPYING LOGGER TO THE DIRECTORY========================='"
+                    bat "mkdir vcpkg"
+                    bat "echo D | Xcopy ${env.LOGGER_PATH} .\\vcpkg  /E /H /C /I"
+                }
+            }
+        }
         stage('Build'){
             steps{
                 dir(env.REPO_NAME){
@@ -40,7 +50,7 @@ pipeline{
         stage('Copying the file to the build'){
             steps{
                 bat "echo '======================COPYING THE FILE========================='"
-                bat "copy ${DLL_PATH} .\\${env.REPO_NAME}\\out\\Debug"
+                bat "echo D | Xcopy ${env.TO_EXE} ${env.REPO_NAME}\\out\\Debug  /E /H /C /I"
             }
         }
     }
