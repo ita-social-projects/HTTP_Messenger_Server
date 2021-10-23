@@ -18,7 +18,7 @@ DefaultGroupName=HTTP_messenger_server
 AllowNoIcons=yes
 ; Uncomment the following line to run in non administrative install mode (install for current user only.)
 ;PrivilegesRequired=lowest
-OutputDir=C:\Jenkins_home\workspace\HTTP_Messenger_server\out\Debug\
+OutputDir=C:\Jenkins_home\workspace\HTTP_Messenger_server\HTTP_Messenger_Server\out\Debug
 OutputBaseFilename=HTTP_messenger_server_installer
 Compression=lzma
 SolidCompression=yes
