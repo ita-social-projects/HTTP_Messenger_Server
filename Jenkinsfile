@@ -6,6 +6,7 @@ pipeline{
         LIBRARY_PATH = 'C:\\Users\\akork\\Desktop\\HttpMessengerServer\\vcpkg'
         LOGGER_PATH = 'C:\\Users\\akork\\Desktop\\HttpMessengerServer\\Logger'
         REQUIRED_FILES = 'C:\\Users\\akork\\Desktop\\HttpMessengerServer\\to_exe'
+        ISCC = '"C:\\Users\\akork\\Desktop\\InnoSetupPortable\\App\\Inno Setup\\iscc"'
         
     }
 
@@ -53,7 +54,15 @@ pipeline{
                 bat "echo D | Xcopy ${env.REQUIRED_FILES} ${env.REPO_NAME}\\out\\Debug  /E /H /C /I"
             }
         }
+        stage('Generating installer'){
+            steps{
+                bat "echo '======================GENERATING INSTALLER========================='"
+                bat "${env.ISCC} server.iss"
+
+            }
+        }
     }
+    
     post{
         success{
             script{
