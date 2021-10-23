@@ -31,10 +31,10 @@ Name: "english"; MessagesFile: "compiler:Default.isl"
 Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{cm:AdditionalIcons}"; Flags: unchecked
 
 [Files]
-Source: "C:\Jenkins_home\workspace\HTTP_Messenger_server\out\Debug\HTTP_Messenger_Server.exe"; DestDir: "{app}"; Flags: ignoreversion
-; Source: "C:\Jenkins_home\workspace\HTTP_Messenger_server\out\Debug\Database.conf"; DestDir: "{autopf}"; Flags: ignoreversion
-Source: "C:\Jenkins_home\workspace\HTTP_Messenger_server\out\Debug\cpprest_2_10d.dll"; DestDir: "{app}"; Flags: ignoreversion
-Source: "C:\Jenkins_home\workspace\HTTP_Messenger_server\out\Debug\libcrypto-1_1-x64.dll"; DestDir: "{app}"; Flags: ignoreversion
+Source: "C:\Jenkins_home\workspace\HTTP_Messenger_server\HTTP_Messenger_Server\out\Debug\HTTP_Messenger_Server.exe"; DestDir: "{app}"; Flags: ignoreversion
+; Source: "C:\Jenkins_home\workspace\HTTP_Messenger_server\HTTP_Messenger_Server\out\Debug\Database.conf"; DestDir: "{autopf}"; Flags: ignoreversion
+Source: "C:\Jenkins_home\workspace\HTTP_Messenger_server\HTTP_Messenger_Server\out\Debug\cpprest_2_10d.dll"; DestDir: "{app}"; Flags: ignoreversion
+Source: "C:\Jenkins_home\workspace\HTTP_Messenger_server\HTTP_Messenger_Server\out\Debug\libcrypto-1_1-x64.dll"; DestDir: "{app}"; Flags: ignoreversion
 ; NOTE: Don't use "Flags: ignoreversion" on any shared system files
 
 [Registry]
