@@ -18,7 +18,7 @@ void ThreadWorker::InitThreads()
         m_ThreadPool.push_back(tempShared);
     }
     DetachThreads();
-    LOG_DEBUG("Programm is using such count of threads: ", ThreadsCount);
+	LOG_DEBUG("Programm is using such count of threads: " + std::to_string(m_threadsCount));
 }
 
 void ThreadWorker::DetachThreads()

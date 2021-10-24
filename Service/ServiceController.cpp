@@ -131,7 +131,8 @@ bool ServiceController::StopService()
 
 void ServiceController::Help()
 {
-	std::cout << "You can must use this parameters:\n"
+	std::cout << "You must use this parameters:\n"
+		<< "NoService - to run the server without Windows Service\n"
 		<< "Install   - for install service\n"
 		<< "Start     - to start Windows Service\n"
 		<< "Stop      - to stop Windows Service\n"

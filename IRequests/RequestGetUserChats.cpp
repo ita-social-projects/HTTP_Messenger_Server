@@ -12,7 +12,7 @@ void RequestGetUserChats::DoRequest() {
     try{
         std::vector<ISXModel::Chat> chatList = db->GetUserChatsFromDB(this->user_access_token);
         result[L"size"] = (int)chatList.size();
-        json::value chats;
+		json::value chats = json::value::array();
         for (int i = 0; i < chatList.size(); i++) {
             json::value current = json::value();
             current[L"id"] = (int)chatList[i].get_id();

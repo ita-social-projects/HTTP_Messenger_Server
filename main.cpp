@@ -79,7 +79,7 @@ int main(int argc, char* argv[])
         else
         {
             ServiceController::Help();
-            LOG_FATAL("Bad Input command!", UserCommand);
+			LOG_FATAL("Bad Input command!" + std::string(UserCommand));
         }
     }
     else
@@ -104,4 +104,5 @@ void InitLogger()
     std::string FolderName("\\HTTP_Messenger_Server");
     CreateDirectory((ProgrammDataPath + FolderName).c_str(), NULL);
     SET_LOGS_FILE(std::string(ProgrammDataPath) + FolderName + "\\Logs.txt");
+	SHOW_LOGS_IN_CONSOLE(true);
 }
