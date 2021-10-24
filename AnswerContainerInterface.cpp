@@ -14,13 +14,3 @@ AnswerContainerInterface::AnswerContainerInterface(http_request request, IReques
 
 }
 
-bool AnswerContainerInterface::IsDone()
-{
-	return this->done;
-}
-
-void AnswerContainerInterface::MakeDone()
-{
-	 this->done = true;
-}
-

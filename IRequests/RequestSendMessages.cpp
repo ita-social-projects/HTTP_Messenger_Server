@@ -28,7 +28,6 @@ void RequestSendMessages::DoRequest() {
         this->answercontainer->SetStatusCode(status_codes::InternalError);
     }
     this->answercontainer->SetAnswer(result);
-    this->answercontainer->MakeDone();
 
     
 }
