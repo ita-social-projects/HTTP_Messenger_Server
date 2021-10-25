@@ -2,9 +2,8 @@
 
 #include <string>
 
-#define USER_LOGIN_LEN 21
-#define USER_PASSWORD_LEN 65
-#define USER_ACCESS_TOKEN_LEN 33
+#define USER_MAX_LOGIN_LEN 21
+#define USER_MAX_ACCESS_TOKEN_LEN 33
 
 namespace ISXModel
 {

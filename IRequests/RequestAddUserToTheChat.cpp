@@ -22,7 +22,7 @@ void RequestAddUserToTheChat::DoRequest() {
         }
     }
     catch (const QueryException& e) {
-        result[L"what"] = json::value::string(to_wstring("No such user"));
+        result[L"what"] = json::value::string(to_wstring(e.what()));
         this->answercontainer->SetStatusCode(status_codes::Unauthorized);
     }
     catch (const std::exception& e) {
@@ -30,5 +30,4 @@ void RequestAddUserToTheChat::DoRequest() {
         this->answercontainer->SetStatusCode(status_codes::InternalError);
     }
     this->answercontainer->SetAnswer(result);
-    this->answercontainer->MakeDone();
 }

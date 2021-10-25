@@ -1,16 +1,13 @@
 #pragma once
 
-#ifdef _WIN32
 #include <Windows.h>
-#endif
-
 #include <sqlext.h>
 #include <sqltypes.h>
 #include <sql.h>
 
 #include "IDatabase.h"
 #include "ConfigFile.h"
-#include "Security/SHA256.h"
+#include "Security/SHA256Crypt.h"
 #include "Security/TokenGenerator.h"
 
 #define SQL_CONNECTION_STRING_LEN 1024
@@ -35,12 +32,12 @@ public:
 
 	ISXModel::Message GetMessageFromDB(const std::string& user_access_token, const unsigned long& message_id) override;
 	std::vector<ISXModel::Message> GetChatMessagesFromDB(const std::string& user_access_token, const unsigned long& chat_id, const unsigned long& last_message_id) override;
-	unsigned long SaveMessageToDB(const std::string& user_access_token, const ISXModel::Message& message);
+	unsigned long SaveMessageToDB(const std::string& user_access_token, const ISXModel::Message& message) override;
 	bool RemoveMessageFromDB(const std::string& user_access_token, const unsigned long& message_id) override;
 
 	ISXModel::Chat GetChatFromDB(const std::string& user_access_token, const unsigned long& chat_id) override;
 	std::vector<ISXModel::Chat> GetUserChatsFromDB(const std::string& user_access_token) override;
-	unsigned long SaveChatToDB(const std::string& user_access_token, const ISXModel::Chat& chat);
+	unsigned long SaveChatToDB(const std::string& user_access_token, const ISXModel::Chat& chat) override;
 	bool RemoveChatFromDB(const std::string& user_access_token, const unsigned long& chat_id) override;
 
 private:
@@ -67,6 +64,6 @@ private:
 	SQLHANDLE m_sql_connection_handle;
 	SQLHANDLE m_sql_statement_handle;
 	ConfigFile m_config_file;
-	SHA256 m_sha256;
+	SHA256Crypt m_sha256_crypt;
 	TokenGenerator m_token_generator;
 };

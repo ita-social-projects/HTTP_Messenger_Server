@@ -12,7 +12,7 @@ void RequestGetMessages::DoRequest() {
     try {
         std::vector<ISXModel::Message> messageList = db->GetChatMessagesFromDB(this->user_access_token,this->chat_id, this->last_message_id);
         result[L"size"] = (int)messageList.size();
-        json::value messages;
+		json::value messages = json::value::array();
         for (int i = 0; i < messageList.size(); i++) {
             json::value current = json::value();
             current[L"message_id"] = (int)messageList[i].get_id();
@@ -33,5 +33,4 @@ void RequestGetMessages::DoRequest() {
         this->answercontainer->SetStatusCode(status_codes::InternalError);
     }
     this->answercontainer->SetAnswer(result);
-    this->answercontainer->MakeDone();
 }

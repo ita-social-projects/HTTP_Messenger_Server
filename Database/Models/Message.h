@@ -2,8 +2,8 @@
 
 #include <string>
 
-#define MESSAGE_CONTENT_LEN 255
-#define MESSAGE_TIMESTAMP_LEN 24
+#define MESSAGE_MAX_CONTENT_LEN 255
+#define MESSAGE_MAX_TIMESTAMP_LEN 24
 
 namespace ISXModel
 {

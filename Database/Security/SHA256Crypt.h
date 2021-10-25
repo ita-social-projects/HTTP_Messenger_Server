@@ -5,17 +5,18 @@
 
 #include <openssl/evp.h>
 
-#include "IHash.h"
+#include "ICryptHash.h"
 #include "../../Logger/Logger.h"
 
 #define HEX_WIDTH 2
 
-class SHA256 final : public IHash
+class SHA256Crypt final : public ICryptHash
 {
 public:
-	SHA256();
-	~SHA256();
-	std::string GenerateHash(const std::string& string) override;
+	SHA256Crypt();
+	~SHA256Crypt();
+	const std::string GenerateHash(const std::string& string) override;
+	const std::string GenerateSaltedHash(const std::string& string, const std::string& salt) override;
 
 private:
 	void Init();
