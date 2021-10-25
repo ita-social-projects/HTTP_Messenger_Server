@@ -20,12 +20,8 @@ void HandlerRequest::_requestLogin               (const http_request& request)
     const std::string USER_LOGIN = to_string(login.as_string());
     const std::string USER_PASS = to_string(pass.as_string());
 
-    IRequests* temp = new RequestLogin(&db, USER_LOGIN, USER_PASS);
-    AnswerContainer* t1 = new AnswerContainer(request, temp);
-
-    temp->setAnswerContainer(t1);
-
-    worker.PushRequest(t1);
+    IRequests* irequest = new RequestLogin(&db, USER_LOGIN, USER_PASS);
+    _pushRequest(request, irequest);
 }
 
 void HandlerRequest::_requestSignUp              (const http_request& request)
@@ -46,12 +42,9 @@ void HandlerRequest::_requestSignUp              (const http_request& request)
     const std::string USER_LOGIN = to_string(login.as_string());
     const std::string USER_PASS = to_string(pass.as_string());
 
-    IRequests* temp = new RequestSignUp( &db, ISXModel::User(USER_LOGIN, USER_PASS) );
-    AnswerContainer* t1 = new AnswerContainer(request, temp);
+    IRequests* irequest = new RequestSignUp( &db, ISXModel::User(USER_LOGIN, USER_PASS) );
+    _pushRequest(request, irequest);
 
-    temp->setAnswerContainer(t1);
-
-    worker.PushRequest(t1);
 }
 
 void HandlerRequest::_requestChangeLogin         (const http_request& request)
@@ -72,12 +65,9 @@ void HandlerRequest::_requestChangeLogin         (const http_request& request)
     const std::string TOKEN          = to_string(token.as_string());
     const std::string USER_NEW_LOGIN = to_string(new_login.as_string());
 
-    IRequests* temp = new RequestChangeLogin( &db, TOKEN, USER_NEW_LOGIN );
-    AnswerContainer* t1 = new AnswerContainer(request, temp);
+    IRequests* irequest = new RequestChangeLogin( &db, TOKEN, USER_NEW_LOGIN );
+    _pushRequest(request, irequest);
 
-    temp->setAnswerContainer(t1);
-
-    worker.PushRequest(t1);
 }
 
 void HandlerRequest::_requestChangePassword      (const http_request& request)
@@ -100,12 +90,9 @@ void HandlerRequest::_requestChangePassword      (const http_request& request)
     const std::string USER_OLD_PASSWORD = to_string(old_password.as_string());
     const std::string USER_NEW_PASSWORD = to_string(new_password.as_string());
 
-    IRequests* temp = new RequestChangePassword( &db, TOKEN, USER_OLD_PASSWORD, USER_NEW_PASSWORD );
-    AnswerContainer* t1 = new AnswerContainer( request, temp );
+    IRequests* irequest = new RequestChangePassword( &db, TOKEN, USER_OLD_PASSWORD, USER_NEW_PASSWORD );
+    _pushRequest(request, irequest);
 
-    temp->setAnswerContainer(t1);
-
-    worker.PushRequest(t1);
 }
 
 void HandlerRequest::_requestLogout              (const http_request& request)
@@ -124,12 +111,9 @@ void HandlerRequest::_requestLogout              (const http_request& request)
 
     const std::string TOKEN = to_string( token.as_string() );
 
-    IRequests* temp = new RequestLogout( &db, TOKEN );
-    AnswerContainer* t1 = new AnswerContainer(request, temp);
+    IRequests* irequest = new RequestLogout( &db, TOKEN );
+    _pushRequest(request, irequest);
 
-    temp->setAnswerContainer(t1);
-
-    worker.PushRequest(t1);
 }
 
 void HandlerRequest::_requestFindUsers           (const http_request& request)
@@ -150,12 +134,9 @@ void HandlerRequest::_requestFindUsers           (const http_request& request)
     const std::string TOKEN = to_string(token.as_string());
     const std::string SEARCH_STRING = to_string(search_string.as_string());
 
-    IRequests* temp = new RequestFindUsers(&db, TOKEN, SEARCH_STRING);
-    AnswerContainer* t1 = new AnswerContainer(request, temp);
+    IRequests* irequest = new RequestFindUsers(&db, TOKEN, SEARCH_STRING);
+    _pushRequest(request, irequest);
 
-    temp->setAnswerContainer(t1);
-
-    worker.PushRequest(t1);
 }
 
 void HandlerRequest::_requestGetUserChats        (const http_request& request)
@@ -174,12 +155,9 @@ void HandlerRequest::_requestGetUserChats        (const http_request& request)
 
     const std::string TOKEN = to_string(token.as_string());
 
-    IRequests* temp = new RequestGetUserChats(&db, TOKEN);
-    AnswerContainer* t1 = new AnswerContainer(request, temp);
+    IRequests* irequest = new RequestGetUserChats(&db, TOKEN);
+    _pushRequest(request, irequest);
 
-    temp->setAnswerContainer(t1);
-
-    worker.PushRequest(t1);
 }
 
 
@@ -202,12 +180,9 @@ void HandlerRequest::_requestGetChatParticipants (const http_request& request)
     const std::string TOKEN = to_string(token.as_string());
     const unsigned long CHAT_ID = (chat_id.as_number().to_uint32());
 
-    IRequests* temp = new RequestGetChatParticipants(&db, TOKEN, CHAT_ID);
-    AnswerContainer* t1 = new AnswerContainer(request, temp);
+    IRequests* irequest = new RequestGetChatParticipants(&db, TOKEN, CHAT_ID);
+    _pushRequest(request, irequest);
 
-    temp->setAnswerContainer(t1);
-
-    worker.PushRequest(t1);
 }
 
 void HandlerRequest::_requestCreateNewChat       (const http_request& request) {
@@ -227,12 +202,9 @@ void HandlerRequest::_requestCreateNewChat       (const http_request& request) {
     const std::string TOKEN = to_string(token.as_string());
     const std::string CHAT_TITLE = to_string(chat_title.as_string());
 
-    IRequests* temp = new RequestCreateNewChat(&db, TOKEN, CHAT_TITLE);
-    AnswerContainer* t1 = new AnswerContainer(request, temp);
+    IRequests* irequest = new RequestCreateNewChat(&db, TOKEN, CHAT_TITLE);
+    _pushRequest(request, irequest);
 
-    temp->setAnswerContainer(t1);
-
-    worker.PushRequest(t1);
 }
 
 void HandlerRequest::_requestAddUserToChat       (const http_request& request)
@@ -256,12 +228,9 @@ void HandlerRequest::_requestAddUserToChat       (const http_request& request)
     const unsigned long CHAT_ID = (chat_id.as_number().to_uint32());
     const std::string USER_LOGIN = to_string(user_login.as_string());
 
-    IRequests* temp = new RequestAddUserToTheChat(&db, TOKEN, CHAT_ID, USER_LOGIN);
-    AnswerContainer* t1 = new AnswerContainer(request, temp);
+    IRequests* irequest = new RequestAddUserToTheChat(&db, TOKEN, CHAT_ID, USER_LOGIN);
+    _pushRequest(request, irequest);
 
-    temp->setAnswerContainer(t1);
-
-    worker.PushRequest(t1);
 }
 
 void HandlerRequest::_requestLeaveChat           (const http_request& request)
@@ -285,12 +254,9 @@ void HandlerRequest::_requestLeaveChat           (const http_request& request)
     const unsigned long CHAT_ID = (chat_id.as_number().to_uint32());
     const std::string USER_LOGIN = to_string(user_login.as_string());
 
-    IRequests* temp = new RequestLeaveChat(&db, TOKEN, CHAT_ID, USER_LOGIN);
-    AnswerContainer* t1 = new AnswerContainer(request, temp);
+    IRequests* irequest = new RequestLeaveChat(&db, TOKEN, CHAT_ID, USER_LOGIN);
+    _pushRequest(request, irequest);
 
-    temp->setAnswerContainer(t1);
-
-    worker.PushRequest(t1);
 }
 
 
@@ -315,11 +281,9 @@ void HandlerRequest::_requestSendMessages         (const http_request& request)
     const std::string MESSAGE = to_string(message.as_string());
     const unsigned long CHAT_ID = (chat_id.as_number().to_uint32());
 
-    IRequests* temp = new RequestSendMessages(&db, TOKEN, ISXModel::Message(MESSAGE, CHAT_ID));
-    AnswerContainer* t1 = new AnswerContainer(request, temp);
-    temp->setAnswerContainer(t1);
+    IRequests* irequest = new RequestSendMessages(&db, TOKEN, ISXModel::Message(MESSAGE, CHAT_ID));
+    _pushRequest(request, irequest);
 
-    worker.PushRequest(t1);
 }
 
 void HandlerRequest::_requestGetMessages         (const http_request& request)
@@ -342,9 +306,7 @@ void HandlerRequest::_requestGetMessages         (const http_request& request)
     const unsigned long LAST_MESSAGE_ID = (last_message_id.as_number().to_uint32());
     const unsigned long CHAT_ID = (chat_id.as_number().to_uint32());
 
-    IRequests* temp = new RequestGetMessages(&db, TOKEN, CHAT_ID, LAST_MESSAGE_ID);
-    AnswerContainer* t1 = new AnswerContainer(request, temp);
-    temp->setAnswerContainer(t1);
+    IRequests* irequest = new RequestGetMessages(&db, TOKEN, CHAT_ID, LAST_MESSAGE_ID);
+    _pushRequest(request, irequest);
 
-    worker.PushRequest(t1);
 }
