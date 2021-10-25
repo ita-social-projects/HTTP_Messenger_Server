@@ -39,17 +39,13 @@ class HandlerRequest
 private:
     MSSQLDatabase db;
     ThreadWorker  worker;
+
+    void _pushRequest(const http_request& request, IRequests* irequest);
     
     //url groups
     void _groupUser                  (const http_request& request, const std::string urlRequest);
     void _groupChat                  (const http_request& request, const std::string urlRequest);
     void _groupMessages              (const http_request& request, const std::string urlRequest);
-
-    // listener
-    void _handle_get                 (http_request request);
-    void _handle_post                (http_request request);
-    void _handle_put                 (http_request request);
-    void _handle_del                 (http_request request);
 
     // /user/...
     void _requestLogin               (const http_request& request);
@@ -70,7 +66,11 @@ private:
     void _requestGetMessages         (const http_request& request);
     void _requestSendMessages        (const http_request& request);
 
-
+    // listener
+    void _handle_get(http_request request);
+    void _handle_post(http_request request);
+    void _handle_put(http_request request);
+    void _handle_del(http_request request);
 
 public:
 
@@ -87,7 +87,7 @@ public:
     
 
 
-    void AddQueueThread(bool&);
+    void AddQueueThread(bool& RunningServer);
 };
 
 #endif /* HandlerRequest_hpp */

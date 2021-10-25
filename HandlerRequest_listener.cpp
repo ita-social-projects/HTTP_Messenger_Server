@@ -1,5 +1,14 @@
 #include "HandlerRequest.h"
 
+void HandlerRequest::_pushRequest(const http_request& request, IRequests* irequest)
+{
+    AnswerContainer* answer = new AnswerContainer(request, irequest);
+
+    irequest->setAnswerContainer(answer);
+
+    worker.PushRequest(answer);
+}
+
 void HandlerRequest::_groupUser (const http_request& request, const std::string urlRequest)
 {
     if (urlRequest == "/login")
@@ -74,6 +83,7 @@ void HandlerRequest::_handle_post(http_request request) {
     std::string urlGroup = urlMain.substr( 0, urlMain.rfind("/") );
     std::string urlRequest = urlMain.substr( urlMain.rfind("/") );
 
+
     if (urlGroup == "/user")
     {
         _groupUser(request, urlRequest);
@@ -98,23 +108,27 @@ void HandlerRequest::_handle_del(http_request request) {
 
 void HandlerRequest::AddQueueThread(bool& RunningServer)
 {
-        http_listener listener(L"http://localhost:8080/restdemo");
+    const std::string link = "http://localhost:8080/restdemo";
+
+    std::cout << "Your server address: " << link << std::endl;
+
+    http_listener listener(to_wstring(link));
     
-        listener.support(methods::GET,  std::bind(&HandlerRequest::_handle_get, this, std::placeholders::_1));
-        listener.support(methods::POST, std::bind(&HandlerRequest::_handle_post, this, std::placeholders::_1));
-        listener.support(methods::PUT,  std::bind(&HandlerRequest::_handle_put, this, std::placeholders::_1));
-        listener.support(methods::DEL,  std::bind(&HandlerRequest::_handle_del, this, std::placeholders::_1));
-        try
-        {
-            listener
-                    .open()
-                    .then([&listener](){std::cout<<"Starting..."<<std::endl;})
-                    .wait();
+    listener.support(methods::GET,  std::bind(&HandlerRequest::_handle_get, this, std::placeholders::_1));
+    listener.support(methods::POST, std::bind(&HandlerRequest::_handle_post, this, std::placeholders::_1));
+    listener.support(methods::PUT,  std::bind(&HandlerRequest::_handle_put, this, std::placeholders::_1));
+    listener.support(methods::DEL,  std::bind(&HandlerRequest::_handle_del, this, std::placeholders::_1));
+    try
+    {
+        listener
+                .open()
+                .then([&listener](){std::cout<<"Starting..."<<std::endl;})
+                .wait();
             while (RunningServer);
-        }
-        catch (std::exception const & e)
-        {
-            std::cout << e.what() << std::endl;
-        }
+    }
+    catch (std::exception const & e)
+    {
+         std::cout << e.what() << std::endl;
+    }
     
 } 
