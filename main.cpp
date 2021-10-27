@@ -13,12 +13,19 @@ int main(int argc, char* argv[])
         ServiceController::set_ServiceName("HTTP_MESSENGER_SERVER");
         
         char* UserCommand = argv[1];
-        if (!strcmp(UserCommand, NO_SERVICE_COMMAND))
+        if (!strcmp(UserCommand, SERVICE_COMMAND))
         {
-            HandlerRequest h;
-            bool ServerWorking = 1;
-            h.AddQueueThread(ServerWorking);
-            LOG_DEBUG("Running without Service");
+            
+            SERVICE_TABLE_ENTRY ServiceTable[] =
+            {
+                {SERVICE_NAME, (LPSERVICE_MAIN_FUNCTION)ServiceStarter::ServiceMain},
+                {NULL, NULL}
+            };
+
+            if (StartServiceCtrlDispatcher(ServiceTable) == FALSE)
+            {
+                return GetLastError();
+            }
         }
         else if(!strcmp(UserCommand, INSTALL_COMMAND))
         {  
@@ -84,17 +91,11 @@ int main(int argc, char* argv[])
     }
     else
     {
+        HandlerRequest h;
+        bool ServerWorking = 1;
+        h.AddQueueThread(ServerWorking);
+        LOG_DEBUG("Running without Service");
         LOG_DEBUG("Starting Service");
-        SERVICE_TABLE_ENTRY ServiceTable[] =
-        {
-            {SERVICE_NAME, (LPSERVICE_MAIN_FUNCTION)ServiceStarter::ServiceMain},
-            {NULL, NULL}
-        };
-
-        if (StartServiceCtrlDispatcher(ServiceTable) == FALSE)
-        {
-            return GetLastError();
-        }
     }
 }
 
