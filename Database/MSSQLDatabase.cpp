@@ -258,7 +258,7 @@ unsigned long MSSQLDatabase::SaveMessageToDB(const std::string& user_access_toke
 
 	std::string content = message.get_content();
 
-	LOG_DEBUG("Saving new message with content: " + content);
+	LOG_DEBUG("Saving new message");
 	ExecuteQuery("insert into Message([content], sender_id, chat_id) output inserted.message_id"
 					   " values(\'" + content + "\', " + std::to_string(sender.get_id()) + ", " + chat_id_str + ")");
 
@@ -269,6 +269,15 @@ unsigned long MSSQLDatabase::SaveMessageToDB(const std::string& user_access_toke
 	}
 
 	return GetMessageFromDB().get_id();
+}
+
+bool MSSQLDatabase::UpdateMessageContentInDB(const std::string& user_access_token, const unsigned long& message_id, const std::string& new_content)
+{
+	CheckIfUserAccessTokenValid(user_access_token);
+
+	LOG_DEBUG("Updating message content");
+	return ExecuteQuery("update m set m.[content]=\'" + new_content + "\' from Message m"
+					   " where m.message_id=" + std::to_string(message_id));
 }
 
 bool MSSQLDatabase::RemoveMessageFromDB(const std::string& user_access_token, const unsigned long& message_id)
@@ -326,7 +335,7 @@ unsigned long MSSQLDatabase::SaveChatToDB(const std::string& user_access_token, 
 
 	const std::string title = chat.get_title();
 
-	LOG_DEBUG("Saving new chat with title: " + title);
+	LOG_DEBUG("Saving new chat");
 	ExecuteQuery("insert into Chat(title) output inserted.chat_id values(\'" + title + "\')");
 
 	if (SQLFetch(m_sql_statement_handle) != SQL_SUCCESS)
@@ -340,6 +349,15 @@ unsigned long MSSQLDatabase::SaveChatToDB(const std::string& user_access_token, 
 	AddUserToChat(user_access_token, GetUserByAccessToken(user_access_token).get_login(), saved_chat_id);
 
 	return saved_chat_id;
+}
+
+bool MSSQLDatabase::UpdateChatTitleInDB(const std::string& user_access_token, const unsigned long& chat_id, const std::string& new_title)
+{
+	CheckIfUserAccessTokenValid(user_access_token);
+
+	LOG_DEBUG("Updating chat title");
+	return ExecuteQuery("update c set c.title=\'" + new_title + "\' from Chat c"
+					   " where c.chat_id=" + std::to_string(chat_id));
 }
 
 bool MSSQLDatabase::RemoveChatFromDB(const std::string& user_access_token, const unsigned long& chat_id)

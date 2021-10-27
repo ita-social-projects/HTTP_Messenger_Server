@@ -74,8 +74,8 @@ std::string ConfigFile::GetStringWithDelimeter(const char delimeter) const
 	return string;
 }
 
-inline bool ConfigFile::IsPathExists(const std::string& filename) const
+inline bool ConfigFile::IsPathExists(const std::string& path) const
 {
 	struct stat buffer;
-	return (stat(filename.c_str(), &buffer) == 0);
+	return (stat(path.c_str(), &buffer) == 0);
 }

@@ -31,13 +31,16 @@ public:
 	bool RemoveUserFromDB(const std::string& user_access_token) override;
 
 	ISXModel::Message GetMessageFromDB(const std::string& user_access_token, const unsigned long& message_id) override;
-	std::vector<ISXModel::Message> GetChatMessagesFromDB(const std::string& user_access_token, const unsigned long& chat_id, const unsigned long& last_message_id) override;
+	std::vector<ISXModel::Message> GetChatMessagesFromDB(const std::string& user_access_token, const unsigned long& chat_id,
+														 const unsigned long& last_message_id) override;
 	unsigned long SaveMessageToDB(const std::string& user_access_token, const ISXModel::Message& message) override;
+	bool UpdateMessageContentInDB(const std::string& user_access_token, const unsigned long& message_id, const std::string& new_content) override;
 	bool RemoveMessageFromDB(const std::string& user_access_token, const unsigned long& message_id) override;
 
 	ISXModel::Chat GetChatFromDB(const std::string& user_access_token, const unsigned long& chat_id) override;
 	std::vector<ISXModel::Chat> GetUserChatsFromDB(const std::string& user_access_token) override;
 	unsigned long SaveChatToDB(const std::string& user_access_token, const ISXModel::Chat& chat) override;
+	bool UpdateChatTitleInDB(const std::string& user_access_token, const unsigned long& chat_id, const std::string& new_title) override;
 	bool RemoveChatFromDB(const std::string& user_access_token, const unsigned long& chat_id) override;
 
 private:

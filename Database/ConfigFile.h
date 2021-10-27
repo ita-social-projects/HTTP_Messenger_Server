@@ -17,7 +17,7 @@ public:
 	std::string GetStringWithDelimeter(const char delimeter) const;
 
 private:
-	bool IsPathExists(const std::string& filename) const;
+	bool IsPathExists(const std::string& path) const;
 
 	std::string m_config_filename;
 
