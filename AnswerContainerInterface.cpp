@@ -14,3 +14,9 @@ AnswerContainerInterface::AnswerContainerInterface(http_request request, IReques
 
 }
 
+AnswerContainerInterface::~AnswerContainerInterface()
+{
+	delete requestProcessor;
+}
+
+

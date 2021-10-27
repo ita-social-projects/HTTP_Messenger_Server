@@ -12,7 +12,7 @@ constexpr const char* INSTALL_COMMAND = "Install";
 constexpr const char* UNINSTALL_COMMAND = "Uninstall";
 constexpr const char* START_COMMAND = "Start";
 constexpr const char* STOP_COMMAND = "Stop";
-constexpr const char* NO_SERVICE_COMMAND = "NoService";
+constexpr const char* SERVICE_COMMAND = "Service";
 constexpr const char* HELP_COMMAND_ = "Help";
 
 

@@ -24,7 +24,7 @@ bool ServiceController::InstallService()
 		SERVICE_WIN32_OWN_PROCESS,
 		SERVICE_DEMAND_START,
 		SERVICE_ERROR_NORMAL,
-		(LPCSTR)m_ExePath.c_str(),
+		(LPCSTR)(m_ExePath + " Service").c_str(),
 		NULL, NULL, NULL, NULL, NULL
 	);
 
@@ -132,7 +132,7 @@ bool ServiceController::StopService()
 void ServiceController::Help()
 {
 	std::cout << "You must use this parameters:\n"
-		<< "NoService - to run the server without Windows Service\n"
+		<< "Service - to run the server as Windows Service\n"
 		<< "Install   - for install service\n"
 		<< "Start     - to start Windows Service\n"
 		<< "Stop      - to stop Windows Service\n"

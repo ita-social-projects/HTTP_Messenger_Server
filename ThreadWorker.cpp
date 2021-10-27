@@ -8,17 +8,17 @@ ThreadWorker::ThreadWorker()
     InitThreads();
 }
 
-using std::min;
 void ThreadWorker::InitThreads()
 {
-    for (int i = 0; i < min(m_threadsCount, 1); i++)
+    int CountOfThreadsToRun = min(m_threadsCount, 1);
+    for (int i = 0; i < CountOfThreadsToRun; i++)
     {
         std::shared_ptr<ThreadInfo> tempShared = std::make_shared<ThreadInfo>(ThreadInfo());
         m_Threads.push_back(std::thread(&ThreadWorker::ThreadProcess, this, tempShared));
         m_ThreadPool.push_back(tempShared);
     }
     DetachThreads();
-	LOG_DEBUG("Programm is using such count of threads: " + std::to_string(m_threadsCount));
+	LOG_DEBUG("Programm is using such count of threads: " + std::to_string(CountOfThreadsToRun));
 }
 
 void ThreadWorker::DetachThreads()
