@@ -19,4 +19,5 @@ public:
 	virtual void RespondOnRequest() = 0;
 	virtual void SetAnswer(json::value answer) = 0;
 	virtual void SetStatusCode(status_code code) = 0;
-};
+	virtual ~AnswerContainerInterface();
+}
