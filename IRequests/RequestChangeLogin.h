@@ -1,7 +1,7 @@
 #pragma once
 #include "IRequests.h"
 #include <cpprest/json.h>
-#include "../stringtowstring.h"
+#include "../StringUtils.h"
 
 using namespace web;
 

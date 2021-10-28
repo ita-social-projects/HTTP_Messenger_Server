@@ -2,7 +2,7 @@
 #include "IRequests.h"
 #include "RequestGetUserChats.h"
 #include <cpprest/json.h>
-#include "../stringtowstring.h"
+#include "../StringUtils.h"
 using namespace web;
 
 RequestGetUserChats::RequestGetUserChats(IDatabase* db, const std::string& userAccessToken) : IRequests(db),user_access_token(userAccessToken) {}

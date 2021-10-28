@@ -2,7 +2,7 @@
 #include "IRequests.h"
 #include "RequestSendMessages.h"
 #include <cpprest/json.h>
-#include "../stringtowstring.h"
+#include "../StringUtils.h"
 using namespace web;
 
 RequestSendMessages::RequestSendMessages(IDatabase* db, const std::string& userAccessToken, const ISXModel::Message& message) : 

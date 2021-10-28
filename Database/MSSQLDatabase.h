@@ -9,6 +9,7 @@
 #include "ConfigFile.h"
 #include "Security/SHA256Crypt.h"
 #include "Security/TokenGenerator.h"
+#include "../StringUtils.h"
 
 #define SQL_CONNECTION_STRING_LEN 1024
 

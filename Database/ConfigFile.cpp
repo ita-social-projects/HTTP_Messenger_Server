@@ -2,7 +2,8 @@
 
 ConfigFile::ConfigFile(const std::string& filename)
 {
-	const char* const program_data_dir = std::getenv(PROGRAM_DATA_DIR);
+	char* program_data_dir = nullptr;
+	_dupenv_s(&program_data_dir, nullptr, PROGRAM_DATA_DIR);
 
 	if (program_data_dir == nullptr)
 	{
@@ -11,6 +12,7 @@ ConfigFile::ConfigFile(const std::string& filename)
 	}
 
 	const std::string http_messenger_server_dir = std::string(program_data_dir) + "\\" + HTTP_MESSENGER_SERVER_DIR;
+	free(program_data_dir);
 
 	if (!IsPathExists(http_messenger_server_dir))
 	{

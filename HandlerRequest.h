@@ -14,7 +14,7 @@
 #include <cpprest/json.h>
 #include <map>
 
-#include "stringtowstring.h"
+#include "StringUtils.h"
 #include "ThreadWorker.h"
 #include "IRequests/IRequests.h"
 #include "IRequests/RequestGetChats.h"
