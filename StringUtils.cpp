@@ -11,14 +11,14 @@ std::wstring to_wstring(std::string value) {
 	return val;
 }
 
-std::string ReplaceSingleQuotes(const std::string& value)
+std::wstring ReplaceSingleQuotes(const std::wstring& value)
 {
 	std::size_t pos = 0;
-	std::string val = value;
+	std::wstring val = value;
 
-	while ((pos = val.find("\'", pos)) != std::string::npos)
+	while ((pos = val.find(L"\'", pos)) != std::wstring::npos)
 	{
-		val.replace(pos, 1, "\'\'", 2);
+		val.replace(pos, 1, L"\'\'", 2);
 		pos += 2;
 	}
 

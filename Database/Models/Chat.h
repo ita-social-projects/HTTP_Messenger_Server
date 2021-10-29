@@ -10,14 +10,14 @@ class Chat
 {
 public:
 	Chat() = delete;
-	Chat(const std::string& title);
-	Chat(unsigned long id, const std::string& title);
+	Chat(const std::wstring& title);
+	Chat(unsigned long id, const std::wstring& title);
 
 	unsigned long get_id() const;
-	const std::string& get_title() const;
+	const std::wstring& get_title() const;
 
 private:
 	unsigned long m_id;
-	std::string m_title;
+	std::wstring m_title;
 };
 }; // namespace ISXModel

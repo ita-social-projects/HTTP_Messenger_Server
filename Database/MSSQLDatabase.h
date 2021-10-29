@@ -1,6 +1,9 @@
 #pragma once
 
+#ifdef _WIN32
 #include <Windows.h>
+#endif
+
 #include <sqlext.h>
 #include <sqltypes.h>
 #include <sql.h>
@@ -35,13 +38,13 @@ public:
 	std::vector<ISXModel::Message> GetChatMessagesFromDB(const std::string& user_access_token, const unsigned long& chat_id,
 														 const unsigned long& last_message_id) override;
 	unsigned long SaveMessageToDB(const std::string& user_access_token, const ISXModel::Message& message) override;
-	bool UpdateMessageContentInDB(const std::string& user_access_token, const unsigned long& message_id, const std::string& new_content) override;
+	bool UpdateMessageContentInDB(const std::string& user_access_token, const unsigned long& message_id, const std::wstring& new_content) override;
 	bool RemoveMessageFromDB(const std::string& user_access_token, const unsigned long& message_id) override;
 
 	ISXModel::Chat GetChatFromDB(const std::string& user_access_token, const unsigned long& chat_id) override;
 	std::vector<ISXModel::Chat> GetUserChatsFromDB(const std::string& user_access_token) override;
 	unsigned long SaveChatToDB(const std::string& user_access_token, const ISXModel::Chat& chat) override;
-	bool UpdateChatTitleInDB(const std::string& user_access_token, const unsigned long& chat_id, const std::string& new_title) override;
+	bool UpdateChatTitleInDB(const std::string& user_access_token, const unsigned long& chat_id, const std::wstring& new_title) override;
 	bool RemoveChatFromDB(const std::string& user_access_token, const unsigned long& chat_id) override;
 
 private:
@@ -52,6 +55,7 @@ private:
 	void FreeConnectionHandle();
 	void FreeStatementHandle();
 	bool ExecuteQuery(const std::string& query);
+	bool ExecuteQuery(const std::wstring& query);
 	ISXModel::User GetUserFromDB() const;
 	ISXModel::Message GetMessageFromDB() const;
 	ISXModel::Chat GetChatFromDB() const;
