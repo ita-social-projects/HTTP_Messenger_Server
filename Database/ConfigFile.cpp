@@ -36,14 +36,14 @@ void ConfigFile::CreateIfNotExists() const
 
 	if (config_file.is_open())
 	{
-		SQLInfo default_sql_info;
+		SQLSettings default_sql_settings{ "{SQL Server}", "tcp:localhost,1433", "HTTP_Messenger", "sa", "" };
 
 		LOG_DEBUG("Saving default configuration settings to file");
-		config_file << "DRIVER=" << default_sql_info.driver << "\n";
-		config_file << "SERVER=" << default_sql_info.server << "\n";
-		config_file << "DATABASE=" << default_sql_info.database << "\n";
-		config_file << "UID=" << default_sql_info.uid << "\n";
-		config_file << "PWD=" << default_sql_info.pwd;
+		config_file << "DRIVER=" << default_sql_settings.driver << "\n";
+		config_file << "SERVER=" << default_sql_settings.server << "\n";
+		config_file << "DATABASE=" << default_sql_settings.database << "\n";
+		config_file << "UID=" << default_sql_settings.uid << "\n";
+		config_file << "PWD=" << default_sql_settings.pwd;
 
 		config_file.close();
 	}

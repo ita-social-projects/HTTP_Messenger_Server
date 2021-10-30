@@ -2,7 +2,7 @@
 
 #include <string>
 
-#define CHAT_MAX_TITLE_LEN 51
+constexpr auto CHAT_MAX_TITLE_LEN = 51;
 
 namespace ISXModel
 {

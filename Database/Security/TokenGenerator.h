@@ -8,11 +8,11 @@
 
 #include "../../Logger/Logger.h"
 
-#define GENERATED_TOKEN_LEN 8
-#define TOKEN_CHARS_ALLOWED "1234567890bcdfghjklnmnpqrstvwxyz"
+constexpr auto GENERATED_TOKEN_LEN = 8;
+constexpr auto TOKEN_CHARS_ALLOWED = "1234567890bcdfghjklnmnpqrstvwxyz";
 
 // selected prime number used to generate a random number
-#define TOKEN_INCREMENT 21'643'785'587
+constexpr auto TOKEN_INCREMENT = 21'643'785'587;
 
 class TokenGenerator
 {

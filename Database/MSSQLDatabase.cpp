@@ -4,7 +4,7 @@ MSSQLDatabase::MSSQLDatabase()
 		: m_sql_environment_handle(SQL_NULL_HENV)
 		, m_sql_connection_handle(SQL_NULL_HDBC)
 		, m_sql_statement_handle(SQL_NULL_HSTMT)
-		, m_config_file("Database.conf")
+		, m_config_file(CONFIG_FILENAME)
 		, m_token_generator(USER_MAX_ACCESS_TOKEN_LEN - 1)
 {
 	InitEnvironmentHandle();

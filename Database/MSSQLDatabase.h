@@ -14,7 +14,8 @@
 #include "Security/TokenGenerator.h"
 #include "../StringUtils.h"
 
-#define SQL_CONNECTION_STRING_LEN 1024
+constexpr auto CONFIG_FILENAME = "Database.conf";
+constexpr auto SQL_CONNECTION_STRING_LEN = 1024;
 
 class MSSQLDatabase final : public IDatabase
 {
@@ -54,17 +55,22 @@ private:
 	void FreeEnvironmentHandle();
 	void FreeConnectionHandle();
 	void FreeStatementHandle();
+
 	bool ExecuteQuery(const std::string& query);
 	bool ExecuteQuery(const std::wstring& query);
+
 	ISXModel::User GetUserFromDB() const;
 	ISXModel::Message GetMessageFromDB() const;
 	ISXModel::Chat GetChatFromDB() const;
+
 	void CheckUserCredentialsInDB(const std::string& user_login, const std::string& user_password);
 	void CheckUserPasswordInDB(const std::string& user_password);
 	void CheckIfUserExists(const std::string& user_login);
 	void CheckIfUserAccessTokenValid(const std::string& user_access_token);
+
 	ISXModel::User GetUserByAccessToken(const std::string& user_access_token);
 	bool SaveUserAccessTokenToDB(const std::string& user_login, const std::string& user_access_token);
+
 	bool IsUserParticipantOfChat(const std::string& user_login, const std::string& chat_id_str);
 	bool ChatHaveParticipants(const std::string& chat_id_str);
 

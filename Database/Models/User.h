@@ -2,8 +2,8 @@
 
 #include <string>
 
-#define USER_MAX_LOGIN_LEN 21
-#define USER_MAX_ACCESS_TOKEN_LEN 33
+constexpr auto USER_MAX_LOGIN_LEN = 21;
+constexpr auto USER_MAX_ACCESS_TOKEN_LEN = 33;
 
 namespace ISXModel
 {
