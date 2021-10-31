@@ -7,14 +7,10 @@
 
 
 
-#define SERVICE_NAME  "My Sample Service"   
+#define SERVICE_NAME  "HTTP_MESSENGER_SERVER"   
 
-template <class T>
-void logFile(T text);
 
 namespace fs = std::filesystem;
-
-#define DFILEPATH "D:\\programming\\Soft\\SoftProject\\WindowsServiceApplication\\out.txt"
 
 class ServiceStarter
 {

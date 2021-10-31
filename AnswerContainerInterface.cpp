@@ -14,13 +14,9 @@ AnswerContainerInterface::AnswerContainerInterface(http_request request, IReques
 
 }
 
-bool AnswerContainerInterface::IsDone()
+AnswerContainerInterface::~AnswerContainerInterface()
 {
-	return this->done;
+	delete requestProcessor;
 }
 
-void AnswerContainerInterface::MakeDone()
-{
-	 this->done = true;
-}
 

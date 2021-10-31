@@ -7,8 +7,8 @@ void RequestFindUsers::DoRequest()
     json::value result;
     try {
         std::vector<ISXModel::User> userList = db->GetUsersFromDBLike(this->user_access_token,this->user_login_part);
-        result[L"size"] = json::value::Number(userList.size());
-        json::value users;
+        result[L"size"] = int(userList.size());
+		json::value users = json::value::array();
         for (int i = 0; i < userList.size(); i++) {
             json::value current = json::value();
             current[L"login"] = json::value::string(to_wstring(userList[i].get_login()));
@@ -26,5 +26,4 @@ void RequestFindUsers::DoRequest()
         this->answercontainer->SetStatusCode(status_codes::InternalError);
     }
     this->answercontainer->SetAnswer(result);
-    this->answercontainer->MakeDone();
 }

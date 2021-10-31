@@ -18,7 +18,8 @@ void RequestSendMessages::DoRequest() {
         result[L"timestamp"] = json::value::string(to_wstring(new_message.get_timestamp()));
         result[L"content"] = json::value::string(to_wstring(new_message.get_content()));
         result[L"sender"] = json::value::string(to_wstring(new_message.get_sender()));
-     }
+		    this->answercontainer->SetStatusCode(status_codes::OK);
+	 }
     catch (const QueryException& e) {
         result[L"what"] = json::value::string(to_wstring(e.what()));
         this->answercontainer->SetStatusCode(status_codes::BadRequest);
@@ -28,7 +29,6 @@ void RequestSendMessages::DoRequest() {
         this->answercontainer->SetStatusCode(status_codes::InternalError);
     }
     this->answercontainer->SetAnswer(result);
-    this->answercontainer->MakeDone();
 
     
 }

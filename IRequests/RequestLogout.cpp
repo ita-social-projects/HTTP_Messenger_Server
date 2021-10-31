@@ -13,6 +13,7 @@ void RequestLogout::DoRequest() {
     try {
         if (this->db->RemoveUserAccessToken(this->user_access_token)) {
             result[L"status"] = json::value::string(L"OK");
+            this->answercontainer->SetStatusCode(status_codes::OK);
         }
         else {
             result[L"what"] = json::value::string(to_wstring("Cannot leave the app"));
@@ -28,5 +29,4 @@ void RequestLogout::DoRequest() {
         this->answercontainer->SetStatusCode(status_codes::InternalError);
     }
     this->answercontainer->SetAnswer(result);
-    this->answercontainer->MakeDone();
 }

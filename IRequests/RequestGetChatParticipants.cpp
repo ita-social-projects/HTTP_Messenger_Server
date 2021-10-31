@@ -8,7 +8,7 @@ void RequestGetChatParticipants::DoRequest()
     try {
         std::vector<ISXModel::User> userList = db->GetChatParticipantsFromDB(this->user_access_token,this->chat_id);
         result[L"size"] = (int)userList.size();
-        json::value users;
+		json::value users = json::value::array();
         for (int i = 0; i < userList.size(); i++) {
             json::value current = json::value();
             current[L"login"] = json::value::string(to_wstring(userList[i].get_login()));
@@ -26,5 +26,4 @@ void RequestGetChatParticipants::DoRequest()
         this->answercontainer->SetStatusCode(status_codes::InternalError);
     }
     this->answercontainer->SetAnswer(result);
-    this->answercontainer->MakeDone();
 }
