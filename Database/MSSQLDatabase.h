@@ -28,7 +28,8 @@ public:
 	std::vector<ISXModel::User> GetChatParticipantsFromDB(const std::string& user_access_token, const unsigned long& chat_id) override;
 	std::string GenerateUserAccessToken(const std::string& user_login, const std::string& user_password) override;
 	unsigned long SaveUserToDB(const ISXModel::User& user) override;
-	bool UpdateUserLoginInDB(const std::string& user_access_token, const std::string& user_login) override;
+	bool UpdateUserAccessTokenUsedDateInDB(const std::string& user_access_token) override;
+	bool UpdateUserLoginInDB(const std::string& user_access_token, const std::string& new_login) override;
 	bool UpdateUserPasswordInDB(const std::string& user_access_token, const std::string& old_password, const std::string& new_password) override;
 	bool AddUserToChat(const std::string& user_access_token, const std::string& user_login, const unsigned long& chat_id) override;
 	bool RemoveUserFromChat(const std::string& user_access_token, const std::string& user_login, const unsigned long& chat_id) override;
@@ -69,10 +70,12 @@ private:
 	void CheckIfUserAccessTokenValid(const std::string& user_access_token);
 
 	ISXModel::User GetUserByAccessToken(const std::string& user_access_token);
-	bool SaveUserAccessTokenToDB(const std::string& user_login, const std::string& user_access_token);
+	std::string GetUserAccessTokenFromDB();
+	bool SaveUserAccessTokenToDB(const std::string& user_access_token, const std::string& user_login);
 
 	bool IsUserParticipantOfChat(const std::string& user_login, const std::string& chat_id_str);
 	bool ChatHaveParticipants(const std::string& chat_id_str);
+	bool UserHasToken(const std::string& user_login);
 
 	SQLHANDLE m_sql_environment_handle;
 	SQLHANDLE m_sql_connection_handle;

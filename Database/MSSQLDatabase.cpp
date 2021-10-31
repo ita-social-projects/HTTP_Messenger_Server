@@ -81,18 +81,23 @@ std::string MSSQLDatabase::GenerateUserAccessToken(const std::string& user_login
 {
 	CheckUserCredentialsInDB(user_login, user_password);
 
-	char access_token[USER_MAX_ACCESS_TOKEN_LEN] = { 0 };
-	char* access_token_ptr = access_token;
-
-	m_token_generator.GetNextToken(access_token_ptr);
-
-	if (!SaveUserAccessTokenToDB(user_login, access_token))
+	if (UserHasToken(user_login))
 	{
-		LOG_ERROR("Cannot save user access token in database");
-		throw QueryException("Cannot save access token");
+		return GetUserAccessTokenFromDB();
 	}
 
-	return access_token;
+	char user_access_token[USER_MAX_ACCESS_TOKEN_LEN] = { 0 };
+	char* user_access_token_ptr = user_access_token;
+
+	m_token_generator.GetNextToken(user_access_token_ptr);
+
+	if (!SaveUserAccessTokenToDB(user_access_token, user_login))
+	{
+		LOG_ERROR("Cannot save user access token to database");
+		throw std::runtime_error("Cannot save access token");
+	}
+
+	return user_access_token;
 }
 
 unsigned long MSSQLDatabase::SaveUserToDB(const ISXModel::User& user)
@@ -115,13 +120,26 @@ unsigned long MSSQLDatabase::SaveUserToDB(const ISXModel::User& user)
 	return GetUserFromDB().get_id();
 }
 
-bool MSSQLDatabase::UpdateUserLoginInDB(const std::string& user_access_token, const std::string& user_login)
+bool MSSQLDatabase::UpdateUserAccessTokenUsedDateInDB(const std::string& user_access_token)
+{
+	LOG_DEBUG("Updating user access token usage date");
+	const bool success = ExecuteQuery("update t set t.last_used_date = CURRENT_TIMESTAMP from Token as t"
+									 " where t.access_token = \'" + user_access_token + "\'");
+
+	CheckIfUserAccessTokenValid(user_access_token);
+	return success;
+}
+
+bool MSSQLDatabase::UpdateUserLoginInDB(const std::string& user_access_token, const std::string& new_login)
 {
 	CheckIfUserAccessTokenValid(user_access_token);
-	CheckIfUserExists(user_login);
+	CheckIfUserExists(new_login);
 
 	LOG_DEBUG("Updating user login");
-	return ExecuteQuery("update u set u.login=\'" + user_login + "\' from [User] u where u.access_token=\'" + user_access_token + "\'");
+	return ExecuteQuery("update u set u.login = \'" + new_login + "\' from [User] as u"
+					   " inner join Token as t"
+					   " on t.user_id = u.user_id"
+					   " where t.access_token = \'" + user_access_token + "\'");
 }
 
 bool MSSQLDatabase::UpdateUserPasswordInDB(const std::string& user_access_token, const std::string& old_password, const std::string& new_password)
@@ -130,8 +148,10 @@ bool MSSQLDatabase::UpdateUserPasswordInDB(const std::string& user_access_token,
 	CheckUserPasswordInDB(old_password);
 
 	LOG_DEBUG("Updating user password");
-	return ExecuteQuery("update u set u.password=\'" + m_sha256_crypt.GenerateHash(new_password) + "\' from [User] u"
-					   " where u.access_token=\'" + user_access_token + "\'");
+	return ExecuteQuery("update u set u.password = \'" + m_sha256_crypt.GenerateHash(new_password) + "\' from [User] as u"
+					   " inner join Token as t"
+					   " on t.user_id = u.user_id"
+					   " where t.access_token = \'" + user_access_token + "\'");
 }
 
 bool MSSQLDatabase::AddUserToChat(const std::string& user_access_token, const std::string& user_login, const unsigned long& chat_id)
@@ -168,9 +188,9 @@ bool MSSQLDatabase::RemoveUserFromChat(const std::string& user_access_token, con
 	}
 
 	LOG_DEBUG("Deleting user from chat with id: " + chat_id_str);
-	bool success = ExecuteQuery("delete cp from ChatParticipant as cp"
-						" where cp.chat_id = " + chat_id_str +
-						" AND cp.participant_id = (select u.user_id from [User] as u where u.login=\'" + user_login + "\')");
+	const bool success = ExecuteQuery("delete cp from ChatParticipant as cp"
+									 " where cp.chat_id = " + chat_id_str +
+									 " AND cp.participant_id = (select u.user_id from [User] as u where u.login=\'" + user_login + "\')");
 
 	if (!ChatHaveParticipants(chat_id_str))
 	{
@@ -183,7 +203,7 @@ bool MSSQLDatabase::RemoveUserFromChat(const std::string& user_access_token, con
 bool MSSQLDatabase::RemoveUserAccessToken(const std::string& user_access_token)
 {
 	LOG_DEBUG("Removing user access token");
-	return ExecuteQuery("update u set u.access_token=NULL from [User] u where u.access_token=\'" + user_access_token + "\'");
+	return ExecuteQuery("delete t from Token as t where t.access_token=\'" + user_access_token + "\'");
 }
 
 bool MSSQLDatabase::RemoveUserFromDB(const std::string& user_access_token)
@@ -191,7 +211,10 @@ bool MSSQLDatabase::RemoveUserFromDB(const std::string& user_access_token)
 	CheckIfUserAccessTokenValid(user_access_token);
 
 	LOG_DEBUG("Deleting user");
-	return ExecuteQuery("delete u from [User] as u where u.access_token=\'" + user_access_token + "\'");
+	return ExecuteQuery("delete u from [User] as u"
+						" inner join Token as t"
+						" on t.user_id = u.user_id"
+						" where t.access_token = \'" + user_access_token + "\'");
 }
 
 ISXModel::Message MSSQLDatabase::GetMessageFromDB(const std::string& user_access_token, const unsigned long& message_id)
@@ -276,7 +299,7 @@ bool MSSQLDatabase::UpdateMessageContentInDB(const std::string& user_access_toke
 	CheckIfUserAccessTokenValid(user_access_token);
 
 	LOG_DEBUG("Updating message content");
-	return ExecuteQuery(L"update m set m.[content]=\'" + ReplaceSingleQuotes(new_content) + L"\' from Message m"
+	return ExecuteQuery(L"update m set m.[content]=\'" + ReplaceSingleQuotes(new_content) + L"\' from Message as m"
 					   " where m.message_id=" + std::to_wstring(message_id));
 }
 
@@ -552,10 +575,16 @@ void MSSQLDatabase::CheckIfUserExists(const std::string& user_login)
 void MSSQLDatabase::CheckIfUserAccessTokenValid(const std::string& user_access_token)
 {
 	LOG_DEBUG("Checking if user access token is valid");
-	ExecuteQuery("select u.user_id, u.login from [User] as u where u.access_token=\'" + user_access_token + "\'");
+	ExecuteQuery("select u.user_id, u.login from [User] as u"
+				" inner join Token as t"
+				" on t.user_id = u.user_id"
+				" where t.access_token = \'" + user_access_token + "\'"
+				" and t.last_used_date < t.expiration_date");
 
 	if (SQLFetch(m_sql_statement_handle) != SQL_SUCCESS)
 	{
+		RemoveUserAccessToken(user_access_token);
+
 		LOG_ERROR("Invalid user access token");
 		throw QueryException("Invalid access token");
 	}
@@ -569,10 +598,22 @@ ISXModel::User MSSQLDatabase::GetUserByAccessToken(const std::string& user_acces
 	return GetUserFromDB();
 }
 
-bool MSSQLDatabase::SaveUserAccessTokenToDB(const std::string& user_login, const std::string& user_access_token)
+std::string MSSQLDatabase::GetUserAccessTokenFromDB()
+{
+	char user_access_token[USER_MAX_ACCESS_TOKEN_LEN] = { 0 };
+
+	LOG_DEBUG("Receiving existing user access token");
+	SQLGetData(m_sql_statement_handle, 1, SQL_C_CHAR, user_access_token, USER_MAX_ACCESS_TOKEN_LEN, nullptr);
+
+	UpdateUserAccessTokenUsedDateInDB(user_access_token);
+	return user_access_token;
+}
+
+bool MSSQLDatabase::SaveUserAccessTokenToDB(const std::string& user_access_token, const std::string& user_login)
 {
 	LOG_DEBUG("Saving user access token");
-	return ExecuteQuery("update u set u.access_token=\'" + user_access_token + "\' from [User] u where u.login=\'" + user_login + "\'");
+	return ExecuteQuery("insert into Token(access_token, user_id) values(\'" + user_access_token + "\',"
+					   " (select u.user_id from [User] as u where u.login=\'" + user_login + "\'))");
 }
 
 bool MSSQLDatabase::IsUserParticipantOfChat(const std::string& user_login, const std::string& chat_id_str)
@@ -592,6 +633,17 @@ bool MSSQLDatabase::ChatHaveParticipants(const std::string& chat_id_str)
 				" where cp.chat_id = " + chat_id_str +
 				" group by cp.chat_id"
 				" having count(*) > 0");
+
+	return SQLFetch(m_sql_statement_handle) == SQL_SUCCESS;
+}
+
+bool MSSQLDatabase::UserHasToken(const std::string& user_login)
+{
+	LOG_DEBUG("Checking if user has token");
+	ExecuteQuery("select t.access_token, count(*) from Token as t"
+				" where t.user_id = (select u.user_id from [User] as u where u.login=\'" + user_login + "\')" +
+				" group by t.access_token"
+				" having count(*) = 1");
 
 	return SQLFetch(m_sql_statement_handle) == SQL_SUCCESS;
 }
