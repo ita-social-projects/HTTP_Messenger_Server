@@ -89,7 +89,7 @@ void HandlerRequest::_handle_post(http_request request) {
     std::string urlMain = to_string(request.relative_uri().to_string());
     std::string urlGroup = urlMain.substr( 0, urlMain.rfind("/") );
     std::string urlRequest = urlMain.substr( urlMain.rfind("/") );
-
+    LOG_DEBUG("Processing URL");
 
     if (urlGroup == "/user")
     {
@@ -103,6 +103,8 @@ void HandlerRequest::_handle_post(http_request request) {
     {
         _groupMessages(request, urlRequest);
     }
+
+    LOG_DEBUG("Request put");
 }
 
 void HandlerRequest::AddQueueThread(bool& RunningServer)
