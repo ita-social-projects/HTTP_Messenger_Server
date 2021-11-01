@@ -1,23 +1,20 @@
 #pragma once
-#include "IRequests.h"
-#include "RequestAddUserToTheChat.h"
-#include <cpprest/json.h>
-#include "../StringUtils.h"
-using namespace web;
+#include "RequestChangeChatName.h"
 
-RequestAddUserToTheChat::RequestAddUserToTheChat(IDatabase* db, const std::string& userAccessToken, const unsigned long& chatId, const std::string& userLogin) : IRequests(db),
-user_access_token(userAccessToken),
-chat_id(chatId),user_login(userLogin) {}
+RequestChangeChatName::RequestChangeChatName(IDatabase* db, const std::string& userAccessToken, const unsigned long& chat_id, const std::wstring& new_title) : IRequests(db),
+chat_id(chat_id),
+new_title(new_title),
+user_access_token(userAccessToken) {}
 
-void RequestAddUserToTheChat::DoRequest() {
+void RequestChangeChatName::DoRequest() {
     json::value result;
     try {
-        if (this->db->AddUserToChat(this->user_access_token, this->user_login,this->chat_id)) {
+        if (this->db->UpdateChatTitleInDB(this->user_access_token, this->chat_id, this->new_title)) {
             result[L"status"] = json::value::string(L"OK");
             this->answercontainer->SetStatusCode(status_codes::OK);
         }
         else {
-            result[L"what"] = json::value::string(to_wstring("Cannot join to this chat"));
+            result[L"what"] = json::value::string(to_wstring("Cannot delete user"));
             this->answercontainer->SetStatusCode(status_codes::Forbidden);
         }
     }

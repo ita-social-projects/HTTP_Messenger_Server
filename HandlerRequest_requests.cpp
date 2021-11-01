@@ -160,6 +160,46 @@ void HandlerRequest::_requestGetUserChats        (const http_request& request)
 
 }
 
+void HandlerRequest::_requestCheckTimeSession    (const http_request& request)
+{
+    json::value value = request.extract_json().get();
+
+    const json::value token = value[L"token"];
+
+    if (token.is_null())
+    {
+        LOG_ERROR("Inalid JSON");
+        request.reply(status_codes::BadRequest, "Invalid JSON");
+
+        return;
+    }
+
+    const std::string TOKEN = to_string(token.as_string());
+
+    IRequests* irequest = new RequestCheckTimeSession(&db, TOKEN);
+    _pushRequest(request, irequest);
+}
+
+void HandlerRequest::_requestDeleteUser          (const http_request& request)
+{
+    json::value value = request.extract_json().get();
+
+    const json::value token = value[L"token"];
+
+    if (token.is_null())
+    {
+        LOG_ERROR("Inalid JSON");
+        request.reply(status_codes::BadRequest, "Invalid JSON");
+
+        return;
+    }
+
+    const std::string TOKEN = to_string(token.as_string());
+
+    IRequests* irequest = new RequestDeleteUser(&db, TOKEN);
+    _pushRequest(request, irequest);
+}
+
 
 // /chat/....
 void HandlerRequest::_requestGetChatParticipants (const http_request& request)
@@ -200,7 +240,7 @@ void HandlerRequest::_requestCreateNewChat       (const http_request& request) {
     }
 
     const std::string TOKEN = to_string(token.as_string());
-    const std::string CHAT_TITLE = to_string(chat_title.as_string());
+    const std::wstring CHAT_TITLE = chat_title.as_string();
 
     IRequests* irequest = new RequestCreateNewChat(&db, TOKEN, CHAT_TITLE);
     _pushRequest(request, irequest);
@@ -259,6 +299,31 @@ void HandlerRequest::_requestLeaveChat           (const http_request& request)
 
 }
 
+void HandlerRequest::_requestChangeChatName                      (const http_request& request)
+{
+    json::value value = request.extract_json().get();
+
+    const json::value token = value[L"token"];
+    const json::value chat_id = value[L"chat_id"];
+    const json::value title = value[L"title"];
+
+    if (token.is_null() || title.is_null() || chat_id.is_null())
+    {
+        LOG_ERROR("Inalid JSON");
+        request.reply(status_codes::BadRequest, "Invalid JSON");
+
+        return;
+    }
+
+    const std::string TOKEN = to_string(token.as_string());
+    const unsigned long CHAT_ID = (chat_id.as_number().to_uint32());
+    const std::wstring TITLE = title.as_string();
+
+    IRequests* irequest = new RequestChangeChatName(&db, TOKEN, CHAT_ID, TITLE);
+    _pushRequest(request, irequest);
+}
+
+
 
 // /messages/...
 void HandlerRequest::_requestSendMessages         (const http_request& request)
@@ -278,7 +343,7 @@ void HandlerRequest::_requestSendMessages         (const http_request& request)
     }
 
     const std::string TOKEN = to_string(token.as_string());
-    const std::string MESSAGE = to_string(message.as_string());
+    const std::wstring MESSAGE = message.as_string();
     const unsigned long CHAT_ID = (chat_id.as_number().to_uint32());
 
     IRequests* irequest = new RequestSendMessages(&db, TOKEN, ISXModel::Message(MESSAGE, CHAT_ID));

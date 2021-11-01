@@ -1,22 +1,18 @@
 #pragma once
-#include "IRequests.h"
-#include "RequestLogout.h"
-#include <cpprest/json.h>
-#include "../StringUtils.h"
-using namespace web;
+#include "RequestDeleteUser.h"
 
-RequestLogout::RequestLogout(IDatabase* db, const std::string& userAccessToken) : IRequests(db),
-user_access_token(userAccessToken){}
+RequestDeleteUser::RequestDeleteUser(IDatabase* db, const std::string& userAccessToken) : IRequests(db),
+user_access_token(userAccessToken) {}
 
-void RequestLogout::DoRequest() {
+void RequestDeleteUser::DoRequest() {
     json::value result;
     try {
-        if (this->db->RemoveUserAccessToken(this->user_access_token)) {
+        if (this->db->RemoveUserFromDB(this->user_access_token)) {
             result[L"status"] = json::value::string(L"OK");
             this->answercontainer->SetStatusCode(status_codes::OK);
         }
         else {
-            result[L"what"] = json::value::string(to_wstring("Cannot leave the app"));
+            result[L"what"] = json::value::string(to_wstring("Cannot delete user"));
             this->answercontainer->SetStatusCode(status_codes::Forbidden);
         }
     }

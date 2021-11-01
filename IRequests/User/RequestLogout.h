@@ -1,6 +1,5 @@
 #pragma once
-#include <cpprest/json.h>
-using namespace web;
+#include "../IRequests.h"
 
 class RequestLogout : public IRequests {
 private:

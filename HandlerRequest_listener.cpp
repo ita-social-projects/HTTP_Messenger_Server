@@ -31,7 +31,7 @@ void HandlerRequest::_groupUser (const http_request& request, const std::string 
     {
         _requestLogout(request);
     }
-    else if (urlRequest == "/find_users")
+    else if (urlRequest == "/find")
     {
         _requestFindUsers(request);
     }
@@ -39,6 +39,15 @@ void HandlerRequest::_groupUser (const http_request& request, const std::string 
     {
         _requestGetUserChats(request);
     }
+    else if (urlRequest == "/check_session")
+    {
+        _requestCheckTimeSession(request);
+    }
+    else if (urlRequest == "/delete")
+    {
+        _requestDeleteUser(request);
+    }
+
 }
 void HandlerRequest::_groupChat(const http_request& request, const std::string urlRequest)
 {
@@ -46,7 +55,7 @@ void HandlerRequest::_groupChat(const http_request& request, const std::string u
     {
         _requestGetChatParticipants(request);
     }
-    else if (urlRequest == "/create_new")
+    else if (urlRequest == "/create")
     {
         _requestCreateNewChat(request);
     }
@@ -57,6 +66,10 @@ void HandlerRequest::_groupChat(const http_request& request, const std::string u
     else if (urlRequest == "/leave")
     {
         _requestLeaveChat(request);
+    }
+    else if (urlRequest == "/change_name")
+    {
+        _requestChangeChatName(request);
     }
 }
 void HandlerRequest::_groupMessages(const http_request& request, const std::string urlRequest)
@@ -69,12 +82,6 @@ void HandlerRequest::_groupMessages(const http_request& request, const std::stri
     {
         _requestSendMessages(request);
     }
-}
-
-void HandlerRequest::_handle_get(http_request request) {
-    
-
-    
 }
 
 void HandlerRequest::_handle_post(http_request request) {
@@ -98,26 +105,15 @@ void HandlerRequest::_handle_post(http_request request) {
     }
 }
 
-void HandlerRequest::_handle_put(http_request request) {
-
-}
-
-void HandlerRequest::_handle_del(http_request request) {
-    std::cout << "Handling delete!\n";
-}
-
 void HandlerRequest::AddQueueThread(bool& RunningServer)
 {
-    const std::string link = "http://localhost:8080/restdemo";
+    const std::string link = "http://localhost:8080/api";
 
     std::cout << "Your server address: " << link << std::endl;
 
     http_listener listener(to_wstring(link));
     
-    listener.support(methods::GET,  std::bind(&HandlerRequest::_handle_get, this, std::placeholders::_1));
     listener.support(methods::POST, std::bind(&HandlerRequest::_handle_post, this, std::placeholders::_1));
-    listener.support(methods::PUT,  std::bind(&HandlerRequest::_handle_put, this, std::placeholders::_1));
-    listener.support(methods::DEL,  std::bind(&HandlerRequest::_handle_del, this, std::placeholders::_1));
     try
     {
         listener
