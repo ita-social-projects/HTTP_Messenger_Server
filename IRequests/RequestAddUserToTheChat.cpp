@@ -2,7 +2,7 @@
 #include "IRequests.h"
 #include "RequestAddUserToTheChat.h"
 #include <cpprest/json.h>
-#include "../stringtowstring.h"
+#include "../StringUtils.h"
 using namespace web;
 
 RequestAddUserToTheChat::RequestAddUserToTheChat(IDatabase* db, const std::string& userAccessToken, const unsigned long& chatId, const std::string& userLogin) : IRequests(db),

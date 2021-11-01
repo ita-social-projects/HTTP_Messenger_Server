@@ -8,7 +8,7 @@
 #include "ICryptHash.h"
 #include "../../Logger/Logger.h"
 
-#define HEX_WIDTH 2
+constexpr auto HEX_WIDTH = 2;
 
 class SHA256Crypt final : public ICryptHash
 {

@@ -2,7 +2,8 @@
 
 ConfigFile::ConfigFile(const std::string& filename)
 {
-	const char* const program_data_dir = std::getenv(PROGRAM_DATA_DIR);
+	char* program_data_dir = nullptr;
+	_dupenv_s(&program_data_dir, nullptr, PROGRAM_DATA_DIR);
 
 	if (program_data_dir == nullptr)
 	{
@@ -11,6 +12,7 @@ ConfigFile::ConfigFile(const std::string& filename)
 	}
 
 	const std::string http_messenger_server_dir = std::string(program_data_dir) + "\\" + HTTP_MESSENGER_SERVER_DIR;
+	free(program_data_dir);
 
 	if (!IsPathExists(http_messenger_server_dir))
 	{
@@ -34,14 +36,14 @@ void ConfigFile::CreateIfNotExists() const
 
 	if (config_file.is_open())
 	{
-		SQLInfo default_sql_info;
+		SQLSettings default_sql_settings{ "{SQL Server}", "tcp:localhost,1433", "HTTP_Messenger", "sa", "" };
 
 		LOG_DEBUG("Saving default configuration settings to file");
-		config_file << "DRIVER=" << default_sql_info.driver << "\n";
-		config_file << "SERVER=" << default_sql_info.server << "\n";
-		config_file << "DATABASE=" << default_sql_info.database << "\n";
-		config_file << "UID=" << default_sql_info.uid << "\n";
-		config_file << "PWD=" << default_sql_info.pwd;
+		config_file << "DRIVER=" << default_sql_settings.driver << "\n";
+		config_file << "SERVER=" << default_sql_settings.server << "\n";
+		config_file << "DATABASE=" << default_sql_settings.database << "\n";
+		config_file << "UID=" << default_sql_settings.uid << "\n";
+		config_file << "PWD=" << default_sql_settings.pwd;
 
 		config_file.close();
 	}
@@ -74,8 +76,8 @@ std::string ConfigFile::GetStringWithDelimeter(const char delimeter) const
 	return string;
 }
 
-inline bool ConfigFile::IsPathExists(const std::string& filename) const
+inline bool ConfigFile::IsPathExists(const std::string& path) const
 {
 	struct stat buffer;
-	return (stat(filename.c_str(), &buffer) == 0);
+	return (stat(path.c_str(), &buffer) == 0);
 }

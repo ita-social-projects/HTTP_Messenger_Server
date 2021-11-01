@@ -6,28 +6,28 @@
 
 #include "../Logger/Logger.h"
 
-#define PROGRAM_DATA_DIR "ProgramData"
-#define HTTP_MESSENGER_SERVER_DIR "HTTP_Messenger_Server"
+constexpr auto PROGRAM_DATA_DIR = "ProgramData";
+constexpr auto HTTP_MESSENGER_SERVER_DIR = "HTTP_Messenger_Server";
 
 class ConfigFile
 {
+private:
+	struct SQLSettings
+	{
+		std::string driver;
+		std::string server;
+		std::string database;
+		std::string uid;
+		std::string pwd;
+	};
+
 public:
 	ConfigFile(const std::string& filename);
 	void CreateIfNotExists() const;
 	std::string GetStringWithDelimeter(const char delimeter) const;
 
 private:
-	bool IsPathExists(const std::string& filename) const;
+	bool IsPathExists(const std::string& path) const;
 
 	std::string m_config_filename;
-
-	struct SQLInfo
-	{
-		std::string driver = "{SQL Server}";
-		std::string server = "tcp:localhost,1433";
-		std::string database = "HTTP_Messenger";
-		std::string uid = "sa";
-		std::string pwd = "";
-	};
 };
-

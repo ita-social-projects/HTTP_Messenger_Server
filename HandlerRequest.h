@@ -9,7 +9,7 @@
 
 #include "Database/MSSQLDatabase.h"
 
-#include "stringtowstring.h"
+#include "StringUtils.h"
 #include "ThreadWorker.h"
 
 #include "IRequests/IRequests.h"

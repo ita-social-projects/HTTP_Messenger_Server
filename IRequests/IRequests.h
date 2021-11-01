@@ -2,7 +2,7 @@
 #include <cpprest/json.h>
 #include "../Database/IDatabase.h"
 #include "../AnswerContainerInterface.h"
-#include "../stringtowstring.h"
+#include "../StringUtils.h"
 
 using namespace web;
 extern class AnswerContainerInterface;

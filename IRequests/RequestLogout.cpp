@@ -2,7 +2,7 @@
 #include "IRequests.h"
 #include "RequestLogout.h"
 #include <cpprest/json.h>
-#include "../stringtowstring.h"
+#include "../StringUtils.h"
 using namespace web;
 
 RequestLogout::RequestLogout(IDatabase* db, const std::string& userAccessToken) : IRequests(db),

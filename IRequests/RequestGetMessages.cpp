@@ -2,7 +2,7 @@
 #include "IRequests.h"
 #include "RequestGetMessages.h"
 #include <cpprest/json.h>
-#include "../stringtowstring.h"
+#include "../StringUtils.h"
 using namespace web;
 RequestGetMessages::RequestGetMessages(IDatabase* db, const std::string& userAccessToken,const unsigned long& chatId, const unsigned long& lastMessageId) :
     IRequests(db), user_access_token(userAccessToken), chat_id(chatId), last_message_id(lastMessageId) {}

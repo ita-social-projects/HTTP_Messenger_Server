@@ -2,7 +2,7 @@
 #include "IRequests.h"
 #include "RequestLogin.h"
 #include <cpprest/json.h>
-#include "../stringtowstring.h"
+#include "../StringUtils.h"
 using namespace web;
 
 RequestLogin::RequestLogin(IDatabase* db, const std::string& login, const std::string& password) : IRequests(db),
