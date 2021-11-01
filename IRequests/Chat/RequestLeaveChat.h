@@ -1,6 +1,5 @@
 #pragma once
-#include <cpprest/json.h>
-using namespace web;
+#include "../IRequests.h"
 
 class RequestLeaveChat : public IRequests {
 private:

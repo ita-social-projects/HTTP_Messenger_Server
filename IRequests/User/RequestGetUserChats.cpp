@@ -1,9 +1,5 @@
 #pragma once
-#include "IRequests.h"
 #include "RequestGetUserChats.h"
-#include <cpprest/json.h>
-#include "../StringUtils.h"
-using namespace web;
 
 RequestGetUserChats::RequestGetUserChats(IDatabase* db, const std::string& userAccessToken) : IRequests(db),user_access_token(userAccessToken) {}
 
@@ -16,7 +12,7 @@ void RequestGetUserChats::DoRequest() {
         for (int i = 0; i < chatList.size(); i++) {
             json::value current = json::value();
             current[L"id"] = (int)chatList[i].get_id();
-            current[L"title"] = json::value::string(to_wstring(chatList[i].get_title()));
+            current[L"title"] = json::value::string(chatList[i].get_title());
             chats[i] = current;
         }
         result[L"chats"] = chats; 

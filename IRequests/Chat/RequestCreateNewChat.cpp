@@ -1,11 +1,7 @@
 #pragma once
-#include "IRequests.h"
 #include "RequestCreateNewChat.h"
-#include <cpprest/json.h>
-#include "../StringUtils.h"
-using namespace web;
 
-RequestCreateNewChat::RequestCreateNewChat(IDatabase* db, const std::string& userAccessToken,const std::string& chatTitle) : IRequests(db),user_access_token(userAccessToken),chat_title(chatTitle) {}
+RequestCreateNewChat::RequestCreateNewChat(IDatabase* db, const std::string& userAccessToken,const std::wstring& chatTitle) : IRequests(db),user_access_token(userAccessToken),chat_title(chatTitle) {}
 
 void RequestCreateNewChat::DoRequest() {
     json::value result;
@@ -14,7 +10,7 @@ void RequestCreateNewChat::DoRequest() {
         unsigned long new_chat_id = this->db->SaveChatToDB(this->user_access_token, new_chat);
         new_chat = this->db->GetChatFromDB(this->user_access_token, new_chat_id);
         result[L"id"] = (int)new_chat.get_id();
-        result[L"title"] = json::value::string(to_wstring(new_chat.get_title()));
+        result[L"title"] = json::value::string(new_chat.get_title());
         this->answercontainer->SetStatusCode(status_codes::Accepted);
     }
     catch (const QueryException& e) {

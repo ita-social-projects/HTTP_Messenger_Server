@@ -13,19 +13,25 @@
 #include "ThreadWorker.h"
 
 #include "IRequests/IRequests.h"
-#include "IRequests/RequestAddUserToTheChat.h"
-#include "IRequests/RequestChangeLogin.h"
-#include "IRequests/RequestChangePassword.h"
-#include "IRequests/RequestCreateNewChat.h"
-#include "IRequests/RequestFindUsers.h"
-#include "IRequests/RequestGetChatParticipants.h"
-#include "IRequests/RequestGetUserChats.h"
-#include "IRequests/RequestLeaveChat.h"
-#include "IRequests/RequestLogout.h"
-#include "IRequests/RequestGetMessages.h"
-#include "IRequests/RequestLogin.h"
-#include "IRequests/RequestSendMessages.h"
-#include "IRequests/RequestSignUp.h"
+
+#include "IRequests/User/RequestLogin.h"
+#include "IRequests/User/RequestSignUp.h"
+#include "IRequests/User/RequestChangeLogin.h"
+#include "IRequests/User/RequestChangePassword.h"
+#include "IRequests/User/RequestLogout.h"
+#include "IRequests/User/RequestFindUsers.h"
+#include "IRequests/User/RequestGetUserChats.h"
+#include "IRequests/User/RequestDeleteUser.h"
+#include "IRequests/User/RequestCheckTimeSession.h"
+
+#include "IRequests/Chat/RequestGetChatParticipants.h"
+#include "IRequests/Chat/RequestCreateNewChat.h"
+#include "IRequests/Chat/RequestAddUserToTheChat.h"
+#include "IRequests/Chat/RequestLeaveChat.h"
+#include "IRequests/Chat/RequestChangeChatName.h"
+
+#include "IRequests/Messages/RequestGetMessages.h"
+#include "IRequests/Messages/RequestSendMessages.h"
 
 using namespace utility;
 using namespace web;
@@ -55,22 +61,22 @@ private:
     void _requestLogout              (const http_request& request);
     void _requestFindUsers           (const http_request& request);
     void _requestGetUserChats        (const http_request& request);
+    void _requestCheckTimeSession    (const http_request& request);
+    void _requestDeleteUser          (const http_request& request);
 
     // /chat/....
     void _requestGetChatParticipants (const http_request& request);
     void _requestCreateNewChat       (const http_request& request);
     void _requestAddUserToChat       (const http_request& request);
     void _requestLeaveChat           (const http_request& request);
+    void _requestChangeChatName      (const http_request& request);
 
     // /messages/...
     void _requestGetMessages         (const http_request& request);
     void _requestSendMessages        (const http_request& request);
 
     // listener
-    void _handle_get(http_request request);
     void _handle_post(http_request request);
-    void _handle_put(http_request request);
-    void _handle_del(http_request request);
 
 public:
 
