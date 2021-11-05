@@ -33,5 +33,7 @@ foreach (TMP_PATH ${PROJECT_SOURCES})
     endif ()
 endforeach(TMP_PATH)
 
-add_executable(HTTP_Messenger_Server ${PROJECT_SOURCES})
+add_library("HTTP_Messenger_Server" STATIC ${PROJECT_SOURCES})
+#add_executable("HTTP_Messenger_Server" ${PROJECT_SOURCES})
+
 target_link_libraries(HTTP_Messenger_Server PRIVATE cpprestsdk::cpprest OpenSSL::SSL OpenSSL::Crypto odbc32 ${CMAKE_CURRENT_SOURCE_DIR}/Logger/Logger.lib)

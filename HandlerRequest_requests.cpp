@@ -22,6 +22,8 @@ void HandlerRequest::_requestLogin               (const http_request& request)
 
     IRequests* irequest = new RequestLogin(&db, USER_LOGIN, USER_PASS);
     _pushRequest(request, irequest);
+
+    LOG_DEBUG("Login DONE");
 }
 
 void HandlerRequest::_requestSignUp              (const http_request& request)
@@ -305,7 +307,7 @@ void HandlerRequest::_requestChangeChatName                      (const http_req
 
     const json::value token = value[L"token"];
     const json::value chat_id = value[L"chat_id"];
-    const json::value title = value[L"title"];
+    const json::value title = value[L"chat_title"];
 
     if (token.is_null() || title.is_null() || chat_id.is_null())
     {
