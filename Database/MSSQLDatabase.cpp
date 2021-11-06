@@ -283,7 +283,7 @@ unsigned long MSSQLDatabase::SaveMessageToDB(const std::string& user_access_toke
 
 	LOG_DEBUG("Saving new message");
 	ExecuteQuery(L"insert into Message([content], sender_id, chat_id) output inserted.message_id"
-				" values(\'" + content + L"\', " + std::to_wstring(sender.get_id()) + L", " + to_wstring(chat_id_str) + L")");
+				" values(N\'" + content + L"\', " + std::to_wstring(sender.get_id()) + L", " + to_wstring(chat_id_str) + L")");
 
 	if (SQLFetch(m_sql_statement_handle) != SQL_SUCCESS)
 	{
@@ -299,7 +299,7 @@ bool MSSQLDatabase::UpdateMessageContentInDB(const std::string& user_access_toke
 	CheckIfUserAccessTokenValid(user_access_token);
 
 	LOG_DEBUG("Updating message content");
-	return ExecuteQuery(L"update m set m.[content]=\'" + ReplaceSingleQuotes(new_content) + L"\' from Message as m"
+	return ExecuteQuery(L"update m set m.[content]=N\'" + ReplaceSingleQuotes(new_content) + L"\' from Message as m"
 					   " where m.message_id=" + std::to_wstring(message_id));
 }
 
@@ -359,7 +359,7 @@ unsigned long MSSQLDatabase::SaveChatToDB(const std::string& user_access_token, 
 	const std::wstring title = ReplaceSingleQuotes(chat.get_title());
 
 	LOG_DEBUG("Saving new chat");
-	ExecuteQuery(L"insert into Chat(title) output inserted.chat_id values(\'" + title + L"\')");
+	ExecuteQuery(L"insert into Chat(title) output inserted.chat_id values(N\'" + title + L"\')");
 
 	if (SQLFetch(m_sql_statement_handle) != SQL_SUCCESS)
 	{
@@ -379,7 +379,7 @@ bool MSSQLDatabase::UpdateChatTitleInDB(const std::string& user_access_token, co
 	CheckIfUserAccessTokenValid(user_access_token);
 
 	LOG_DEBUG("Updating chat title");
-	return ExecuteQuery(L"update c set c.title=\'" + ReplaceSingleQuotes(new_title) + L"\' from Chat c"
+	return ExecuteQuery(L"update c set c.title=N\'" + ReplaceSingleQuotes(new_title) + L"\' from Chat c"
 					   " where c.chat_id=" + std::to_wstring(chat_id));
 }
 

@@ -1,32 +1,13 @@
 #include "ConfigFile.h"
 
 ConfigFile::ConfigFile(const std::string& filename)
-{
-	char* program_data_dir = nullptr;
-	_dupenv_s(&program_data_dir, nullptr, PROGRAM_DATA_DIR);
-
-	if (program_data_dir == nullptr)
-	{
-		LOG_FATAL("Environment variable \"" + std::string(PROGRAM_DATA_DIR) + "\" is not set");
-		throw std::runtime_error("Environment variable \"" + std::string(PROGRAM_DATA_DIR) + "\" is not set");
-	}
-
-	const std::string http_messenger_server_dir = std::string(program_data_dir) + "\\" + HTTP_MESSENGER_SERVER_DIR;
-	free(program_data_dir);
-
-	if (!IsPathExists(http_messenger_server_dir))
-	{
-		LOG_DEBUG("Creating directory: \"" + http_messenger_server_dir + "\"");
-		CreateDirectoryA(http_messenger_server_dir.c_str(), nullptr);
-	}
-
-	m_config_filename = http_messenger_server_dir + "\\" + filename;
-}
+		: m_config_filename(filename)
+{}
 
 void ConfigFile::CreateIfNotExists() const
 {
 	LOG_DEBUG("Checking if config file exists");
-	if (IsPathExists(m_config_filename))
+	if (IsFileExist(m_config_filename))
 	{
 		LOG_DEBUG("Config file exists");
 		return;
@@ -76,8 +57,8 @@ std::string ConfigFile::GetStringWithDelimeter(const char delimeter) const
 	return string;
 }
 
-inline bool ConfigFile::IsPathExists(const std::string& path) const
+inline bool ConfigFile::IsFileExist(const std::string& filename) const
 {
 	struct stat buffer;
-	return (stat(path.c_str(), &buffer) == 0);
+	return (stat(filename.c_str(), &buffer) == 0);
 }

@@ -6,9 +6,6 @@
 
 #include "../Logger/Logger.h"
 
-constexpr auto PROGRAM_DATA_DIR = "ProgramData";
-constexpr auto HTTP_MESSENGER_SERVER_DIR = "HTTP_Messenger_Server";
-
 class ConfigFile
 {
 private:
@@ -24,10 +21,10 @@ private:
 public:
 	ConfigFile(const std::string& filename);
 	void CreateIfNotExists() const;
-	std::string GetStringWithDelimeter(const char delimeter) const;
+	std::string GetStringWithDelimeter(const char delimeter = '\n') const;
 
 private:
-	bool IsPathExists(const std::string& path) const;
+	bool IsFileExist(const std::string& filename) const;
 
 	std::string m_config_filename;
 };
