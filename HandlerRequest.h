@@ -46,15 +46,16 @@ protected:
     MSSQLDatabase db;
     std::unique_ptr<ThreadWorker> worker;
 
+    void _pushRequest(http_request& request, IRequests* irequest);
     void _pushRequest(const http_request& request, IRequests* irequest);
     
     //url groups
-    void _groupUser                  (const http_request& request, const std::string urlRequest);
+    void _groupUser                  (http_request& request, const std::string urlRequest);
     void _groupChat                  (const http_request& request, const std::string urlRequest);
     void _groupMessages              (const http_request& request, const std::string urlRequest);
 
     // /user/...
-    void _requestLogin               (const http_request& request);
+    void _requestLogin               (http_request& request);
     void _requestSignUp              (const http_request& request);
     void _requestChangeLogin         (const http_request& request);
     void _requestChangePassword      (const http_request& request);
@@ -80,8 +81,8 @@ protected:
 
 public:
 
-    HandlerRequest(bool TEST)
-    try : db(), worker(TEST ? nullptr : std::make_unique<ThreadWorker>())
+    HandlerRequest(bool MultiThreading)
+    try : db(), worker(!MultiThreading ? nullptr : std::make_unique<ThreadWorker>())
     {
         LOG_DEBUG("Created HandlerRequest");
     }

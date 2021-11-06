@@ -1,15 +1,50 @@
 #include "HandlerRequest.h"
 
+void HandlerRequest::_pushRequest(http_request& request, IRequests* irequest)
+{
+    AnswerContainer* answer = new AnswerContainer(request, irequest);
+
+    irequest->setAnswerContainer(answer);
+
+    if (worker != nullptr)
+    {
+        LOG_DEBUG("Process with threads");
+        worker->PushRequest(answer);
+    }
+    else
+    {
+        LOG_DEBUG("Process without threads");
+        answer->ProcessRequest();
+        answer->RespondOnRequest();
+        delete answer;
+        answer = nullptr;
+    }
+
+}
+
 void HandlerRequest::_pushRequest(const http_request& request, IRequests* irequest)
 {
     AnswerContainer* answer = new AnswerContainer(request, irequest);
 
     irequest->setAnswerContainer(answer);
 
-    worker->PushRequest(answer);
+    if (worker != nullptr)
+    {
+        LOG_DEBUG("Process with threads");
+        worker->PushRequest(answer);
+    }
+    else
+    {
+        LOG_DEBUG("Process without threads");
+        answer->ProcessRequest();
+        answer->RespondOnRequest();
+        delete answer;
+        answer = nullptr;
+    }
+
 }
 
-void HandlerRequest::_groupUser (const http_request& request, const std::string urlRequest)
+void HandlerRequest::_groupUser (http_request& request, const std::string urlRequest)
 {
     if (urlRequest == "/login")
     {
