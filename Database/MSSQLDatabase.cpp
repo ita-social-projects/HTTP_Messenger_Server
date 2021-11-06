@@ -1,18 +1,31 @@
 #include "MSSQLDatabase.h"
 
-MSSQLDatabase::MSSQLDatabase()
+MSSQLDatabase::MSSQLDatabase(const std::string& config_filename)
 		: m_sql_environment_handle(SQL_NULL_HENV)
 		, m_sql_connection_handle(SQL_NULL_HDBC)
 		, m_sql_statement_handle(SQL_NULL_HSTMT)
-		, m_config_file(CONFIG_FILENAME)
+		, m_config_file(config_filename)
 		, m_token_generator(USER_MAX_ACCESS_TOKEN_LEN - 1)
 {
-	InitEnvironmentHandle();
-	m_config_file.CreateIfNotExists();
-	InitConnectionHandle();
+	Connect();
 }
 
 MSSQLDatabase::~MSSQLDatabase()
+{
+	Disconnect();
+}
+
+void MSSQLDatabase::Connect()
+{
+	if (m_sql_connection_handle == SQL_NULL_HDBC)
+	{
+		InitEnvironmentHandle();
+		m_config_file.CreateIfNotExists();
+		InitConnectionHandle();
+	}
+}
+
+void MSSQLDatabase::Disconnect()
 {
 	FreeStatementHandle();
 	FreeConnectionHandle();
@@ -77,7 +90,7 @@ std::vector<ISXModel::User> MSSQLDatabase::GetChatParticipantsFromDB(const std::
 	return participants;
 }
 
-std::string MSSQLDatabase::GenerateUserAccessToken(const std::string& user_login, const std::string& user_password)
+std::string MSSQLDatabase::GetUserAccessToken(const std::string& user_login, const std::string& user_password)
 {
 	CheckUserCredentialsInDB(user_login, user_password);
 
@@ -85,19 +98,21 @@ std::string MSSQLDatabase::GenerateUserAccessToken(const std::string& user_login
 	{
 		return GetUserAccessTokenFromDB();
 	}
-
-	char user_access_token[USER_MAX_ACCESS_TOKEN_LEN] = { 0 };
-	char* user_access_token_ptr = user_access_token;
-
-	m_token_generator.GetNextToken(user_access_token_ptr);
-
-	if (!SaveUserAccessTokenToDB(user_access_token, user_login))
+	else
 	{
-		LOG_ERROR("Cannot save user access token to database");
-		throw std::runtime_error("Cannot save access token");
-	}
+		char user_access_token[USER_MAX_ACCESS_TOKEN_LEN] = { 0 };
+		char* user_access_token_ptr = user_access_token;
 
-	return user_access_token;
+		m_token_generator.GetNextToken(user_access_token_ptr);
+
+		if (!SaveUserAccessTokenToDB(user_access_token, user_login))
+		{
+			LOG_ERROR("Cannot save user access token to database");
+			throw std::runtime_error("Cannot save access token");
+		}
+
+		return user_access_token;
+	}
 }
 
 unsigned long MSSQLDatabase::SaveUserToDB(const ISXModel::User& user)
@@ -270,20 +285,29 @@ std::vector<ISXModel::Message> MSSQLDatabase::GetChatMessagesFromDB(const std::s
 
 unsigned long MSSQLDatabase::SaveMessageToDB(const std::string& user_access_token, const ISXModel::Message& message)
 {
-	const ISXModel::User sender = GetUserByAccessToken(user_access_token);
 	const std::string chat_id_str = std::to_string(message.get_chat_id());
-
-	if (!IsUserParticipantOfChat(sender.get_login(), chat_id_str))
-	{
-		LOG_ERROR("User with id: " + std::to_string(sender.get_id()) + " is not participant of chat with id: " + chat_id_str);
-		throw QueryException("You are not participant of the chat");
-	}
-
 	const std::wstring content = ReplaceSingleQuotes(message.get_content());
 
-	LOG_DEBUG("Saving new message");
-	ExecuteQuery(L"insert into Message([content], sender_id, chat_id) output inserted.message_id"
-				" values(N\'" + content + L"\', " + std::to_wstring(sender.get_id()) + L", " + to_wstring(chat_id_str) + L")");
+	if (user_access_token.empty())
+	{
+		LOG_DEBUG("Saving system message");
+		ExecuteQuery(L"insert into Message([content], sender_id, chat_id) output inserted.message_id"
+					" values(N\'" + content + L"\', NULL, " + to_wstring(chat_id_str) + L")");
+	}
+	else
+	{
+		const ISXModel::User sender = GetUserByAccessToken(user_access_token);
+
+		if (!IsUserParticipantOfChat(sender.get_login(), chat_id_str))
+		{
+			LOG_ERROR("User with id: " + std::to_string(sender.get_id()) + " is not participant of chat with id: " + chat_id_str);
+			throw QueryException("You are not participant of the chat");
+		}
+
+		LOG_DEBUG("Saving new message");
+		ExecuteQuery(L"insert into Message([content], sender_id, chat_id) output inserted.message_id"
+					" values(N\'" + content + L"\', " + std::to_wstring(sender.get_id()) + L", " + to_wstring(chat_id_str) + L")");
+	}
 
 	if (SQLFetch(m_sql_statement_handle) != SQL_SUCCESS)
 	{
