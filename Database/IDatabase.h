@@ -22,6 +22,7 @@ public:
 	virtual bool UpdateUserAccessTokenUsedDateInDB(const std::string& user_access_token) = 0;
 	virtual bool UpdateUserLoginInDB(const std::string& user_access_token, const std::string& new_login) = 0;
 	virtual bool UpdateUserPasswordInDB(const std::string& user_access_token, const std::string& old_password, const std::string& new_password) = 0;
+	virtual bool UpdateUserImageInDB(const std::string& user_access_token, const std::string& new_image_str) = 0;
 	virtual bool AddUserToChat(const std::string& user_access_token, const std::string& user_login, const unsigned long& chat_id) = 0;
 	virtual bool RemoveUserFromChat(const std::string& user_access_token, const std::string& user_login, const unsigned long& chat_id) = 0;
 	virtual bool RemoveUserAccessToken(const std::string& user_access_token) = 0;
@@ -38,5 +39,6 @@ public:
 	virtual std::vector<ISXModel::Chat> GetUserChatsFromDB(const std::string& user_access_token) = 0;
 	virtual unsigned long SaveChatToDB(const std::string& user_access_token, const ISXModel::Chat& chat) = 0;
 	virtual bool UpdateChatTitleInDB(const std::string& user_access_token, const unsigned long& chat_id, const std::wstring& new_title) = 0;
+	virtual bool UpdateChatImageInDB(const std::string& user_access_token, const unsigned long& chat_id, const std::string& new_image_str) = 0;
 	virtual bool RemoveChatFromDB(const std::string& user_access_token, const unsigned long& chat_id) = 0;
 };

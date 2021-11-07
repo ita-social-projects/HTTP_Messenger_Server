@@ -34,6 +34,7 @@ public:
 	bool UpdateUserAccessTokenUsedDateInDB(const std::string& user_access_token) override;
 	bool UpdateUserLoginInDB(const std::string& user_access_token, const std::string& new_login) override;
 	bool UpdateUserPasswordInDB(const std::string& user_access_token, const std::string& old_password, const std::string& new_password) override;
+	bool UpdateUserImageInDB(const std::string& user_access_token, const std::string& new_image_str) override;
 	bool AddUserToChat(const std::string& user_access_token, const std::string& user_login, const unsigned long& chat_id) override;
 	bool RemoveUserFromChat(const std::string& user_access_token, const std::string& user_login, const unsigned long& chat_id) override;
 	bool RemoveUserAccessToken(const std::string& user_access_token) override;
@@ -50,6 +51,7 @@ public:
 	std::vector<ISXModel::Chat> GetUserChatsFromDB(const std::string& user_access_token) override;
 	unsigned long SaveChatToDB(const std::string& user_access_token, const ISXModel::Chat& chat) override;
 	bool UpdateChatTitleInDB(const std::string& user_access_token, const unsigned long& chat_id, const std::wstring& new_title) override;
+	bool UpdateChatImageInDB(const std::string& user_access_token, const unsigned long& chat_id, const std::string& new_image_str) override;
 	bool RemoveChatFromDB(const std::string& user_access_token, const unsigned long& chat_id) override;
 
 private:
@@ -63,6 +65,7 @@ private:
 	bool ExecuteQuery(const std::string& query);
 	bool ExecuteQuery(const std::wstring& query);
 
+	bool IsFieldNull(const SQLUSMALLINT field_number) const;
 	ISXModel::User GetUserFromDB() const;
 	ISXModel::Message GetMessageFromDB() const;
 	ISXModel::Chat GetChatFromDB() const;
