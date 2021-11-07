@@ -2,6 +2,7 @@
 
 ConfigFile::ConfigFile(const std::string& filename)
 		: m_config_filename(filename)
+		, m_connection_settings(nullptr)
 {}
 
 void ConfigFile::CreateIfNotExists() const
@@ -17,14 +18,14 @@ void ConfigFile::CreateIfNotExists() const
 
 	if (config_file.is_open())
 	{
-		SQLSettings default_sql_settings{ "{SQL Server}", "tcp:localhost,1433", "HTTP_Messenger", "sa", "" };
+		DatabaseConnectionSettings default_settings{ "{SQL Server}", "tcp:localhost,1433", "HTTP_Messenger", "sa", "" };
 
 		LOG_DEBUG("Saving default configuration settings to file");
-		config_file << "DRIVER=" << default_sql_settings.driver << "\n";
-		config_file << "SERVER=" << default_sql_settings.server << "\n";
-		config_file << "DATABASE=" << default_sql_settings.database << "\n";
-		config_file << "UID=" << default_sql_settings.uid << "\n";
-		config_file << "PWD=" << default_sql_settings.pwd;
+		config_file << "DRIVER" << SETTING_VALUE_DELIMITER << default_settings.driver << "\n";
+		config_file << "SERVER" << SETTING_VALUE_DELIMITER << default_settings.server << "\n";
+		config_file << "DATABASE" << SETTING_VALUE_DELIMITER << default_settings.database << "\n";
+		config_file << "UID" << SETTING_VALUE_DELIMITER << default_settings.uid << "\n";
+		config_file << "PWD" << SETTING_VALUE_DELIMITER << default_settings.pwd;
 
 		config_file.close();
 	}
@@ -35,11 +36,22 @@ void ConfigFile::CreateIfNotExists() const
 	}
 }
 
-std::string ConfigFile::GetStringWithDelimeter(const char delimeter) const
+DatabaseConnectionSettings ConfigFile::get_connection_settings() const
 {
-	std::string string;
+	if (m_connection_settings == nullptr)
+	{
+		const_cast<ConfigFile*>(this)->GetSettingsFromFile();
+	}
+
+	LOG_DEBUG("Receiving saved configuration settings");
+	return *m_connection_settings;
+}
+
+void ConfigFile::GetSettingsFromFile()
+{
 	std::string line;
 	std::ifstream config_file(m_config_filename, std::ios::in);
+	m_connection_settings = std::make_unique<DatabaseConnectionSettings>();
 
 	if (!config_file.is_open())
 	{
@@ -50,11 +62,45 @@ std::string ConfigFile::GetStringWithDelimeter(const char delimeter) const
 	LOG_DEBUG("Receiving configuration settings from file");
 	while (std::getline(config_file, line))
 	{
-		string += line + delimeter;
+		GetSettingFromString(line);
 	}
 
 	config_file.close();
-	return string;
+}
+
+void ConfigFile::GetSettingFromString(const std::string& setting)
+{
+		const std::size_t delimiter_pos = setting.find(SETTING_VALUE_DELIMITER);
+
+		if (delimiter_pos == std::string::npos)
+		{
+			LOG_FATAL("Incorrect format of configuration settings in file");
+			throw std::runtime_error("Incorrect format of configuration settings in file");
+		}
+
+		const std::string setting_name = setting.substr(0, delimiter_pos);
+		const std::string setting_value = setting.substr(delimiter_pos+1);
+
+		if (setting_name == "DRIVER")
+		{
+			m_connection_settings->driver = setting_value;
+		}
+		else if (setting_name == "SERVER")
+		{
+			m_connection_settings->server = setting_value;
+		}
+		else if (setting_name == "DATABASE")
+		{
+			m_connection_settings->database = setting_value;
+		}
+		else if (setting_name == "UID")
+		{
+			m_connection_settings->uid = setting_value;
+		}
+		else if (setting_name == "PWD")
+		{
+			m_connection_settings->pwd = setting_value;
+		}
 }
 
 inline bool ConfigFile::IsFileExist(const std::string& filename) const

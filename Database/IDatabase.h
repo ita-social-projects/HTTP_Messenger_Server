@@ -1,12 +1,28 @@
 #pragma once
 
 #include <vector>
+#include <tuple>
 
 #include "Models/User.h"
 #include "Models/Message.h"
 #include "Models/Chat.h"
 #include "Exception/QueryException.h"
 #include "../Logger/Logger.h"
+
+struct DatabaseConnectionSettings
+{
+	std::string driver;
+	std::string server;
+	std::string database;
+	std::string uid;
+	std::string pwd;
+
+	bool operator==(const DatabaseConnectionSettings& obj) const
+	{
+		return std::tie(this->driver, this->server, this->database, this->uid, this->pwd)
+			== std::tie(obj.driver, obj.server, obj.database, obj.uid, obj.pwd);
+	}
+};
 
 class IDatabase
 {

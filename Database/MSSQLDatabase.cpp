@@ -7,6 +7,7 @@ MSSQLDatabase::MSSQLDatabase(const std::string& config_filename)
 		, m_config_file(config_filename)
 		, m_token_generator(USER_MAX_ACCESS_TOKEN_LEN - 1)
 {
+	m_config_file.CreateIfNotExists();
 	Connect();
 }
 
@@ -20,7 +21,6 @@ void MSSQLDatabase::Connect()
 	if (m_sql_connection_handle == SQL_NULL_HDBC)
 	{
 		InitEnvironmentHandle();
-		m_config_file.CreateIfNotExists();
 		InitConnectionHandle();
 	}
 }
@@ -186,7 +186,7 @@ bool MSSQLDatabase::UpdateUserImageInDB(const std::string& user_access_token, co
 	CheckIfUserAccessTokenValid(user_access_token);
 
 	LOG_DEBUG("Updating user image");
-	return ExecuteQuery("update u set u.[image] = 0x" +
+	return ExecuteQuery("update u set u.image = 0x" +
 						 m_sha256_crypt.GetHexString((const unsigned char*) new_image_str.c_str(), new_image_str.length()) +
 					   " from [User] as u" +
 					   " inner join Token as t"
@@ -322,7 +322,7 @@ unsigned long MSSQLDatabase::SaveMessageToDB(const std::string& user_access_toke
 	if (user_access_token.empty())
 	{
 		LOG_DEBUG("Saving system message");
-		ExecuteQuery(L"insert into Message(content, sender_id, chat_id) output inserted.message_id"
+		ExecuteQuery(L"insert into Message([content], sender_id, chat_id) output inserted.message_id"
 					" values(N\'" + content + L"\', NULL, " + to_wstring(chat_id_str) + L")");
 	}
 	else
@@ -336,7 +336,7 @@ unsigned long MSSQLDatabase::SaveMessageToDB(const std::string& user_access_toke
 		}
 
 		LOG_DEBUG("Saving new message");
-		ExecuteQuery(L"insert into Message(content, sender_id, chat_id) output inserted.message_id"
+		ExecuteQuery(L"insert into Message([content], sender_id, chat_id) output inserted.message_id"
 					" values(N\'" + content + L"\', " + std::to_wstring(sender.get_id()) + L", " + to_wstring(chat_id_str) + L")");
 	}
 
@@ -360,7 +360,7 @@ bool MSSQLDatabase::UpdateMessageContentInDB(const std::string& user_access_toke
 	CheckIfUserAccessTokenValid(user_access_token);
 
 	LOG_DEBUG("Updating message content");
-	return ExecuteQuery(L"update m set m.content=N\'" + ReplaceSingleQuotes(new_content) + L"\' from Message as m"
+	return ExecuteQuery(L"update m set m.[content]=N\'" + ReplaceSingleQuotes(new_content) + L"\' from Message as m"
 					   " where m.message_id=" + std::to_wstring(message_id));
 }
 
@@ -461,7 +461,7 @@ bool MSSQLDatabase::UpdateChatImageInDB(const std::string& user_access_token, co
 	CheckIfUserAccessTokenValid(user_access_token);
 
 	LOG_DEBUG("Updating chat image");
-	return ExecuteQuery("update c set c.[image]=0x" +
+	return ExecuteQuery("update c set c.image=0x" +
 						 m_sha256_crypt.GetHexString((const unsigned char*) new_image_str.c_str(), new_image_str.length()) +
 					   " from Chat c"
 					   " where c.chat_id=" + std::to_string(chat_id));
@@ -500,13 +500,19 @@ void MSSQLDatabase::InitConnectionHandle()
 		throw std::runtime_error("Error allocating connection handle");
 	}
 
-	const std::string connection_string = m_config_file.GetStringWithDelimeter(';');
+	const DatabaseConnectionSettings connection_settings = m_config_file.get_connection_settings();
 
-	if (connection_string.empty())
+	if (connection_settings == DatabaseConnectionSettings{})
 	{
 		LOG_FATAL("The contents of the configuration file are empty");
 		throw std::runtime_error("The contents of the configuration file are empty");
 	}
+
+	const std::string connection_string = "DRIVER=" + connection_settings.driver + ";"
+									"SERVER=" + connection_settings.server + ";"
+									"DATABASE=" + connection_settings.database + ";"
+									"UID=" + connection_settings.uid + ";"
+									"PWD=" + connection_settings.pwd;
 
 	SQLCHAR sql_connection_string[SQL_CONNECTION_STRING_LEN] = { 0 };
 	strcpy_s((char*)sql_connection_string, SQL_CONNECTION_STRING_LEN, connection_string.c_str());
