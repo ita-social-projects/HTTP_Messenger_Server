@@ -91,8 +91,14 @@ void HandlerRequest::_groupUser (http_request& request, const std::string urlReq
         LOG_DEBUG("Request /user/delete");
         _requestDeleteUser(request);
     }
+    else if (urlRequest == "/change_immage")
+    {
+        LOG_DEBUG("Request /user/change_immage");
+        _requestUpdateUserImmage(request);
+    }
 
 }
+
 void HandlerRequest::_groupChat(const http_request& request, const std::string urlRequest)
 {
     if (urlRequest == "/get_participants")
@@ -120,7 +126,13 @@ void HandlerRequest::_groupChat(const http_request& request, const std::string u
         LOG_DEBUG("Request /chat/change_name");
         _requestChangeChatName(request);
     }
+    else if (urlRequest == "/change_immage")
+    {
+        LOG_DEBUG("Request /chat/change_immage");
+        _requestUpdateChatImmage(request);
+    }
 }
+
 void HandlerRequest::_groupMessages(const http_request& request, const std::string urlRequest)
 {
     if (urlRequest == "/get")
@@ -140,11 +152,7 @@ void HandlerRequest::_handle_post(http_request &request) {
     std::string urlMain = to_string(request.relative_uri().to_string());
     std::string urlGroup = urlMain.substr( 0, urlMain.rfind("/") );
     std::string urlRequest = urlMain.substr( urlMain.rfind("/") );
-    LOG_DEBUG("Processing URL");
-
     LOG_DEBUG("Your main URL: " + urlMain);
-    LOG_DEBUG("Your group URL: " + urlGroup);
-    LOG_DEBUG("Your request URL: " + urlRequest);
 
     if (urlGroup == "/user")
     {
@@ -160,7 +168,7 @@ void HandlerRequest::_handle_post(http_request &request) {
     }
     else
     {
-        LOG_DEBUG("Wrong URL group");
+        LOG_ERROR("Wrong URL group");
     }
 
 }
