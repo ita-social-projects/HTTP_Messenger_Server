@@ -4,30 +4,24 @@
 #include <fstream>
 #include <sys/stat.h>
 
+#include "IDatabase.h"
 #include "../Logger/Logger.h"
 
-constexpr auto PROGRAM_DATA_DIR = "ProgramData";
-constexpr auto HTTP_MESSENGER_SERVER_DIR = "HTTP_Messenger_Server";
+constexpr auto SETTING_VALUE_DELIMITER = "=";
 
 class ConfigFile
 {
-private:
-	struct SQLSettings
-	{
-		std::string driver;
-		std::string server;
-		std::string database;
-		std::string uid;
-		std::string pwd;
-	};
-
 public:
 	ConfigFile(const std::string& filename);
 	void CreateIfNotExists() const;
-	std::string GetStringWithDelimeter(const char delimeter) const;
+
+	DatabaseConnectionSettings get_connection_settings() const;
 
 private:
-	bool IsPathExists(const std::string& path) const;
+	void GetSettingsFromFile();
+	void GetSettingFromString(const std::string& setting);
+	bool IsFileExist(const std::string& filename) const;
 
 	std::string m_config_filename;
+	std::unique_ptr<DatabaseConnectionSettings> m_connection_settings;
 };

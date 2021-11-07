@@ -24,7 +24,8 @@ const std::string SHA256Crypt::GenerateHash(const std::string& string)
 	Update(string);
 	Final();
 
-	return GetHashString();
+	LOG_DEBUG("Receiving hash string");
+	return GetHexString(m_hash.get(), m_hash_length);
 }
 
 const std::string SHA256Crypt::GenerateSaltedHash(const std::string& string, const std::string& salt)
@@ -34,7 +35,8 @@ const std::string SHA256Crypt::GenerateSaltedHash(const std::string& string, con
 	Update(string);
 	Final();
 
-	return GetHashString();
+	LOG_DEBUG("Receiving hash string");
+	return GetHexString(m_hash.get(), m_hash_length);
 }
 
 void SHA256Crypt::Init()
@@ -64,15 +66,20 @@ void SHA256Crypt::Final()
 	}
 }
 
-std::string SHA256Crypt::GetHashString() const
+const std::string SHA256Crypt::GetHexString(const unsigned char* char_array_ptr, const std::size_t char_array_size)
 {
-	std::stringstream ss;
-
-	LOG_DEBUG("Receiving hash string");
-	for (unsigned int i = 0; i < m_hash_length; i++)
+	if (char_array_ptr == nullptr)
 	{
-		ss << std::setfill('0') << std::setw(HEX_WIDTH) << std::hex << (unsigned int) m_hash[i];
+		return "";
 	}
 
-	return ss.str();
+	std::ostringstream oss;
+
+	oss << std::setfill('0') << std::hex;
+	for (std::size_t i = 0; i < char_array_size; i++)
+	{
+		oss << std::setw(HEX_WIDTH) << (unsigned int) char_array_ptr[i];
+	}
+
+	return oss.str();
 }
