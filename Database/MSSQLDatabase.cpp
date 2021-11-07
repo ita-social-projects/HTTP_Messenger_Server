@@ -119,6 +119,12 @@ unsigned long MSSQLDatabase::SaveUserToDB(const ISXModel::User& user)
 {
 	const std::string login = user.get_login();
 
+	if (login.length() >= USER_MAX_LOGIN_LEN)
+	{
+		LOG_ERROR("User login exceeds the character limit");
+		throw QueryException("User login exceeds length of " + std::to_string(USER_MAX_LOGIN_LEN - 1) + " characters");
+	}
+
 	CheckIfUserExists(login);
 
 	const std::string password = m_sha256_crypt.GenerateHash(user.get_password());
@@ -147,6 +153,12 @@ bool MSSQLDatabase::UpdateUserAccessTokenUsedDateInDB(const std::string& user_ac
 
 bool MSSQLDatabase::UpdateUserLoginInDB(const std::string& user_access_token, const std::string& new_login)
 {
+	if (new_login.length() >= USER_MAX_LOGIN_LEN)
+	{
+		LOG_ERROR("User login exceeds the character limit");
+		throw QueryException("User login exceeds length of " + std::to_string(USER_MAX_LOGIN_LEN - 1) + " characters");
+	}
+
 	CheckIfUserAccessTokenValid(user_access_token);
 	CheckIfUserExists(new_login);
 
@@ -301,6 +313,12 @@ unsigned long MSSQLDatabase::SaveMessageToDB(const std::string& user_access_toke
 	const std::string chat_id_str = std::to_string(message.get_chat_id());
 	const std::wstring content = ReplaceSingleQuotes(message.get_content());
 
+	if (content.length() >= MESSAGE_MAX_CONTENT_LEN)
+	{
+		LOG_ERROR("Message content exceeds the character limit");
+		throw QueryException("Message content exceeds length of " + std::to_string(MESSAGE_MAX_CONTENT_LEN - 1) + " characters");
+	}
+
 	if (user_access_token.empty())
 	{
 		LOG_DEBUG("Saving system message");
@@ -333,6 +351,12 @@ unsigned long MSSQLDatabase::SaveMessageToDB(const std::string& user_access_toke
 
 bool MSSQLDatabase::UpdateMessageContentInDB(const std::string& user_access_token, const unsigned long& message_id, const std::wstring& new_content)
 {
+	if (new_content.length() >= MESSAGE_MAX_CONTENT_LEN)
+	{
+		LOG_ERROR("Message content exceeds the character limit");
+		throw QueryException("Message content exceeds length of " + std::to_string(MESSAGE_MAX_CONTENT_LEN - 1) + " characters");
+	}
+
 	CheckIfUserAccessTokenValid(user_access_token);
 
 	LOG_DEBUG("Updating message content");
@@ -391,9 +415,15 @@ std::vector<ISXModel::Chat> MSSQLDatabase::GetUserChatsFromDB(const std::string&
 
 unsigned long MSSQLDatabase::SaveChatToDB(const std::string& user_access_token, const ISXModel::Chat& chat)
 {
-	CheckIfUserAccessTokenValid(user_access_token);
-
 	const std::wstring title = ReplaceSingleQuotes(chat.get_title());
+
+	if (title.length() >= CHAT_MAX_TITLE_LEN)
+	{
+		LOG_ERROR("Chat title exceeds the character limit");
+		throw QueryException("Chat title exceeds length of " + std::to_string(CHAT_MAX_TITLE_LEN - 1) + " characters");
+	}
+
+	CheckIfUserAccessTokenValid(user_access_token);
 
 	LOG_DEBUG("Saving new chat");
 	ExecuteQuery(L"insert into Chat(title) output inserted.chat_id values(N\'" + title + L"\')");
@@ -413,6 +443,12 @@ unsigned long MSSQLDatabase::SaveChatToDB(const std::string& user_access_token, 
 
 bool MSSQLDatabase::UpdateChatTitleInDB(const std::string& user_access_token, const unsigned long& chat_id, const std::wstring& new_title)
 {
+	if (new_title.length() >= CHAT_MAX_TITLE_LEN)
+	{
+		LOG_ERROR("Chat title exceeds the character limit");
+		throw QueryException("Chat title exceeds length of " + std::to_string(CHAT_MAX_TITLE_LEN - 1) + " characters");
+	}
+
 	CheckIfUserAccessTokenValid(user_access_token);
 
 	LOG_DEBUG("Updating chat title");
@@ -464,7 +500,7 @@ void MSSQLDatabase::InitConnectionHandle()
 		throw std::runtime_error("Error allocating connection handle");
 	}
 
-	std::string connection_string = m_config_file.GetStringWithDelimeter(';');
+	const std::string connection_string = m_config_file.GetStringWithDelimeter(';');
 
 	if (connection_string.empty())
 	{
@@ -476,7 +512,7 @@ void MSSQLDatabase::InitConnectionHandle()
 	strcpy_s((char*)sql_connection_string, SQL_CONNECTION_STRING_LEN, connection_string.c_str());
 
 	LOG_DEBUG("Connecting to SQL Server");
-	SQLRETURN return_code = SQLDriverConnect(m_sql_connection_handle,
+	const SQLRETURN return_code = SQLDriverConnect(m_sql_connection_handle,
 							 nullptr,
 							 sql_connection_string,
 							 SQL_CONNECTION_STRING_LEN,
@@ -662,7 +698,7 @@ void MSSQLDatabase::CheckIfUserAccessTokenValid(const std::string& user_access_t
 		RemoveUserAccessToken(user_access_token);
 
 		LOG_ERROR("Invalid user access token");
-		throw QueryException("Invalid access token");
+		throw QueryException("Time session expired. Please login again.");
 	}
 }
 
