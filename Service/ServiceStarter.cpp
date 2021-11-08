@@ -136,7 +136,7 @@ DWORD WINAPI ServiceStarter::ServiceWorkerThread(LPVOID lpParam)
     {
         try
         {
-            HandlerRequest h;
+            HandlerRequest h(false);
             h.AddQueueThread(RunningServer);
         }
         catch (const std::exception& ex)

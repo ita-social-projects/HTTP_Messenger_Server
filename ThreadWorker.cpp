@@ -25,12 +25,16 @@ void ThreadWorker::DetachThreads()
 {
     for (auto& thread : m_Threads)
     {
-        thread.detach();
+        if (thread.joinable())
+             thread.detach();
     }
 }
 
 ThreadWorker::~ThreadWorker()
-{}
+{
+    DetachThreads();
+
+}
 
 
 void ThreadWorker::ProcessPool()
@@ -39,7 +43,7 @@ void ThreadWorker::ProcessPool()
         {
             for (auto& threadInfo : m_ThreadPool)
             {
-                if (!threadInfo->isThreadWorking && !m_requestsQueue.empty())
+                if (threadInfo != nullptr && !threadInfo->isThreadWorking && !m_requestsQueue.empty())
                 {
                     AnswerContainer* tempr = m_requestsQueue.front().get();
                     m_requestsQueue.front().release();
@@ -97,6 +101,6 @@ void ThreadInfo::ProcessRequest()
 }
 
 ThreadInfo::~ThreadInfo()
-{
+{   
     isThreadWorking = false;
 }
