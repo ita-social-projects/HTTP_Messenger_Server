@@ -30,7 +30,7 @@ public:
 	virtual void Connect() = 0;
 	virtual void Disconnect() = 0;
 
-	virtual ISXModel::User GetUserFromDB(const std::string& user_access_token, const unsigned long& user_id) = 0;
+	virtual ISXModel::User GetUserFromDB(const std::string& user_access_token) = 0;
 	virtual std::vector<ISXModel::User> GetUsersFromDBLike(const std::string& user_access_token, const std::string& search_string) = 0;
 	virtual std::vector<ISXModel::User> GetChatParticipantsFromDB(const std::string& user_access_token, const unsigned long& chat_id) = 0;
 	virtual std::string GetUserAccessToken(const std::string& user_login, const std::string& user_password) = 0;

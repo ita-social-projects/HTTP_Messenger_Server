@@ -18,6 +18,7 @@ class TokenGenerator
 {
 public:
 	TokenGenerator(const std::uint32_t token_length = GENERATED_TOKEN_LEN);
+
 	void GetNextToken(char*& output_token_ptr);
 	void ReseedGenerator();
 
