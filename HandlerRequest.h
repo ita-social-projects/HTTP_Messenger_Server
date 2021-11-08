@@ -52,12 +52,12 @@ protected:
     void _pushRequest(const http_request& request, IRequests* irequest);
     
     //url groups
-    void _groupUser                  (http_request& request, const std::string urlRequest);
+    void _groupUser                  (const http_request& request, const std::string urlRequest);
     void _groupChat                  (const http_request& request, const std::string urlRequest);
     void _groupMessages              (const http_request& request, const std::string urlRequest);
 
     // /user/...
-    void _requestLogin               (http_request& request);
+    void _requestLogin               (const http_request& request);
     void _requestSignUp              (const http_request& request);
     void _requestChangeLogin         (const http_request& request);
     void _requestChangePassword      (const http_request& request);
