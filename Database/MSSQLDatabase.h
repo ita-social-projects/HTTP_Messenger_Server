@@ -26,7 +26,7 @@ public:
 	void Connect() override;
 	void Disconnect() override;
 
-	ISXModel::User GetUserFromDB(const std::string& user_access_token, const unsigned long& user_id) override;
+	ISXModel::User GetUserFromDB(const std::string& user_access_token) override;
 	std::vector<ISXModel::User> GetUsersFromDBLike(const std::string& user_access_token, const std::string& search_string) override;
 	std::vector<ISXModel::User> GetChatParticipantsFromDB(const std::string& user_access_token, const unsigned long& chat_id) override;
 	std::string GetUserAccessToken(const std::string& user_login, const std::string& user_password) override;
