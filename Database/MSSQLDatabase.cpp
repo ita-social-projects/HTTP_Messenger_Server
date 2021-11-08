@@ -247,7 +247,10 @@ bool MSSQLDatabase::RemoveUserFromDB(const std::string& user_access_token)
 
 ISXModel::Message MSSQLDatabase::GetMessageFromDB(const std::string& user_access_token, const unsigned long& message_id)
 {
-	CheckIfUserAccessTokenValid(user_access_token);
+	if (!user_access_token.empty())
+	{
+		CheckIfUserAccessTokenValid(user_access_token);
+	}
 
 	const std::string message_id_str = std::to_string(message_id);
 
