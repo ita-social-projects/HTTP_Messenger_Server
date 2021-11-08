@@ -1,27 +1,5 @@
 #include "HandlerRequest.h"
 
-void HandlerRequest::_pushRequest(http_request& request, IRequests* irequest)
-{
-    AnswerContainer* answer = new AnswerContainer(request, irequest);
-
-    irequest->setAnswerContainer(answer);
-
-    if (worker != nullptr)
-    {
-        LOG_DEBUG("Process with threads");
-        worker->PushRequest(answer);
-    }
-    else
-    {
-        LOG_DEBUG("Process without threads");
-        answer->ProcessRequest();
-        answer->RespondOnRequest();
-        delete answer;
-        answer = nullptr;
-    }
-
-}
-
 void HandlerRequest::_pushRequest(const http_request& request, IRequests* irequest)
 {
     AnswerContainer* answer = new AnswerContainer(request, irequest);
@@ -44,7 +22,7 @@ void HandlerRequest::_pushRequest(const http_request& request, IRequests* ireque
 
 }
 
-void HandlerRequest::_groupUser (http_request& request, const std::string urlRequest)
+void HandlerRequest::_groupUser (const http_request& request, const std::string urlRequest)
 {
     if (urlRequest == "/login")
     {
@@ -147,7 +125,7 @@ void HandlerRequest::_groupMessages(const http_request& request, const std::stri
     }
 }
 
-void HandlerRequest::_handle_post(http_request &request) {
+void HandlerRequest::_handle_post(const http_request &request) {
 
     std::string urlMain = to_string(request.relative_uri().to_string());
     std::string urlGroup = urlMain.substr( 0, urlMain.rfind("/") );

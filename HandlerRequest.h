@@ -48,7 +48,6 @@ protected:
     MSSQLDatabase db;
     std::unique_ptr<ThreadWorker> worker;
 
-    void _pushRequest(http_request& request, IRequests* irequest);
     void _pushRequest(const http_request& request, IRequests* irequest);
     
     //url groups
@@ -82,7 +81,7 @@ protected:
     void _requestSendMessages        (const http_request& request);
 
     // listener
-    void _handle_post(http_request& request);
+    void _handle_post(const http_request& request);
 
 public:
 

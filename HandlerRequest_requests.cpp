@@ -2,7 +2,7 @@
 
 
 // /user/...
-void HandlerRequest::_requestLogin               (http_request& request)
+void HandlerRequest::_requestLogin               (const http_request& request)
 {
     json::value value = request.extract_json().get();
 
