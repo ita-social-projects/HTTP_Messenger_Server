@@ -13,12 +13,13 @@ class ConfigFile
 {
 public:
 	ConfigFile(const std::string& filename);
+
 	void CreateIfNotExists() const;
 
 	DatabaseConnectionSettings get_connection_settings() const;
 
 private:
-	void GetSettingsFromFile();
+	void ReadSettingsFromFile();
 	void GetSettingFromString(const std::string& setting);
 	bool IsFileExist(const std::string& filename) const;
 

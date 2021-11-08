@@ -100,7 +100,7 @@ std::string MSSQLDatabase::GetUserAccessToken(const std::string& user_login, con
 	}
 	else
 	{
-		char user_access_token[USER_MAX_ACCESS_TOKEN_LEN] = { 0 };
+		char user_access_token[USER_MAX_ACCESS_TOKEN_LEN]{ 0 };
 		char* user_access_token_ptr = user_access_token;
 
 		m_token_generator.GetNextToken(user_access_token_ptr);
@@ -509,23 +509,23 @@ void MSSQLDatabase::InitConnectionHandle()
 	}
 
 	const std::string connection_string = "DRIVER=" + connection_settings.driver + ";"
-									"SERVER=" + connection_settings.server + ";"
-									"DATABASE=" + connection_settings.database + ";"
-									"UID=" + connection_settings.uid + ";"
-									"PWD=" + connection_settings.pwd;
+										  "SERVER=" + connection_settings.server + ";"
+										  "DATABASE=" + connection_settings.database + ";"
+										  "UID=" + connection_settings.uid + ";"
+										  "PWD=" + connection_settings.pwd;
 
-	SQLCHAR sql_connection_string[SQL_CONNECTION_STRING_LEN] = { 0 };
+	SQLCHAR sql_connection_string[SQL_CONNECTION_STRING_LEN]{ 0 };
 	strcpy_s((char*)sql_connection_string, SQL_CONNECTION_STRING_LEN, connection_string.c_str());
 
 	LOG_DEBUG("Connecting to SQL Server");
 	const SQLRETURN return_code = SQLDriverConnect(m_sql_connection_handle,
-							 nullptr,
-							 sql_connection_string,
-							 SQL_CONNECTION_STRING_LEN,
-							 nullptr,
-							 0,
-							 nullptr,
-							 SQL_DRIVER_NOPROMPT);
+												   nullptr,
+												   sql_connection_string,
+												   SQL_CONNECTION_STRING_LEN,
+												   nullptr,
+												   0,
+												   nullptr,
+												   SQL_DRIVER_NOPROMPT);
 
 	switch (return_code)
 	{
@@ -718,7 +718,7 @@ ISXModel::User MSSQLDatabase::GetUserByAccessToken(const std::string& user_acces
 
 std::string MSSQLDatabase::GetUserAccessTokenFromDB()
 {
-	char user_access_token[USER_MAX_ACCESS_TOKEN_LEN] = { 0 };
+	char user_access_token[USER_MAX_ACCESS_TOKEN_LEN]{ 0 };
 
 	LOG_DEBUG("Receiving existing user access token");
 	SQLGetData(m_sql_statement_handle, 1, SQL_C_CHAR, user_access_token, USER_MAX_ACCESS_TOKEN_LEN, nullptr);
