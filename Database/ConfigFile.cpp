@@ -1,5 +1,7 @@
 #include "ConfigFile.h"
 
+std::mutex ConfigFile::s_mutex;
+
 ConfigFile::ConfigFile(const std::string& filename)
 		: m_config_filename(filename)
 		, m_connection_settings(nullptr)
@@ -18,15 +20,7 @@ void ConfigFile::CreateIfNotExists() const
 
 	if (config_file.is_open())
 	{
-		DatabaseConnectionSettings default_settings{ "{SQL Server}", "tcp:localhost,1433", "HTTP_Messenger", "sa", "" };
-
-		LOG_DEBUG("Saving default configuration settings to file");
-		config_file << "DRIVER" << SETTING_VALUE_DELIMITER << default_settings.driver << "\n";
-		config_file << "SERVER" << SETTING_VALUE_DELIMITER << default_settings.server << "\n";
-		config_file << "DATABASE" << SETTING_VALUE_DELIMITER << default_settings.database << "\n";
-		config_file << "UID" << SETTING_VALUE_DELIMITER << default_settings.uid << "\n";
-		config_file << "PWD" << SETTING_VALUE_DELIMITER << default_settings.pwd;
-
+		WriteSettingsToFile(config_file);
 		config_file.close();
 	}
 	else
@@ -38,19 +32,19 @@ void ConfigFile::CreateIfNotExists() const
 
 DatabaseConnectionSettings ConfigFile::get_connection_settings() const
 {
+	std::lock_guard<std::mutex> lock(s_mutex);
 	if (m_connection_settings == nullptr)
 	{
-		const_cast<ConfigFile*>(this)->ReadSettingsFromFile();
+		std::ifstream config_file(m_config_filename, std::ios::in);
+		const_cast<ConfigFile*>(this)->ReadSettingsFromFile(config_file);
 	}
 
 	LOG_DEBUG("Receiving saved configuration settings");
 	return *m_connection_settings;
 }
 
-void ConfigFile::ReadSettingsFromFile()
+void ConfigFile::ReadSettingsFromFile(std::ifstream& config_file)
 {
-	std::string line;
-	std::ifstream config_file(m_config_filename, std::ios::in);
 	m_connection_settings = std::make_unique<DatabaseConnectionSettings>();
 
 	if (!config_file.is_open())
@@ -58,6 +52,8 @@ void ConfigFile::ReadSettingsFromFile()
 		LOG_FATAL("Cannot open file: \"" + m_config_filename + "\"");
 		throw std::runtime_error("Cannot open file: \"" + m_config_filename + "\"");
 	}
+
+	std::string line;
 
 	LOG_DEBUG("Receiving configuration settings from file");
 	while (std::getline(config_file, line))
@@ -101,6 +97,18 @@ void ConfigFile::GetSettingFromString(const std::string& setting)
 	{
 		m_connection_settings->pwd = setting_value;
 	}
+}
+
+void ConfigFile::WriteSettingsToFile(std::ofstream& config_file) const
+{
+	DatabaseConnectionSettings default_settings{ "{SQL Server}", "tcp:localhost,1433", "HTTP_Messenger", "sa", "" };
+
+	LOG_DEBUG("Saving default configuration settings to file");
+	config_file << "DRIVER" << SETTING_VALUE_DELIMITER << default_settings.driver << "\n";
+	config_file << "SERVER" << SETTING_VALUE_DELIMITER << default_settings.server << "\n";
+	config_file << "DATABASE" << SETTING_VALUE_DELIMITER << default_settings.database << "\n";
+	config_file << "UID" << SETTING_VALUE_DELIMITER << default_settings.uid << "\n";
+	config_file << "PWD" << SETTING_VALUE_DELIMITER << default_settings.pwd;
 }
 
 inline bool ConfigFile::IsFileExist(const std::string& filename) const

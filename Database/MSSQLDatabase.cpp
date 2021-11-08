@@ -32,21 +32,9 @@ void MSSQLDatabase::Disconnect()
 	FreeEnvironmentHandle();
 }
 
-ISXModel::User MSSQLDatabase::GetUserFromDB(const std::string& user_access_token, const unsigned long& user_id)
+ISXModel::User MSSQLDatabase::GetUserFromDB(const std::string& user_access_token)
 {
-	CheckIfUserAccessTokenValid(user_access_token);
-	const std::string user_id_str = std::to_string(user_id);
-
-	LOG_DEBUG("Receiving user with id: " + user_id_str);
-	ExecuteQuery("select u.user_id, u.login, u.image from [User] as u where u.user_id=" + user_id_str);
-
-	if (SQLFetch(m_sql_statement_handle) != SQL_SUCCESS)
-	{
-		LOG_ERROR("No user with id: " + user_id_str);
-		throw QueryException("No such user");
-	}
-
-	return GetUserFromDB();
+	return GetUserByAccessToken(user_access_token);
 }
 
 std::vector<ISXModel::User> MSSQLDatabase::GetUsersFromDBLike(const std::string& user_access_token, const std::string& search_string)
@@ -693,7 +681,7 @@ void MSSQLDatabase::CheckIfUserExists(const std::string& user_login)
 void MSSQLDatabase::CheckIfUserAccessTokenValid(const std::string& user_access_token)
 {
 	LOG_DEBUG("Checking if user access token is valid");
-	ExecuteQuery("select u.user_id, u.login from [User] as u"
+	ExecuteQuery("select u.user_id, u.login, u.image from [User] as u"
 				" inner join Token as t"
 				" on t.user_id = u.user_id"
 				" where t.access_token = \'" + user_access_token + "\'"
