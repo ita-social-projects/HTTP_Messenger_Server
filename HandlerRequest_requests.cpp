@@ -202,6 +202,28 @@ void HandlerRequest::_requestDeleteUser          (const http_request& request)
     _pushRequest(request, irequest);
 }
 
+void HandlerRequest::_requestUpdateUserImmage(const http_request& request)
+{
+    json::value value = request.extract_json().get();
+
+    const json::value token = value[L"token"];
+    const json::value image = value[L"image"];
+
+    if (token.is_null(), image.is_null())
+    {
+        LOG_ERROR("Inalid JSON");
+        request.reply(status_codes::BadRequest, "Invalid JSON");
+
+        return;
+    }
+
+    const std::string TOKEN = to_string(token.as_string());
+    const std::string IMAGE = to_string(image.as_string());
+
+    IRequests* irequest = new RequestUpdateUserImage(&db, TOKEN, IMAGE);
+    _pushRequest(request, irequest);
+}
+
 
 // /chat/....
 void HandlerRequest::_requestGetChatParticipants (const http_request& request)
@@ -257,7 +279,6 @@ void HandlerRequest::_requestAddUserToChat       (const http_request& request)
     const json::value chat_id = value[L"chat_id"];
     const json::value user_login = value[L"login"];
 
-
     if (token.is_null() || chat_id.is_null() || user_login.is_null())
     {
         LOG_ERROR("Inalid JSON");
@@ -301,7 +322,7 @@ void HandlerRequest::_requestLeaveChat           (const http_request& request)
 
 }
 
-void HandlerRequest::_requestChangeChatName                      (const http_request& request)
+void HandlerRequest::_requestChangeChatName      (const http_request& request)
 {
     json::value value = request.extract_json().get();
 
@@ -322,6 +343,30 @@ void HandlerRequest::_requestChangeChatName                      (const http_req
     const std::wstring TITLE = title.as_string();
 
     IRequests* irequest = new RequestChangeChatName(&db, TOKEN, CHAT_ID, TITLE);
+    _pushRequest(request, irequest);
+}
+
+void HandlerRequest::_requestUpdateChatImmage    (const http_request& request)
+{
+    json::value value = request.extract_json().get();
+
+    const json::value token = value[L"token"];
+    const json::value chat_id = value[L"chat_id"];
+    const json::value image = value[L"image"];
+
+    if (token.is_null(), image.is_null(), chat_id.is_null(), chat_id.is_null())
+    {
+        LOG_ERROR("Inalid JSON");
+        request.reply(status_codes::BadRequest, "Invalid JSON");
+
+        return;
+    }
+
+    const std::string TOKEN = to_string(token.as_string());
+    const unsigned long CHAT_ID = (chat_id.as_number().to_uint32());
+    const std::string IMAGE = to_string(image.as_string());
+
+    IRequests* irequest = new RequestUpdateChatImage(&db, TOKEN, CHAT_ID, IMAGE);
     _pushRequest(request, irequest);
 }
 

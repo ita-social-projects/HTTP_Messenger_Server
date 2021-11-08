@@ -12,6 +12,7 @@ void RequestGetChatParticipants::DoRequest()
         for (int i = 0; i < userList.size(); i++) {
             json::value current = json::value();
             current[L"login"] = json::value::string(to_wstring(userList[i].get_login()));
+            current[L"image"] = json::value::string(to_wstring(userList[i].get_image()));
             users[i] = current;
         }
         result[L"users"] = users;
