@@ -13,6 +13,7 @@ void RequestLogin::DoRequest() {
         std::string user_access_token = db->GetUserAccessToken(this->login,this->password);
         result[L"token"] = json::value::string(to_wstring(user_access_token));
         result[L"login"] = json::value::string(to_wstring(this->login));
+
         this->answercontainer->SetStatusCode(status_codes::OK);
     }
     catch (const QueryException& e) {

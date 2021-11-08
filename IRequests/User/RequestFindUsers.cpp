@@ -8,10 +8,11 @@ void RequestFindUsers::DoRequest()
     try {
         std::vector<ISXModel::User> userList = db->GetUsersFromDBLike(this->user_access_token,this->user_login_part);
         result[L"size"] = int(userList.size());
-		json::value users = json::value::array();
+        json::value users = json::value::array();
         for (int i = 0; i < userList.size(); i++) {
             json::value current = json::value();
             current[L"login"] = json::value::string(to_wstring(userList[i].get_login()));
+            current[L"image"] = json::value::string(to_wstring(userList[i].get_image()));
             users[i] = current;
         }
         result[L"users"] = users;
