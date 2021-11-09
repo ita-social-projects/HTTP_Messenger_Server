@@ -91,7 +91,7 @@ int main(int argc, char* argv[])
     }
     else
     {
-        HandlerRequest h;
+        HandlerRequest h(true);
         bool ServerWorking = 1;
         h.AddQueueThread(ServerWorking);
         LOG_DEBUG("Running without Service");
