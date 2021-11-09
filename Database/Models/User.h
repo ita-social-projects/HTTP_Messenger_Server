@@ -4,7 +4,7 @@
 
 constexpr auto USER_MAX_LOGIN_LEN = 21;
 constexpr auto USER_MAX_ACCESS_TOKEN_LEN = 33;
-constexpr auto USER_MAX_IMAGE_LEN = INT_MAX;
+constexpr auto USER_MAX_IMAGE_LEN = 5'242'881; // 5 MB
 
 namespace ISXModel
 {

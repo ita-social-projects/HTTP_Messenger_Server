@@ -247,7 +247,10 @@ bool MSSQLDatabase::RemoveUserFromDB(const std::string& user_access_token)
 
 ISXModel::Message MSSQLDatabase::GetMessageFromDB(const std::string& user_access_token, const unsigned long& message_id)
 {
-	CheckIfUserAccessTokenValid(user_access_token);
+	if (!user_access_token.empty())
+	{
+		CheckIfUserAccessTokenValid(user_access_token);
+	}
 
 	const std::string message_id_str = std::to_string(message_id);
 
@@ -309,6 +312,8 @@ unsigned long MSSQLDatabase::SaveMessageToDB(const std::string& user_access_toke
 
 	if (user_access_token.empty())
 	{
+		GetChatFromDB(user_access_token, message.get_chat_id()); // check if chat exists
+
 		LOG_DEBUG("Saving system message");
 		ExecuteQuery(L"insert into Message([content], sender_id, chat_id) output inserted.message_id"
 					" values(N\'" + content + L"\', NULL, " + to_wstring(chat_id_str) + L")");
@@ -364,7 +369,10 @@ bool MSSQLDatabase::RemoveMessageFromDB(const std::string& user_access_token, co
 
 ISXModel::Chat MSSQLDatabase::GetChatFromDB(const std::string& user_access_token, const unsigned long& chat_id)
 {
-	CheckIfUserAccessTokenValid(user_access_token);
+	if (!user_access_token.empty())
+	{
+		CheckIfUserAccessTokenValid(user_access_token);
+	}
 
 	const std::string chat_id_str = std::to_string(chat_id);
 
