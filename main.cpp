@@ -101,9 +101,6 @@ int main(int argc, char* argv[])
 
 void InitLogger()
 {
-    std::string ProgrammDataPath(std::getenv("PROGRAMDATA"));
-    std::string FolderName("\\HTTP_Messenger_Server");
-    CreateDirectory((ProgrammDataPath + FolderName).c_str(), NULL);
-    SET_LOGS_FILE(std::string(ProgrammDataPath) + FolderName + "\\Logs.txt");
+	SET_LOGS_FILE("Logs.txt");
 	SHOW_LOGS_IN_CONSOLE(true);
 }
