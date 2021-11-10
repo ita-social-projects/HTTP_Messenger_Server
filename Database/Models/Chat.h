@@ -3,7 +3,7 @@
 #include <string>
 
 constexpr auto CHAT_MAX_TITLE_LEN = 51;
-constexpr auto CHAT_MAX_IMAGE_LEN = INT_MAX;
+constexpr auto CHAT_MAX_IMAGE_LEN = 5'242'881; // 5 MB
 
 namespace ISXModel
 {
