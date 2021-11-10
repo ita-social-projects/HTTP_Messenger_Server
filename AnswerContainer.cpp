@@ -18,7 +18,7 @@ void AnswerContainer::ProcessRequest()
 }
 
 void AnswerContainer::RespondOnRequest() {
-	LOG_DEBUG("Making reply with status_code:"+std::to_string(this->code));
+	LOG_DEBUG("Making reply with status_code: "+std::to_string(this->requestProcessor->answercontainer->code));
 	
 	this->request.reply(this->requestProcessor->answercontainer->code, this->requestProcessor->answercontainer->answer);
 }
